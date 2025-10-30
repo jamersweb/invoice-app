@@ -1,0 +1,66 @@
+<?php
+
+return [
+    'document_expiry_subject' => 'تذكير بانتهاء صلاحية الوثيقة',
+    'welcome_subject' => 'مرحباً بك في منصة التمويل',
+    // Dashboard
+    'dashboard' => 'لوحة التحكم',
+    'total_funded' => 'إجمالي الممول',
+    'total_repaid' => 'إجمالي المسدد',
+    'outstanding' => 'المستحق',
+    'overdue' => 'المتأخر',
+    'revenue' => 'الإيرادات',
+    'overview_new_invoices' => 'فواتير جديدة اليوم',
+    'overview_kyb_pending' => 'KYB قيد المراجعة',
+    'overview_funding_approvals' => 'موافقات التمويل',
+    // KYB
+    'kyb_queue' => 'قائمة KYB',
+    'assigned_to' => 'مُسند إلى',
+    'vip' => 'مهم',
+    'priority' => 'الأولوية',
+    'status' => 'الحالة',
+
+    // Collections
+    'collections_queue_title' => 'تحصيل المستحقات المتأخرة',
+    'collections_queue_subtitle' => 'إدارة تحصيل الفواتير المتأخرة',
+    'collections_queue_filters' => 'المرشحات',
+    'collections_queue_assigned_to' => 'مُعيَّن إلى',
+    'collections_queue_min_amount' => 'الحد الأدنى للمبلغ',
+    'collections_queue_age' => 'العمر (أيام)',
+    'collections_queue_actions' => 'الإجراءات',
+    'collections_queue_claim' => 'مطالبة',
+    'collections_queue_reassign' => 'إعادة تعيين',
+    'collections_queue_remind' => 'إرسال تذكير',
+    'collections_queue_no_invoices' => 'لا توجد فواتير متأخرة',
+    'collections_queue_loading' => 'جاري التحميل...',
+    'collections_queue_success' => 'تم تنفيذ الإجراء بنجاح',
+    'collections_queue_error' => 'حدث خطأ',
+    'collections_queue_invoice_number' => 'رقم الفاتورة',
+    'collections_queue_supplier' => 'المورد',
+    'collections_queue_amount' => 'المبلغ',
+    'collections_queue_due_date' => 'تاريخ الاستحقاق',
+    'collections_queue_days_overdue' => 'أيام التأخير',
+    'collections_queue_priority' => 'الأولوية',
+    'collections_queue_assigned' => 'مُعيَّن إلى',
+    'collections_queue_quick_filters' => 'مرشحات سريعة',
+    'collections_queue_all' => 'الكل',
+    'collections_queue_high_priority' => 'أولوية عالية',
+    'collections_queue_unassigned' => 'غير مُعيَّن',
+    'collections_queue_oldest_first' => 'الأقدم أولاً',
+
+    // Collections Email
+    'collections_reminder_subject' => 'تذكير بالدفع - فاتورة متأخرة',
+    'collections_reminder_greeting' => 'عزيزي العميل المحترم،',
+    'collections_reminder_message' => 'هذا تذكير ودود بأن دفعة فاتورتك متأخرة. يرجى ترتيب الدفع في أقرب وقت ممكن لتجنب أي انقطاع في الخدمة.',
+    'collections_reminder_footer' => 'إذا كنت قد قمت بالدفع بالفعل، يرجى تجاهل هذا الإشعار. لأي أسئلة، يرجى الاتصال بفريق الدعم.',
+    'invoice_details' => 'تفاصيل الفاتورة',
+    'invoice_number' => 'رقم الفاتورة',
+    'amount' => 'المبلغ',
+    'due_date' => 'تاريخ الاستحقاق',
+    'days_overdue' => 'أيام التأخير',
+    'days' => 'أيام',
+    'view_invoice' => 'عرض الفاتورة',
+    'email_footer' => 'هذه رسالة آلية. يرجى عدم الرد على هذا البريد الإلكتروني.',
+];
+
+

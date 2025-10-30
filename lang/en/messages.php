@@ -1,0 +1,66 @@
+<?php
+
+return [
+    'document_expiry_subject' => 'Document expiry reminder',
+    'welcome_subject' => 'Welcome to SCF Platform',
+    // Dashboard
+    'dashboard' => 'Dashboard',
+    'total_funded' => 'Total Funded',
+    'total_repaid' => 'Total Repaid',
+    'outstanding' => 'Outstanding',
+    'overdue' => 'Overdue',
+    'revenue' => 'Revenue',
+    'overview_new_invoices' => 'New invoices today',
+    'overview_kyb_pending' => 'KYB pending',
+    'overview_funding_approvals' => 'Funding approvals',
+    // KYB
+    'kyb_queue' => 'KYB Queue',
+    'assigned_to' => 'Assigned to',
+    'vip' => 'VIP',
+    'priority' => 'Priority',
+    'status' => 'Status',
+
+    // Collections
+    'collections_queue_title' => 'Overdue Collections',
+    'collections_queue_subtitle' => 'Manage overdue invoice collections',
+    'collections_queue_filters' => 'Filters',
+    'collections_queue_assigned_to' => 'Assigned To',
+    'collections_queue_min_amount' => 'Min Amount',
+    'collections_queue_age' => 'Age (days)',
+    'collections_queue_actions' => 'Actions',
+    'collections_queue_claim' => 'Claim',
+    'collections_queue_reassign' => 'Reassign',
+    'collections_queue_remind' => 'Send Reminder',
+    'collections_queue_no_invoices' => 'No overdue invoices found',
+    'collections_queue_loading' => 'Loading...',
+    'collections_queue_success' => 'Action completed successfully',
+    'collections_queue_error' => 'An error occurred',
+    'collections_queue_invoice_number' => 'Invoice #',
+    'collections_queue_supplier' => 'Supplier',
+    'collections_queue_amount' => 'Amount',
+    'collections_queue_due_date' => 'Due Date',
+    'collections_queue_days_overdue' => 'Days Overdue',
+    'collections_queue_priority' => 'Priority',
+    'collections_queue_assigned' => 'Assigned To',
+    'collections_queue_quick_filters' => 'Quick Filters',
+    'collections_queue_all' => 'All',
+    'collections_queue_high_priority' => 'High Priority',
+    'collections_queue_unassigned' => 'Unassigned',
+    'collections_queue_oldest_first' => 'Oldest First',
+
+    // Collections Email
+    'collections_reminder_subject' => 'Payment Reminder - Overdue Invoice',
+    'collections_reminder_greeting' => 'Dear Valued Customer,',
+    'collections_reminder_message' => 'This is a friendly reminder that your invoice payment is overdue. Please arrange payment at your earliest convenience to avoid any service interruptions.',
+    'collections_reminder_footer' => 'If you have already made payment, please disregard this notice. For any questions, please contact our support team.',
+    'invoice_details' => 'Invoice Details',
+    'invoice_number' => 'Invoice Number',
+    'amount' => 'Amount',
+    'due_date' => 'Due Date',
+    'days_overdue' => 'Days Overdue',
+    'days' => 'days',
+    'view_invoice' => 'View Invoice',
+    'email_footer' => 'This is an automated message. Please do not reply to this email.',
+];
+
+
