@@ -40,3 +40,5 @@ class Buyer extends Model
     }
 }
 
+
+

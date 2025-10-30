@@ -20,6 +20,15 @@ watch([from, to], () => {
 const page = usePage();
 const t = (page.props as any)?.t as Record<string, string> | undefined;
 
+// Normalize chart series to expected array shape
+const seriesArr = computed(() => {
+    const s: any = (store as any).series;
+    if (Array.isArray(s)) return s;
+    if (s && typeof s === 'object' && 'fundedLast30' in s && 'repaidLast30' in s) {
+        return [{ date: 'Last 30d', funded: s.fundedLast30, repaid: s.repaidLast30 }];
+    }
+    return [] as Array<{ date: string; funded: number; repaid: number }>;
+});
 // Admin reporting widgets (silent fail if 403)
 const aging = ref<{ current:number, d1_30:number, d31_60:number, d60p:number }|null>(null);
 const topSuppliers = ref<Array<{ supplier_id:number, total:number }>>([]);
@@ -124,7 +133,7 @@ const overviewItems = [
                                 Clear
                             </button>
                         </div>
-                        <RevenueChart :title="t?.revenue || 'Revenue Overview'" :series="store.series || []" />
+                        <RevenueChart :title="t?.revenue || 'Revenue Overview'" :series="seriesArr" />
                     </div>
                     <!-- Overview list -->
                     <OverviewList

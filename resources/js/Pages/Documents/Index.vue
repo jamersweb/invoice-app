@@ -1,41 +1,5 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3'
-defineProps<{ documents: any }>()
-</script>
-
-<template>
-  <Head title="KYB Documents" />
-  <div class="max-w-6xl mx-auto p-6">
-    <h1 class="text-xl font-semibold mb-4">KYB Queue</h1>
-    <table class="min-w-full text-sm">
-      <thead>
-        <tr class="text-left border-b">
-          <th class="py-2">ID</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Owner</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="d in documents.data" :key="d.id" class="border-b">
-          <td class="py-2">{{ d.id }}</td>
-          <td>{{ d.document_type_id }}</td>
-          <td>{{ d.status }}</td>
-          <td>{{ d.owner_type }}#{{ d.owner_id }}</td>
-          <td>{{ d.created_at }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="mt-4 flex gap-2">
-      <Link v-if="documents.prev_page_url" :href="documents.prev_page_url" class="px-3 py-1 border rounded">Prev</Link>
-      <Link v-if="documents.next_page_url" :href="documents.next_page_url" class="px-3 py-1 border rounded">Next</Link>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
 
 defineProps<{ documents: Array<{id:number, document_type_id:number, status:string, file_path:string, created_at:string}> }>()
 </script>

@@ -46,7 +46,7 @@ const form = useForm({
 });
 
 // Auto-save functionality
-const autoSaveTimeout = ref<NodeJS.Timeout | null>(null);
+const autoSaveTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
 const lastSaved = ref<Date | null>(null);
 
 const autoSave = () => {
@@ -173,7 +173,7 @@ const industries = [
 const submitForm = () => {
   if (validateStep(4)) {
     // merge notes into kyc_data
-    form.kyc_data = { ...(form.kyc_data || {}), document_notes } as any;
+    form.kyc_data = { ...(form.kyc_data || {}), document_notes: documentNotes.value } as any;
     form.post('/api/v1/supplier/kyc/submit', {
       onSuccess: () => {
         // Redirect to success page or dashboard

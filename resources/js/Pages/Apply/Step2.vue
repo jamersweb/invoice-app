@@ -1,8 +1,18 @@
 <script setup lang="ts">
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, usePage } from '@inertiajs/vue3';
-const page = usePage();
-const token = (page.props as any)?.token as string | undefined;
+import { Head, useForm, router } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+
+const props = defineProps<{ token: string | null }>()
+const token = props.token ?? undefined
+
+const form = useForm({
+  company_name: '',
+  contact_name: ''
+})
+
+function submit() {
+  router.visit('/apply')
+}
 </script>
 
 <template>
@@ -19,44 +29,25 @@ const token = (page.props as any)?.token as string | undefined;
         </div>
       </div>
     </div>
+
+    <div class="max-w-xl mx-auto p-6">
+      <h1 class="text-2xl font-semibold mb-4">Apply Now - Step 2</h1>
+      <p class="text-sm text-gray-600 mb-4">Token: {{ token }}</p>
+      <form @submit.prevent="submit" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Company Name</label>
+          <input v-model="form.company_name" type="text" class="mt-1 block w-full border rounded p-2" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Contact Name</label>
+          <input v-model="form.contact_name" type="text" class="mt-1 block w-full border rounded p-2" />
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" :disabled="form.processing">
+          Continue
+        </button>
+      </form>
+    </div>
   </AuthenticatedLayout>
-</template>
-
-<script setup lang="ts">
-import { Head, useForm, router } from '@inertiajs/vue3'
-
-const props = defineProps<{ token: string | null }>()
-
-const form = useForm({
-  company_name: '',
-  contact_name: ''
-})
-
-function submit() {
-  // For MVP, we can't fetch lead by token here; show placeholder
-  router.visit('/apply')
-}
-</script>
-
-<template>
-  <Head title="Apply - Step 2" />
-  <div class="max-w-xl mx-auto p-6">
-    <h1 class="text-2xl font-semibold mb-4">Apply Now - Step 2</h1>
-    <p class="text-sm text-gray-600 mb-4">Token: {{ props.token }}</p>
-    <form @submit.prevent="submit" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium">Company Name</label>
-        <input v-model="form.company_name" type="text" class="mt-1 block w-full border rounded p-2" required />
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Contact Name</label>
-        <input v-model="form.contact_name" type="text" class="mt-1 block w-full border rounded p-2" />
-      </div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" :disabled="form.processing">
-        Continue
-      </button>
-    </form>
-  </div>
   </template>
 
 
