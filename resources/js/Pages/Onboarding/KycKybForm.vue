@@ -4,6 +4,10 @@ import { Head, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import DocumentUpload from '@/Components/Onboarding/DocumentUpload.vue';
+import GradientButton from '@/Components/GradientButton.vue';
+import DarkInput from '@/Components/DarkInput.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import InputError from '@/Components/InputError.vue';
 
 // Form steps
 const currentStep = ref(1);
@@ -219,49 +223,48 @@ onMounted(() => {
   <Head title="KYC/KYB Onboarding" />
 
   <AuthenticatedLayout>
-    <template #header>
+    <div class="space-y-6">
+      <!-- Header -->
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">Complete Your Profile</h2>
-          <p class="mt-1 text-sm text-gray-500">Please provide the required information to complete your KYC/KYB verification</p>
+          <h1 class="text-2xl font-bold text-dark-text-primary">Registration & KYB</h1>
+          <p class="mt-1 text-sm text-dark-text-secondary">Please provide the required information to complete your KYC/KYB verification</p>
         </div>
         <div class="text-right">
-          <div class="text-sm text-gray-500">Progress</div>
-          <div class="text-lg font-semibold text-indigo-600">{{ progress }}%</div>
+          <div class="text-sm text-dark-text-secondary">Progress</div>
+          <div class="text-lg font-semibold text-purple-accent">{{ progress }}%</div>
         </div>
       </div>
-    </template>
 
-    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <!-- Progress Steps -->
-      <div class="mb-8">
+      <div class="card">
         <div class="flex items-center justify-between">
-          <div v-for="(step, index) in steps" :key="step.id" class="flex items-center">
+          <div v-for="(step, index) in steps" :key="step.id" class="flex items-center flex-1">
             <div class="flex items-center">
               <button
                 @click="goToStep(step.id)"
                 :class="[
                   'flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors',
                   currentStep >= step.id
-                    ? 'border-indigo-600 bg-indigo-600 text-white'
-                    : 'border-gray-300 bg-white text-gray-500 hover:border-gray-400'
+                    ? 'border-purple-accent bg-purple-accent text-white'
+                    : 'border-dark-border bg-dark-secondary text-dark-text-secondary hover:border-dark-border/70'
                 ]"
               >
                 {{ step.id }}
               </button>
               <div class="ml-3 hidden sm:block">
-                <div class="text-sm font-medium text-gray-900">{{ step.title }}</div>
-                <div class="text-xs text-gray-500">{{ step.description }}</div>
+                <div class="text-sm font-medium text-dark-text-primary">{{ step.title }}</div>
+                <div class="text-xs text-dark-text-secondary">{{ step.description }}</div>
               </div>
             </div>
-            <div v-if="index < steps.length - 1" class="ml-8 h-0.5 w-16 bg-gray-300"></div>
+            <div v-if="index < steps.length - 1" class="ml-8 h-0.5 flex-1 bg-dark-border"></div>
           </div>
         </div>
       </div>
 
       <!-- Auto-save indicator -->
-      <div v-if="lastSaved" class="mb-4 flex items-center justify-end text-sm text-gray-500">
-        <svg class="mr-1 h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+      <div v-if="lastSaved" class="flex items-center justify-end gap-2 text-sm text-dark-text-secondary">
+        <svg class="h-4 w-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
         </svg>
         Last saved: {{ lastSaved.toLocaleTimeString() }}
@@ -270,285 +273,283 @@ onMounted(() => {
       <!-- Form Content -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Main card -->
-        <div class="rounded-xl border border-gray-200 bg-white p-8 shadow-sm lg:col-span-2">
-        <!-- Step 1: Company Information -->
-        <div v-if="currentStep === 1" class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Company Information</h3>
-            <p class="mt-1 text-sm text-gray-500">Please provide your company's basic information</p>
+        <div class="card lg:col-span-2">
+          <!-- Step 1: Company Information -->
+          <div v-if="currentStep === 1" class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-dark-text-primary">Company Information</h3>
+              <p class="mt-1 text-sm text-dark-text-secondary">Please provide your company's basic information</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <InputLabel for="company_name" value="Company Name *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="company_name"
+                  v-model="form.company_name"
+                  placeholder="Enter your company name"
+                  :class="{ 'border-red-500': validationErrors.company_name }"
+                />
+                <InputError :message="validationErrors.company_name" />
+              </div>
+
+              <div>
+                <InputLabel for="legal_name" value="Legal Name *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="legal_name"
+                  v-model="form.legal_name"
+                  placeholder="Enter legal company name"
+                  :class="{ 'border-red-500': validationErrors.legal_name }"
+                />
+                <InputError :message="validationErrors.legal_name" />
+              </div>
+
+              <div>
+                <InputLabel for="tax_registration_number" value="Tax Registration Number *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="tax_registration_number"
+                  v-model="form.tax_registration_number"
+                  placeholder="Enter tax registration number"
+                  :class="{ 'border-red-500': validationErrors.tax_registration_number }"
+                />
+                <InputError :message="validationErrors.tax_registration_number" />
+              </div>
+
+              <div>
+                <InputLabel for="website" value="Website" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="website"
+                  v-model="form.website"
+                  type="url"
+                  placeholder="https://yourcompany.com"
+                />
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <!-- Step 2: Business Details -->
+          <div v-if="currentStep === 2" class="space-y-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Company Name *</label>
-              <input
-                v-model="form.company_name"
-                type="text"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.company_name }"
-                placeholder="Enter your company name"
-              />
-              <p v-if="validationErrors.company_name" class="mt-1 text-sm text-red-600">{{ validationErrors.company_name }}</p>
+              <h3 class="text-lg font-semibold text-dark-text-primary">Business Details</h3>
+              <p class="mt-1 text-sm text-dark-text-secondary">Tell us about your business structure and industry</p>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Legal Name *</label>
-              <input
-                v-model="form.legal_name"
-                type="text"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.legal_name }"
-                placeholder="Enter legal company name"
-              />
-              <p v-if="validationErrors.legal_name" class="mt-1 text-sm text-red-600">{{ validationErrors.legal_name }}</p>
-            </div>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <InputLabel for="business_type" value="Business Type *" class="text-dark-text-secondary mb-2" />
+                <select
+                  id="business_type"
+                  v-model="form.business_type"
+                  class="input-dark"
+                  :class="{ 'border-red-500': validationErrors.business_type }"
+                >
+                  <option value="">Select business type</option>
+                  <option v-for="type in businessTypes" :key="type" :value="type">{{ type }}</option>
+                </select>
+                <InputError :message="validationErrors.business_type" />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Tax Registration Number *</label>
-              <input
-                v-model="form.tax_registration_number"
-                type="text"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.tax_registration_number }"
-                placeholder="Enter tax registration number"
-              />
-              <p v-if="validationErrors.tax_registration_number" class="mt-1 text-sm text-red-600">{{ validationErrors.tax_registration_number }}</p>
-            </div>
+              <div>
+                <InputLabel for="industry" value="Industry *" class="text-dark-text-secondary mb-2" />
+                <select
+                  id="industry"
+                  v-model="form.industry"
+                  class="input-dark"
+                  :class="{ 'border-red-500': validationErrors.industry }"
+                >
+                  <option value="">Select industry</option>
+                  <option v-for="industry in industries" :key="industry" :value="industry">{{ industry }}</option>
+                </select>
+                <InputError :message="validationErrors.industry" />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Website</label>
-              <input
-                v-model="form.website"
-                type="url"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="https://yourcompany.com"
-              />
+              <div class="sm:col-span-2">
+                <InputLabel for="incorporation_date" value="Incorporation Date *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="incorporation_date"
+                  v-model="form.incorporation_date"
+                  type="date"
+                  :class="{ 'border-red-500': validationErrors.incorporation_date }"
+                />
+                <InputError :message="validationErrors.incorporation_date" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Step 2: Business Details -->
-        <div v-if="currentStep === 2" class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Business Details</h3>
-            <p class="mt-1 text-sm text-gray-500">Tell us about your business structure and industry</p>
+          <!-- Step 3: Location & Contact -->
+          <div v-if="currentStep === 3" class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-dark-text-primary">Location & Contact Information</h3>
+              <p class="mt-1 text-sm text-dark-text-secondary">Provide your business address and contact details</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <InputLabel for="country" value="Country *" class="text-dark-text-secondary mb-2" />
+                <select
+                  id="country"
+                  v-model="form.country"
+                  class="input-dark"
+                  :class="{ 'border-red-500': validationErrors.country }"
+                >
+                  <option value="">Select country</option>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="DE">Germany</option>
+                  <option value="FR">France</option>
+                  <option value="AE">United Arab Emirates</option>
+                  <option value="SA">Saudi Arabia</option>
+                  <option value="EG">Egypt</option>
+                  <option value="JO">Jordan</option>
+                  <option value="LB">Lebanon</option>
+                  <option value="KW">Kuwait</option>
+                  <option value="QA">Qatar</option>
+                  <option value="BH">Bahrain</option>
+                  <option value="OM">Oman</option>
+                </select>
+                <InputError :message="validationErrors.country" />
+              </div>
+
+              <div>
+                <InputLabel for="state_province" value="State/Province" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="state_province"
+                  v-model="form.state_province"
+                  placeholder="Enter state or province"
+                />
+              </div>
+
+              <div>
+                <InputLabel for="city" value="City *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="city"
+                  v-model="form.city"
+                  placeholder="Enter city"
+                  :class="{ 'border-red-500': validationErrors.city }"
+                />
+                <InputError :message="validationErrors.city" />
+              </div>
+
+              <div>
+                <InputLabel for="postal_code" value="Postal Code" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="postal_code"
+                  v-model="form.postal_code"
+                  placeholder="Enter postal code"
+                />
+              </div>
+
+              <div class="sm:col-span-2">
+                <InputLabel for="address" value="Address" class="text-dark-text-secondary mb-2" />
+                <textarea
+                  id="address"
+                  v-model="form.address"
+                  rows="3"
+                  class="input-dark resize-none"
+                  placeholder="Enter complete address"
+                ></textarea>
+              </div>
+
+              <div>
+                <InputLabel for="contact_email" value="Contact Email *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="contact_email"
+                  v-model="form.contact_email"
+                  type="email"
+                  icon="email"
+                  placeholder="contact@yourcompany.com"
+                  :class="{ 'border-red-500': validationErrors.contact_email }"
+                />
+                <InputError :message="validationErrors.contact_email" />
+              </div>
+
+              <div>
+                <InputLabel for="contact_phone" value="Contact Phone *" class="text-dark-text-secondary mb-2" />
+                <DarkInput
+                  id="contact_phone"
+                  v-model="form.contact_phone"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  :class="{ 'border-red-500': validationErrors.contact_phone }"
+                />
+                <InputError :message="validationErrors.contact_phone" />
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <!-- Step 4: Document Upload -->
+          <div v-if="currentStep === 4" class="space-y-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Business Type *</label>
-              <select
-                v-model="form.business_type"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.business_type }"
-              >
-                <option value="">Select business type</option>
-                <option v-for="type in businessTypes" :key="type" :value="type">{{ type }}</option>
-              </select>
-              <p v-if="validationErrors.business_type" class="mt-1 text-sm text-red-600">{{ validationErrors.business_type }}</p>
+              <h3 class="text-lg font-semibold text-dark-text-primary">Document Upload</h3>
+              <p class="mt-1 text-sm text-dark-text-secondary">Upload the required documents for verification</p>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Industry *</label>
-              <select
-                v-model="form.industry"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.industry }"
-              >
-                <option value="">Select industry</option>
-                <option v-for="industry in industries" :key="industry" :value="industry">{{ industry }}</option>
-              </select>
-              <p v-if="validationErrors.industry" class="mt-1 text-sm text-red-600">{{ validationErrors.industry }}</p>
-            </div>
-
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-medium text-gray-700">Incorporation Date *</label>
-              <input
-                v-model="form.incorporation_date"
-                type="date"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.incorporation_date }"
+            <div class="space-y-6">
+              <DocumentUpload
+                v-for="docType in documentTypes"
+                :key="docType.id"
+                :document-type="docType"
+                :uploaded-files="uploadedDocuments[docType.id] || []"
+                :max-files="3"
+                :accepted-types="['.pdf', '.jpg', '.jpeg', '.png']"
+                @files-uploaded="(files) => handleDocumentUpload(docType.id, files)"
+                @file-removed="(index) => removeDocument(docType.id, index)"
+                @version-note="(note) => (documentNotes[docType.id] = note)"
               />
-              <p v-if="validationErrors.incorporation_date" class="mt-1 text-sm text-red-600">{{ validationErrors.incorporation_date }}</p>
+            </div>
+
+            <div v-if="validationErrors.documents" class="rounded-lg bg-red-500/20 border border-red-500/30 p-4">
+              <p class="text-sm text-red-400">{{ validationErrors.documents }}</p>
             </div>
           </div>
-        </div>
 
-        <!-- Step 3: Location & Contact -->
-        <div v-if="currentStep === 3" class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Location & Contact Information</h3>
-            <p class="mt-1 text-sm text-gray-500">Provide your business address and contact details</p>
-          </div>
-
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Country *</label>
-              <select
-                v-model="form.country"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.country }"
-              >
-                <option value="">Select country</option>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="UK">United Kingdom</option>
-                <option value="DE">Germany</option>
-                <option value="FR">France</option>
-                <option value="AE">United Arab Emirates</option>
-                <option value="SA">Saudi Arabia</option>
-                <option value="EG">Egypt</option>
-                <option value="JO">Jordan</option>
-                <option value="LB">Lebanon</option>
-                <option value="KW">Kuwait</option>
-                <option value="QA">Qatar</option>
-                <option value="BH">Bahrain</option>
-                <option value="OM">Oman</option>
-              </select>
-              <p v-if="validationErrors.country" class="mt-1 text-sm text-red-600">{{ validationErrors.country }}</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">State/Province</label>
-              <input
-                v-model="form.state_province"
-                type="text"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="Enter state or province"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">City *</label>
-              <input
-                v-model="form.city"
-                type="text"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.city }"
-                placeholder="Enter city"
-              />
-              <p v-if="validationErrors.city" class="mt-1 text-sm text-red-600">{{ validationErrors.city }}</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Postal Code</label>
-              <input
-                v-model="form.postal_code"
-                type="text"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="Enter postal code"
-              />
-            </div>
-
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-medium text-gray-700">Address</label>
-              <textarea
-                v-model="form.address"
-                rows="3"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="Enter complete address"
-              ></textarea>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Contact Email *</label>
-              <input
-                v-model="form.contact_email"
-                type="email"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.contact_email }"
-                placeholder="contact@yourcompany.com"
-              />
-              <p v-if="validationErrors.contact_email" class="mt-1 text-sm text-red-600">{{ validationErrors.contact_email }}</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Contact Phone *</label>
-              <input
-                v-model="form.contact_phone"
-                type="tel"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                :class="{ 'border-red-500': validationErrors.contact_phone }"
-                placeholder="+1 (555) 123-4567"
-              />
-              <p v-if="validationErrors.contact_phone" class="mt-1 text-sm text-red-600">{{ validationErrors.contact_phone }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4: Document Upload -->
-        <div v-if="currentStep === 4" class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Document Upload</h3>
-            <p class="mt-1 text-sm text-gray-500">Upload the required documents for verification</p>
-          </div>
-
-          <div class="space-y-6">
-            <DocumentUpload
-              v-for="docType in documentTypes"
-              :key="docType.id"
-              :document-type="docType"
-              :uploaded-files="uploadedDocuments[docType.id] || []"
-              :max-files="3"
-              :accepted-types="['.pdf', '.jpg', '.jpeg', '.png']"
-              @files-uploaded="(files) => handleDocumentUpload(docType.id, files)"
-              @file-removed="(index) => removeDocument(docType.id, index)"
-              @version-note="(note) => (documentNotes[docType.id] = note)"
-            />
-          </div>
-
-          <div v-if="validationErrors.documents" class="rounded-lg bg-red-50 p-4">
-            <p class="text-sm text-red-600">{{ validationErrors.documents }}</p>
-          </div>
-        </div>
-
-        <!-- Navigation Buttons -->
-        <div class="mt-8 flex items-center justify-between">
-          <button
-            v-if="currentStep > 1"
-            @click="prevStep"
-            type="button"
-            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Previous
-          </button>
-          <div v-else></div>
-
-          <div class="flex items-center space-x-3">
+          <!-- Navigation Buttons -->
+          <div class="mt-8 flex items-center justify-between border-t border-dark-border pt-6">
             <button
-              v-if="currentStep < totalSteps"
-              @click="nextStep"
+              v-if="currentStep > 1"
+              @click="prevStep"
               type="button"
-              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="btn-secondary"
             >
-              Next
+              Previous
             </button>
-            <button
-              v-else
-              @click="submitForm"
-              type="button"
-              :disabled="form.processing"
-              class="rounded-lg bg-green-600 px-6 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
-            >
-              {{ form.processing ? 'Submitting...' : 'Submit Application' }}
-            </button>
+            <div v-else></div>
+
+            <div class="flex items-center space-x-3">
+              <GradientButton
+                v-if="currentStep < totalSteps"
+                @click="nextStep"
+                type="button"
+              >
+                Next
+              </GradientButton>
+              <GradientButton
+                v-else
+                @click="submitForm"
+                type="button"
+                :disabled="form.processing"
+                class="disabled:opacity-50"
+              >
+                {{ form.processing ? 'Submitting...' : 'Submit Application' }}
+              </GradientButton>
+            </div>
           </div>
-        </div>
         </div>
 
         <!-- Checklist side panel -->
-        <aside class="rounded-xl border border-gray-200 bg-white p-6 h-fit">
-          <div class="mb-3 text-base font-semibold text-gray-900">Requirements</div>
+        <aside class="card h-fit">
+          <div class="mb-3 text-base font-semibold text-dark-text-primary">Requirements</div>
           <ul class="space-y-3">
             <li v-for="dt in documentTypes" :key="dt.id" class="flex items-start justify-between">
               <div>
-                <div class="text-sm font-medium text-gray-900 flex items-center gap-2">
+                <div class="text-sm font-medium text-dark-text-primary flex items-center gap-2">
                   <span>{{ dt.name }}</span>
-                  <span v-if="dt.required" class="rounded bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">Required</span>
+                  <span v-if="dt.required" class="badge-danger">Required</span>
                 </div>
-                <div v-if="dt.description" class="text-xs text-gray-500 max-w-xs">{{ dt.description }}</div>
+                <div v-if="dt.description" class="text-xs text-dark-text-secondary max-w-xs mt-1">{{ dt.description }}</div>
               </div>
-              <div class="text-xs font-medium" :class="(uploadedDocuments[dt.id]?.length||0) > 0 ? 'text-green-700' : 'text-gray-500'">
+              <div class="text-xs font-medium" :class="(uploadedDocuments[dt.id]?.length||0) > 0 ? 'text-green-400' : 'text-dark-text-muted'">
                 {{ (uploadedDocuments[dt.id]?.length||0) > 0 ? 'Attached' : 'Pending' }}
               </div>
             </li>

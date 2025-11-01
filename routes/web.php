@@ -782,6 +782,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/agreements/send', [\App\Http\Controllers\AgreementController::class, 'send'])->name('agreements.send');
     Route::get('/bank', [\App\Http\Controllers\BankAccountController::class, 'index'])->name('bank.index');
     Route::post('/bank', [\App\Http\Controllers\BankAccountController::class, 'store'])->name('bank.store');
+    Route::get('/invoices', function () {
+        return Inertia::render('Invoices/Index');
+    })->name('invoices.index');
+    Route::get('/invoices/submit', function () {
+        return Inertia::render('Invoices/SubmitInvoice');
+    })->name('invoices.submit');
+    Route::get('/customers', function () {
+        return Inertia::render('Customers/Index');
+    })->name('customers.index');
+    Route::get('/reports', function () {
+        return Inertia::render('Reports/Index');
+    })->name('reports.index');
     Route::post('/invoices', [InvoicesController::class, 'store'])->middleware('throttle:uploads')->name('invoices.store');
     Route::post('/offers/issue', [OffersController::class, 'issue'])->middleware('throttle:60,1')->name('offers.issue');
     Route::post('/offers/accept', [OffersController::class, 'accept'])->middleware('throttle:30,1')->name('offers.accept');

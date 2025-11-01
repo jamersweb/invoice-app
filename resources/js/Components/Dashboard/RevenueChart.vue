@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   title?: string;
@@ -23,9 +23,15 @@ const chartData = computed(() => {
   };
 });
 
-onMounted(() => {
+watch(() => props.series, () => {
   if (chartRef.value && props.series && props.series.length > 0) {
     drawChart();
+  }
+}, { deep: true });
+
+onMounted(() => {
+  if (chartRef.value && props.series && props.series.length > 0) {
+    setTimeout(() => drawChart(), 100);
   }
 });
 
@@ -47,10 +53,21 @@ function drawChart() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Chart dimensions
-  const padding = 40;
+  const padding = 50;
   const chartWidth = canvas.width - (padding * 2);
   const chartHeight = canvas.height - (padding * 2);
   const barWidth = chartWidth / funded.length;
+
+  // Draw grid lines
+  ctx.strokeStyle = '#3A3A3A';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padding + (chartHeight / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(padding + chartWidth, y);
+    ctx.stroke();
+  }
 
   // Draw bars
   funded.forEach((value, index) => {
@@ -59,44 +76,50 @@ function drawChart() {
     const height = maxValue > 0 ? (value / maxValue) * chartHeight : 0;
     const y = padding + chartHeight - height;
 
-    // Funded bar
-    ctx.fillStyle = '#4F46E5'; // indigo-600
+    // Funded bar (purple gradient)
+    const gradient = ctx.createLinearGradient(x, y, x, padding + chartHeight);
+    gradient.addColorStop(0, '#9333EA');
+    gradient.addColorStop(1, '#7C3AED');
+    ctx.fillStyle = gradient;
     ctx.fillRect(x, y, barWidthActual, height);
 
-    // Repaid bar
+    // Repaid bar (green)
     const repaidValue = repaid[index];
     const repaidHeight = maxValue > 0 ? (repaidValue / maxValue) * chartHeight : 0;
     const repaidY = padding + chartHeight - repaidHeight;
 
-    ctx.fillStyle = '#10B981'; // emerald-500
+    const repaidGradient = ctx.createLinearGradient(x + barWidthActual + 2, repaidY, x + barWidthActual + 2, padding + chartHeight);
+    repaidGradient.addColorStop(0, '#10B981');
+    repaidGradient.addColorStop(1, '#059669');
+    ctx.fillStyle = repaidGradient;
     ctx.fillRect(x + barWidthActual + 2, repaidY, barWidthActual, repaidHeight);
   });
 
   // Draw labels
-  ctx.fillStyle = '#6B7280'; // gray-500
-  ctx.font = '12px Inter, sans-serif';
+  ctx.fillStyle = '#B0B0B0';
+  ctx.font = '12px Figtree, sans-serif';
   ctx.textAlign = 'center';
 
   labels.forEach((label, index) => {
     const x = padding + (index * barWidth) + (barWidth / 2);
-    const y = canvas.height - 10;
+    const y = canvas.height - 15;
     ctx.fillText(label, x, y);
   });
 }
 </script>
 
 <template>
-  <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+  <div class="card">
     <div class="mb-6 flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-900">{{ title || 'Revenue Overview' }}</h3>
-      <div class="flex items-center gap-4 text-sm text-gray-500">
+      <h3 class="text-lg font-semibold text-dark-text-primary">{{ title || 'Revenue Overview' }}</h3>
+      <div class="flex items-center gap-4 text-sm">
         <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-sm bg-indigo-500"></div>
-          <span>Funded</span>
+          <div class="h-3 w-3 rounded-sm bg-purple-accent"></div>
+          <span class="text-dark-text-secondary">Funded</span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-sm bg-emerald-500"></div>
-          <span>Repaid</span>
+          <div class="h-3 w-3 rounded-sm bg-green-500"></div>
+          <span class="text-dark-text-secondary">Repaid</span>
         </div>
       </div>
     </div>
@@ -105,13 +128,13 @@ function drawChart() {
       <canvas
         ref="chartRef"
         class="h-full w-full"
-        :width="400"
+        :width="600"
         :height="256"
       ></canvas>
     </div>
 
     <!-- Fallback for no data -->
-    <div v-if="!series || series.length === 0" class="flex h-64 items-center justify-center text-gray-500">
+    <div v-if="!series || series.length === 0" class="flex h-64 items-center justify-center text-dark-text-muted">
       <div class="text-center">
         <div class="text-4xl mb-2">📊</div>
         <p>No data available</p>
@@ -119,5 +142,3 @@ function drawChart() {
     </div>
   </div>
 </template>
-
-

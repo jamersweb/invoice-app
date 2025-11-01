@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +16,7 @@
         @vite(['resources/js/app.ts', 'resources/css/app.css'])
         @inertiaHead
     </head>
-    <body class="font-sans antialiased {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
+    <body class="font-sans antialiased bg-dark-primary text-dark-text-primary {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
         @inertia
     </body>
 </html>

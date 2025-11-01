@@ -10,10 +10,34 @@ export default {
         './resources/js/**/*.vue',
     ],
 
+    darkMode: 'class',
+
     theme: {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                dark: {
+                    primary: '#1E1E1E',
+                    secondary: '#2D2D2D',
+                    tertiary: '#3A3A3A',
+                    card: '#252525',
+                    border: '#3A3A3A',
+                    text: {
+                        primary: '#FFFFFF',
+                        secondary: '#B0B0B0',
+                        muted: '#808080',
+                    },
+                },
+                purple: {
+                    accent: '#9333EA',
+                    hover: '#A855F7',
+                    light: '#C084FC',
+                },
+            },
+            borderRadius: {
+                'card': '12px',
             },
         },
     },

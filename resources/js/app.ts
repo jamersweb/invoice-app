@@ -9,6 +9,14 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+// Ensure dark mode is enabled
+if (typeof document !== 'undefined') {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+    document.body.style.backgroundColor = '#1E1E1E';
+    document.body.style.color = '#FFFFFF';
+}
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
@@ -28,6 +36,12 @@ createInertiaApp({
             .use(pinia)
             .use(ZiggyVue)
             .mount(el);
+            
+        // Ensure dark mode after mount
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        document.body.style.backgroundColor = '#1E1E1E';
+        document.body.style.color = '#FFFFFF';
     },
     progress: {
         color: '#4B5563',

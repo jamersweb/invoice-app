@@ -2,8 +2,9 @@
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import GradientButton from '@/Components/GradientButton.vue';
+import DarkInput from '@/Components/DarkInput.vue';
+import Checkbox from '@/Components/Checkbox.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
@@ -11,6 +12,7 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    terms: false,
 });
 
 const submit = () => {
@@ -23,64 +25,120 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout bg='gradient'>
+    <GuestLayout>
         <Head title="Register" />
-        <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-tr from-indigo-100 via-white to-purple-100">
-            <div class="w-full max-w-md p-8 mx-auto bg-white rounded-2xl shadow-2xl border border-gray-100 mt-10">
-                <div class="mb-8 text-center">
-                    <h2 class="mb-2 text-3xl font-extrabold text-gray-900 font-sans">Create your account</h2>
-                    <p class="text-gray-500 text-sm">Fill in the details to get started on Invoice App.</p>
+        
+        <div class="space-y-6">
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-dark-text-primary mb-2">Register</h2>
+                <p class="text-sm text-dark-text-secondary">Fill in the details to get started on Invoice App.</p>
+            </div>
+
+            <form @submit.prevent="submit" class="space-y-5">
+                <div>
+                    <InputLabel for="name" value="Name" class="text-dark-text-secondary mb-2" />
+                    <DarkInput
+                        id="name"
+                        v-model="form.name"
+                        type="text"
+                        placeholder="Enter your full name"
+                        required
+                        autofocus
+                        autocomplete="name"
+                    />
+                    <InputError class="mt-2" :message="form.errors.name" />
                 </div>
-                <form @submit.prevent="submit" class="space-y-6">
-                    <div>
-                        <InputLabel for="name" value="Name" />
-                        <div class="relative mt-1">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-width="1.5" d="M13.25 6a3.25 3.25 0 11-6.5 0 3.25 3.25 0 016.5 0zM4.75 15.25a4.5 4.5 0 0110.5 0v.5a.75.75 0 01-.75.75h-9a.75.75 0 01-.75-.75v-.5z"/></svg>
-                            </span>
-                            <TextInput id="name" type="text" class="pl-10 pr-3 py-2 mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow transition" v-model="form.name" required autofocus autocomplete="name" placeholder="Full Name" />
-                        </div>
-                        <InputError class="mt-2" :message="form.errors.name" />
-                    </div>
-                    <div>
-                        <InputLabel for="email" value="Email" />
-                        <div class="relative mt-1">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-width="1.5" d="M3 7.5L10 13l7-5.5M5 5h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
-                            </span>
-                            <TextInput id="email" type="email" class="pl-10 pr-3 py-2 mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow transition" v-model="form.email" required autocomplete="username" placeholder="Email address" />
-                        </div>
-                        <InputError class="mt-2" :message="form.errors.email" />
-                    </div>
-                    <div>
-                        <InputLabel for="password" value="Password" />
-                        <div class="relative mt-1">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-width="1.5" d="M10 13a2 2 0 100-4 2 2 0 000 4zm8-3V7a5 5 0 00-10 0v3a2 2 0 00-2 2v5a2 2 0 002 2h6a2 2 0 002-2v-5a2 2 0 00-2-2z"/></svg>
-                            </span>
-                            <TextInput id="password" type="password" class="pl-10 pr-3 py-2 mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow transition" v-model="form.password" required autocomplete="new-password" placeholder="Create a password" />
-                        </div>
-                        <InputError class="mt-2" :message="form.errors.password" />
-                    </div>
-                    <div>
-                        <InputLabel for="password_confirmation" value="Confirm Password" />
-                        <div class="relative mt-1">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-width="1.5" d="M10 13a2 2 0 100-4 2 2 0 000 4zm8-3V7a5 5 0 00-10 0v3a2 2 0 00-2 2v5a2 2 0 002 2h6a2 2 0 002-2v-5a2 2 0 00-2-2z"/></svg>
-                            </span>
-                            <TextInput id="password_confirmation" type="password" class="pl-10 pr-3 py-2 mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow transition" v-model="form.password_confirmation" required autocomplete="new-password" placeholder="Confirm password" />
-                        </div>
-                        <InputError class="mt-2" :message="form.errors.password_confirmation" />
-                    </div>
-                    <div class="flex items-center justify-between mt-6">
-                        <Link :href="route('login')" class="rounded-md text-indigo-600 hover:text-indigo-800 font-medium underline transition">
-                            Already registered?
-                        </Link>
-                        <PrimaryButton class="ms-4 px-7 py-3 text-base rounded-lg bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition text-white font-semibold shadow-lg" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                            Register
-                        </PrimaryButton>
-                    </div>
-                </form>
+
+                <div>
+                    <InputLabel for="email" value="Email" class="text-dark-text-secondary mb-2" />
+                    <DarkInput
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        placeholder="Enter your email"
+                        icon="email"
+                        required
+                        autocomplete="username"
+                    />
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
+
+                <div>
+                    <InputLabel for="password" value="Password" class="text-dark-text-secondary mb-2" />
+                    <DarkInput
+                        id="password"
+                        v-model="form.password"
+                        type="password"
+                        placeholder="Create a password"
+                        icon="lock"
+                        required
+                        autocomplete="new-password"
+                    />
+                    <InputError class="mt-2" :message="form.errors.password" />
+                </div>
+
+                <div>
+                    <InputLabel for="password_confirmation" value="Confirm Password" class="text-dark-text-secondary mb-2" />
+                    <DarkInput
+                        id="password_confirmation"
+                        v-model="form.password_confirmation"
+                        type="password"
+                        placeholder="Confirm your password"
+                        icon="lock"
+                        required
+                        autocomplete="new-password"
+                    />
+                    <InputError class="mt-2" :message="form.errors.password_confirmation" />
+                </div>
+
+                <div>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <Checkbox name="terms" v-model:checked="form.terms" />
+                        <span class="text-sm text-dark-text-secondary">
+                            I agree to the <a href="#" class="text-purple-accent hover:text-purple-hover">Terms and Conditions</a>
+                        </span>
+                    </label>
+                    <InputError class="mt-2" :message="form.errors.terms" />
+                </div>
+
+                <GradientButton type="submit" class="w-full" :disabled="form.processing">
+                    Register
+                </GradientButton>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-dark-border"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-dark-card text-dark-text-muted">OR</span>
+                </div>
+            </div>
+
+            <!-- Social Login -->
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary border border-dark-border text-dark-text-primary transition-colors">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 14 14">
+                        <path d="M13.714 7.071A6.714 6.714 0 1 0 7 13.714a6.678 6.678 0 0 0 4.357-1.571L11.357 10a4.285 4.285 0 0 1-2.714.928c-2.357 0-4.286-1.929-4.286-4.286S6.286 2.357 8.643 2.357c1.071 0 2 .393 2.714 1.036l1.786-1.786A6.714 6.714 0 0 0 7 .286a6.714 6.714 0 0 0 0 13.428 6.714 6.714 0 0 0 6.714-6.643Z"/>
+                    </svg>
+                    <span class="text-sm">Google</span>
+                </button>
+                <button type="button" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary border border-dark-border text-dark-text-primary transition-colors">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 14 14">
+                        <path d="M7 0a7 7 0 0 0-2.188 13.643v-4.833H4.143V6.857h.669V5.286c0-2.071 1.571-3.857 3.857-3.857 1.071 0 2 .357 2.714 1.071v1.714H9.857c-.857 0-1.214.429-1.214 1.143v1.143h2.429l-.429 2.953H8.643v4.833A7.001 7.001 0 0 0 7 0Z"/>
+                    </svg>
+                    <span class="text-sm">Facebook</span>
+                </button>
+            </div>
+
+            <!-- Login Link -->
+            <div class="text-center text-sm">
+                <span class="text-dark-text-secondary">Already have an account? </span>
+                <Link :href="route('login')" class="text-purple-accent hover:text-purple-hover font-medium transition-colors">
+                    Sign In
+                </Link>
             </div>
         </div>
     </GuestLayout>
