@@ -14,7 +14,15 @@ const searchQuery = ref('');
 const page = usePage();
 const user = computed(() => (page.props as any).auth?.user);
 
-const navigation = [
+interface NavItem {
+    name: string;
+    href: string;
+    icon: string;
+    section: 'main' | 'bottom' | 'admin';
+    isUrl?: boolean;
+}
+
+const navigation: NavItem[] = [
     // Main navigation
     { name: 'Dashboard', href: 'dashboard', icon: '📊', section: 'main' },
     { name: 'Invoices', href: 'invoices.index', icon: '🧾', section: 'main' },
