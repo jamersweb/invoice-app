@@ -59,6 +59,57 @@ class Supplier extends Model
         $completed = collect($fields)->filter(fn($field) => !empty($this->$field))->count();
         return round(($completed / count($fields)) * 100);
     }
+
+    /**
+     * Get onboarding progress status
+     */
+    public function getOnboardingProgress(): array
+    {
+        // Check if user exists for this supplier
+        $user = \App\Models\User::where('email', $this->contact_email)->first();
+        $signedAgreements = $user
+            ? \App\Models\Agreement::where('status', 'signed')
+                ->where('signer_id', $user->id)
+                ->exists()
+            : false;
+
+        $progress = [
+            'kyc_completed' => $this->completion_percentage >= 80,
+            'documents_uploaded' => $this->documents()->whereIn('status', ['approved', 'pending_review', 'under_review'])->exists(),
+            'kyb_approved' => $this->kyb_status === 'approved',
+            'agreements_signed' => $signedAgreements,
+            'bank_account_added' => \App\Models\BankAccount::where('supplier_id', $this->id)->exists(),
+            'is_active' => $this->is_active,
+        ];
+
+        $completed = collect($progress)->filter(fn($val) => $val === true)->count();
+        $total = count($progress);
+        $percentage = round(($completed / $total) * 100);
+
+        return [
+            'percentage' => $percentage,
+            'completed_steps' => $completed,
+            'total_steps' => $total,
+            'details' => $progress,
+        ];
+    }
+
+    /**
+     * Check if supplier can submit invoices
+     */
+    public function canSubmitInvoices(): bool
+    {
+        $user = \App\Models\User::where('email', $this->contact_email)->first();
+        $hasSignedAgreement = $user
+            ? \App\Models\Agreement::where('status', 'signed')
+                ->where('signer_id', $user->id)
+                ->exists()
+            : false;
+
+        return $this->kyb_status === 'approved'
+            && $this->is_active
+            && $hasSignedAgreement;
+    }
 }
 
 

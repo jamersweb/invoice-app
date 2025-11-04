@@ -52,6 +52,14 @@ class DocumentController extends Controller
             'expiry_at' => ['nullable', 'date'],
         ]);
 
+        // Ensure supplier profile exists before allowing document upload
+        $user = $request->user();
+        $supplier = Supplier::where('contact_email', $user->email)->first();
+
+        if (!$supplier) {
+            return back()->withErrors(['error' => 'Supplier profile not found. Please complete KYC/KYB onboarding first.']);
+        }
+
         $docType = DocumentType::findOrFail($validated['document_type_id']);
         if ($docType->required && empty($validated['expiry_at']) && in_array(strtolower($docType->name), ['commercial registration','vat certificate'])) {
             return back()->withErrors(['expiry_at' => 'Expiry date is required for this document type.']);
@@ -66,7 +74,7 @@ class DocumentController extends Controller
             'document_type_id' => $validated['document_type_id'],
             'owner_type' => 'supplier',
             'owner_id' => auth()->id() ?? 0,
-            'supplier_id' => Supplier::where('contact_email', $request->user()?->email)->value('id'),
+            'supplier_id' => $supplier->id,
             'status' => $status,
             'expiry_at' => $validated['expiry_at'] ?? null,
             'file_path' => $path,

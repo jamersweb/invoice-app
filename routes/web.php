@@ -556,6 +556,33 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         abort_unless(auth()->user()?->hasRole('Admin'), 403);
         $batch = \App\Modules\Funding\Models\FundingBatch::findOrFail($id);
         $items = \App\Modules\Funding\Models\Funding::where('batch_id', $batch->id)->get();
+
+        // Check bank accounts before execution
+        $missingBankAccounts = [];
+        foreach ($items as $f) {
+            $invoice = \App\Modules\Invoices\Models\Invoice::find($f->invoice_id);
+            if (!$invoice) continue;
+
+            $supplier = \App\Models\Supplier::find($invoice->supplier_id);
+            if ($supplier) {
+                $bankAccount = \App\Models\BankAccount::where('supplier_id', $supplier->id)->first();
+                if (!$bankAccount) {
+                    $missingBankAccounts[] = [
+                        'invoice_id' => $invoice->id,
+                        'supplier_name' => $supplier->company_name ?? $supplier->legal_name ?? 'N/A',
+                        'invoice_number' => $invoice->invoice_number,
+                    ];
+                }
+            }
+        }
+
+        if (!empty($missingBankAccounts)) {
+            return response()->json([
+                'error' => 'Some suppliers are missing bank account details',
+                'missing_accounts' => $missingBankAccounts
+            ], 422);
+        }
+
         foreach ($items as $f) {
             $invoice = \App\Modules\Invoices\Models\Invoice::find($f->invoice_id);
             if (!$invoice) continue;
@@ -592,6 +619,21 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     Route::post('/admin/fundings/{id}/record', function ($id) {
         abort_unless(auth()->user()?->hasRole('Admin'), 403);
         $f = \App\Modules\Funding\Models\Funding::findOrFail($id);
+        $invoice = \App\Modules\Invoices\Models\Invoice::find($f->invoice_id);
+
+        if ($invoice) {
+            $supplier = \App\Models\Supplier::find($invoice->supplier_id);
+            if ($supplier) {
+                $bankAccount = \App\Models\BankAccount::where('supplier_id', $supplier->id)->first();
+                if (!$bankAccount) {
+                    return response()->json([
+                        'error' => 'Supplier bank account details are required before recording funding',
+                        'supplier_name' => $supplier->company_name ?? $supplier->legal_name ?? 'N/A',
+                    ], 422);
+                }
+            }
+        }
+
         $f->status = 'executed';
         $f->funded_at = now();
         $f->save();

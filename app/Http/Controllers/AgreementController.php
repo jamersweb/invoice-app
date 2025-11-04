@@ -79,6 +79,21 @@ class AgreementController extends Controller
             'template_id' => ['required','exists:agreement_templates,id']
         ]);
 
+        // Check if supplier is KYB approved before allowing agreement signing
+        $user = auth()->user();
+        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+
+        // Skip check for Admin/Analyst roles
+        if (!$user->hasAnyRole(['Admin', 'Analyst'])) {
+            if (!$supplier) {
+                return back()->withErrors(['error' => 'Supplier profile not found. Please complete KYC/KYB onboarding first.']);
+            }
+
+            if ($supplier->kyb_status !== 'approved') {
+                return back()->withErrors(['error' => 'Your supplier profile must be approved before signing agreements. Current status: ' . $supplier->kyb_status]);
+            }
+        }
+
         $template = AgreementTemplate::findOrFail($request->input('template_id'));
         $agreement = Agreement::create([
             'agreement_template_id' => $template->id,
