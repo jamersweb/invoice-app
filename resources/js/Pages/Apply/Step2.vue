@@ -31,21 +31,23 @@ function submit() {
     </div>
 
     <div class="max-w-xl mx-auto p-6">
-      <h1 class="text-2xl font-semibold mb-4">Apply Now - Step 2</h1>
-      <p class="text-sm text-gray-600 mb-4">Token: {{ token }}</p>
-      <form @submit.prevent="submit" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium">Company Name</label>
-          <input v-model="form.company_name" type="text" class="mt-1 block w-full border rounded p-2" required />
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Contact Name</label>
-          <input v-model="form.contact_name" type="text" class="mt-1 block w-full border rounded p-2" />
-        </div>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" :disabled="form.processing">
-          Continue
-        </button>
-      </form>
+      <div class="rounded-xl border border-gray-200 bg-white p-6">
+        <h1 class="text-2xl font-semibold mb-4 text-gray-900">Apply Now - Step 2</h1>
+        <p class="text-sm text-gray-600 mb-4">Token: {{ token }}</p>
+        <form @submit.prevent="submit" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Company Name</label>
+            <input v-model="form.company_name" type="text" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Enter company name" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Contact Name</label>
+            <input v-model="form.contact_name" type="text" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Enter contact name" />
+          </div>
+          <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-white" :disabled="form.processing">
+            Continue
+          </button>
+        </form>
+      </div>
     </div>
   </AuthenticatedLayout>
   </template>

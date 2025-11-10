@@ -117,3 +117,37 @@
         @apply bg-dark-secondary;
     }
 }
+
+@layer utilities {
+    /* Fix input text color globally - inputs should have dark text by default */
+    /* This overrides the body's white text color for form inputs */
+    /* Apply to all input types except dark-themed inputs */
+    input[type="text"]:not(.input-dark),
+    input[type="email"]:not(.input-dark),
+    input[type="password"]:not(.input-dark),
+    input[type="tel"]:not(.input-dark),
+    input[type="url"]:not(.input-dark),
+    input[type="number"]:not(.input-dark),
+    input[type="date"]:not(.input-dark),
+    input[type="time"]:not(.input-dark),
+    input[type="datetime-local"]:not(.input-dark),
+    input[type="search"]:not(.input-dark),
+    input[type="checkbox"]:not(.input-dark),
+    input[type="radio"]:not(.input-dark),
+    textarea:not(.input-dark),
+    select:not(.input-dark) {
+        color: #111827 !important;
+    }
+    
+    /* Ensure inputs in white/light containers have dark text (higher specificity) */
+    .bg-white input:not(.input-dark),
+    .bg-white textarea:not(.input-dark),
+    .bg-white select:not(.input-dark),
+    .bg-gray-50 input:not(.input-dark),
+    .bg-gray-100 input:not(.input-dark),
+    input.bg-white,
+    textarea.bg-white,
+    select.bg-white {
+        color: #111827 !important;
+    }
+}

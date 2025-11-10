@@ -17,11 +17,11 @@ const submit = () => form.post('/apply');
         <form @submit.prevent="submit" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Company Email</label>
-            <input v-model="form.company_email" type="email" required class="mt-1 w-full rounded-lg border border-gray-300 p-2" />
+            <input v-model="form.company_email" type="email" required class="mt-1 w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Enter company email" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">Company Phone</label>
-            <input v-model="form.company_phone" type="text" class="mt-1 w-full rounded-lg border border-gray-300 p-2" />
+            <input v-model="form.company_phone" type="text" class="mt-1 w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Enter company phone" />
           </div>
           <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-white">Continue</button>
         </form>

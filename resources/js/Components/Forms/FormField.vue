@@ -43,9 +43,9 @@ const isValid = computed(() => validationErrors.value.length === 0 && props.valu
 const inputClasses = computed(() => [
   'block w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-1',
   {
-    'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500': !hasError.value,
-    'border-red-500 focus:border-red-500 focus:ring-red-500': hasError.value,
-    'bg-gray-50 cursor-not-allowed': props.disabled
+    'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 bg-white text-gray-900': !hasError.value && !props.disabled,
+    'border-red-500 focus:border-red-500 focus:ring-red-500 bg-white text-gray-900': hasError.value && !props.disabled,
+    'bg-gray-50 cursor-not-allowed text-gray-500': props.disabled
   }
 ]);
 
