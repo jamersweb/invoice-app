@@ -8,6 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Check if invoices table exists first
+        if (!Schema::hasTable('invoices')) {
+            return; // Skip this migration if invoices table doesn't exist yet
+        }
+
         Schema::table('invoices', function (Blueprint $table) {
             $table->integer('repayment_parts')->nullable()->after('due_date'); // 3, 6, etc.
             $table->decimal('extra_percentage', 5, 2)->default(0)->after('repayment_parts'); // Extra interest/percentage
@@ -19,6 +24,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Check if invoices table exists first
+        if (!Schema::hasTable('invoices')) {
+            return; // Skip if table doesn't exist
+        }
+
         Schema::table('invoices', function (Blueprint $table) {
             $table->dropColumn([
                 'repayment_parts',

@@ -8,6 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Check if invoices table exists first
+        if (!Schema::hasTable('invoices')) {
+            return; // Skip this migration if invoices table doesn't exist yet
+        }
+
         // Check if columns exist before adding them
         // These columns may already exist from 2025_01_15_120000_add_invoice_review_fields migration
         
@@ -26,6 +31,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Check if invoices table exists first
+        if (!Schema::hasTable('invoices')) {
+            return; // Skip if table doesn't exist
+        }
+
         // Only drop columns if they exist
         // Note: This migration may not have added these columns if they already existed
         if (Schema::hasColumn('invoices', 'priority')) {

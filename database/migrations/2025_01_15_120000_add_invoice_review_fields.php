@@ -9,6 +9,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Check if invoices table exists first
+        if (!Schema::hasTable('invoices')) {
+            return; // Skip this migration if invoices table doesn't exist yet
+        }
+
         // Add columns only if they don't exist
         if (!Schema::hasColumn('invoices', 'assigned_to')) {
             Schema::table('invoices', function (Blueprint $table) {
@@ -114,6 +119,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Check if invoices table exists first
+        if (!Schema::hasTable('invoices')) {
+            return; // Skip if table doesn't exist
+        }
+
         Schema::table('invoices', function (Blueprint $table) {
             $table->dropForeign(['assigned_to']);
             $table->dropForeign(['reviewed_by']);
