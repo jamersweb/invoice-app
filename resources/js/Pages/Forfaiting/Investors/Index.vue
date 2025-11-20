@@ -55,7 +55,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { route } from 'ziggy-js';
 
 interface Investor {
     name: string;

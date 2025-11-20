@@ -138,7 +138,6 @@
 import { Head, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ref } from 'vue';
-import { route } from 'ziggy-js';
 
 interface Transaction {
     id: number;
