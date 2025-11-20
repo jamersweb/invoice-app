@@ -31,30 +31,54 @@ class LeadController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage (User Registration).
      */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'company_email' => ['required', 'email'],
-            'company_phone' => ['nullable', 'string', 'max:30'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ]);
 
-        $token = Str::random(40);
+        // Create user account
+        $user = \App\Models\User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+        ]);
 
+        // Create or update lead
         $lead = Lead::updateOrCreate(
-            ['company_email' => strtolower($validated['company_email'])],
+            ['company_email' => strtolower($validated['email'])],
             [
-                'company_phone' => $validated['company_phone'] ?? null,
                 'status' => 'new',
-                'verify_token' => $token,
+                'verify_token' => Str::random(40),
             ]
         );
 
-        $verifyUrl = route('apply.verify', ['token' => $lead->verify_token]);
-        Mail::to($lead->company_email)->send(new LeadVerifyMail($verifyUrl));
+        // Create supplier profile linked to user
+        \App\Models\Supplier::updateOrCreate(
+            ['contact_email' => $user->email],
+            [
+                'company_name' => $validated['name'],
+                'kyb_status' => 'pending',
+            ]
+        );
 
-        return redirect()->route('apply.step2', ['token' => $lead->verify_token]);
+        // Assign Supplier role
+        $user->assignRole('Supplier');
+
+        // Send email verification
+        event(new \Illuminate\Auth\Events\Registered($user));
+
+        // Login user
+        \Illuminate\Support\Facades\Auth::login($user);
+
+        return redirect()->route('apply.step2', [
+            'token' => $lead->verify_token,
+            'email' => $user->email,
+        ]);
     }
 
     /**
@@ -78,19 +102,50 @@ class LeadController extends Controller
      */
     public function step2(Request $request): Response
     {
+        $token = $request->query('token');
+        $email = $request->query('email');
+        $verified = false;
+
+        if ($token) {
+            $lead = Lead::where('verify_token', $token)->first();
+            if ($lead && $lead->verified_at) {
+                $verified = true;
+            }
+        }
+
         return Inertia::render('Apply/Step2', [
-            'token' => $request->query('token'),
+            'token' => $token,
+            'email' => $email ?? auth()->user()?->email,
+            'verified' => $verified,
         ]);
     }
 
     public function verify(Request $request): RedirectResponse
     {
         $lead = Lead::where('verify_token', $request->query('token'))->firstOrFail();
+        
+        // Mark lead as verified
         $lead->forceFill([
             'status' => 'verified',
             'verified_at' => now(),
         ])->save();
-        return redirect()->route('apply.step2', ['token' => $lead->verify_token]);
+
+        // Mark user email as verified if user exists
+        $user = \App\Models\User::where('email', $lead->company_email)->first();
+        if ($user && !$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
+        // Login user if not already logged in
+        if (!$request->user() && $user) {
+            \Illuminate\Support\Facades\Auth::login($user);
+        }
+
+        return redirect()->route('apply.step2', [
+            'token' => $lead->verify_token,
+            'email' => $lead->company_email,
+            'verified' => true,
+        ])->with('verified', true);
     }
 
     public function update(Request $request, Lead $lead): RedirectResponse

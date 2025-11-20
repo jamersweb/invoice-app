@@ -43,6 +43,12 @@ class Invoice extends Model
         'amount',
         'currency',
         'due_date',
+        'repayment_parts',
+        'repayment_interval_days',
+        'extra_percentage',
+        'funded_amount',
+        'funded_date',
+        'funded_by',
         'status',
         'ocr_data',
         'ocr_confidence',
@@ -63,12 +69,17 @@ class Invoice extends Model
     protected $casts = [
         'ocr_data' => 'array',
         'due_date' => 'date',
+        'funded_date' => 'date',
         'amount' => 'decimal:2',
+        'funded_amount' => 'decimal:2',
+        'extra_percentage' => 'decimal:2',
         'is_duplicate_flag' => 'boolean',
         'status' => 'string',
         'reviewed_at' => 'datetime',
         'written_off_at' => 'datetime',
         'priority' => 'integer',
+        'repayment_parts' => 'integer',
+        'repayment_interval_days' => 'integer',
     ];
 }
 

@@ -41,5 +41,8 @@ class DatabaseSeeder extends Seeder
         if (method_exists($admin, 'assignRole')) {
             $admin->assignRole('Admin');
         }
+
+        // Seed client workflow test data (optional - comment out for production)
+        // $this->call(ClientWorkflowSeeder::class);
     }
 }

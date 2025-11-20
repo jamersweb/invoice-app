@@ -1,55 +1,61 @@
 <script setup lang="ts">
-import { Head, useForm, router } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { route } from 'ziggy-js'
 
-const props = defineProps<{ token: string | null }>()
-const token = props.token ?? undefined
-
-const form = useForm({
-  company_name: '',
-  contact_name: ''
-})
-
-function submit() {
-  router.visit('/apply')
-}
+const props = defineProps<{ 
+  token: string | null,
+  email: string | null,
+  verified: boolean
+}>()
 </script>
 
 <template>
-  <Head title="Apply - Step 2" />
+  <Head title="Verify Your Email" />
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="text-2xl font-bold text-gray-900">Verify Email</h2>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Verify Your Email</h2>
     </template>
     <div class="mx-auto max-w-lg py-8 px-4 sm:px-6 lg:px-8">
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <div class="text-sm text-gray-700">We sent a verification link to your email. If you didn’t receive it, check spam or click below to verify now.</div>
-        <div class="mt-4">
-          <a :href="route('apply.verify', { token })" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white">Verify Now</a>
+      <div class="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
+        <div v-if="!verified" class="space-y-4">
+          <div class="text-sm text-gray-700 dark:text-slate-300">
+            We've sent a verification code to <strong>{{ email }}</strong>. 
+            Please check your email and click the verification link to continue.
+          </div>
+          <div class="text-sm text-gray-600 dark:text-slate-400">
+            If you didn't receive the email, check your spam folder or click below to resend.
+          </div>
+          <div class="flex gap-3">
+            <a 
+              :href="route('apply.verify', { token })" 
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+            >
+              Verify Email
+            </a>
+            <a 
+              :href="route('verification.send')" 
+              class="rounded-lg bg-gray-200 dark:bg-slate-700 px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-300 dark:hover:bg-slate-600"
+            >
+              Resend Email
+            </a>
+          </div>
+        </div>
+        <div v-else class="space-y-4">
+          <div class="text-green-600 dark:text-green-400 font-semibold">
+            ✓ Email verified successfully!
+          </div>
+          <div class="text-sm text-gray-700 dark:text-slate-300">
+            You can now proceed to complete your KYC/KYB onboarding.
+          </div>
+          <a 
+            :href="route('onboarding.kyc')" 
+            class="inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+          >
+            Continue to KYC/KYB
+          </a>
         </div>
       </div>
     </div>
-
-    <div class="max-w-xl mx-auto p-6">
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <h1 class="text-2xl font-semibold mb-4 text-gray-900">Apply Now - Step 2</h1>
-        <p class="text-sm text-gray-600 mb-4">Token: {{ token }}</p>
-        <form @submit.prevent="submit" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Company Name</label>
-            <input v-model="form.company_name" type="text" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Enter company name" required />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Contact Name</label>
-            <input v-model="form.contact_name" type="text" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Enter contact name" />
-          </div>
-          <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-white" :disabled="form.processing">
-            Continue
-          </button>
-        </form>
-      </div>
-    </div>
   </AuthenticatedLayout>
-  </template>
-
-
+</template>

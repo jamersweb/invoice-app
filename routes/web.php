@@ -848,6 +848,101 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Admin/CollectionsQueue');
     })->middleware(['role:Admin|Collector'])->name('admin.collections');
 
+    // Admin Settings
+    Route::prefix('admin/api/settings')->middleware(['role:Admin'])->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('admin.settings.index');
+        Route::put('/', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('admin.settings.update');
+        Route::get('/reminder-email', [\App\Http\Controllers\Admin\SettingsController::class, 'reminderSettings'])->name('admin.settings.reminder');
+        Route::put('/reminder-email', [\App\Http\Controllers\Admin\SettingsController::class, 'updateReminderSettings'])->name('admin.settings.reminder.update');
+    });
+
+    // Forfaiting Routes
+    Route::prefix('forfaiting')->name('forfaiting.')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [\App\Http\Controllers\Forfaiting\DashboardController::class, 'index'])
+            ->middleware(['role:Admin'])->name('dashboard');
+
+        // Investments
+        Route::get('/investments', [\App\Http\Controllers\Forfaiting\InvestmentController::class, 'index'])
+            ->middleware(['role:Admin'])->name('investments.index');
+        Route::post('/investments', [\App\Http\Controllers\Forfaiting\InvestmentController::class, 'store'])
+            ->middleware(['role:Admin'])->name('investments.store');
+        Route::delete('/investments/{investment}', [\App\Http\Controllers\Forfaiting\InvestmentController::class, 'destroy'])
+            ->middleware(['role:Admin'])->name('investments.destroy');
+        Route::get('/investments/export', [\App\Http\Controllers\Forfaiting\InvestmentController::class, 'export'])
+            ->middleware(['role:Admin'])->name('investments.export');
+
+        // Transactions
+        Route::get('/transactions', [\App\Http\Controllers\Forfaiting\TransactionController::class, 'index'])
+            ->middleware(['role:Admin'])->name('transactions.index');
+        Route::post('/transactions', [\App\Http\Controllers\Forfaiting\TransactionController::class, 'store'])
+            ->middleware(['role:Admin'])->name('transactions.store');
+        Route::put('/transactions/{transaction}', [\App\Http\Controllers\Forfaiting\TransactionController::class, 'update'])
+            ->middleware(['role:Admin'])->name('transactions.update');
+        Route::delete('/transactions/{transaction}', [\App\Http\Controllers\Forfaiting\TransactionController::class, 'destroy'])
+            ->middleware(['role:Admin'])->name('transactions.destroy');
+
+        // Profit Allocations
+        Route::get('/profit-allocations', [\App\Http\Controllers\Forfaiting\ProfitAllocationController::class, 'index'])
+            ->middleware(['role:Admin'])->name('profit-allocations.index');
+        Route::post('/profit-allocations', [\App\Http\Controllers\Forfaiting\ProfitAllocationController::class, 'store'])
+            ->middleware(['role:Admin'])->name('profit-allocations.store');
+        Route::post('/profit-allocations/recalculate', [\App\Http\Controllers\Forfaiting\ProfitAllocationController::class, 'recalculate'])
+            ->middleware(['role:Admin'])->name('profit-allocations.recalculate');
+
+        // Expenses
+        Route::get('/expenses', [\App\Http\Controllers\Forfaiting\ExpenseController::class, 'index'])
+            ->middleware(['role:Admin'])->name('expenses.index');
+        Route::post('/expenses', [\App\Http\Controllers\Forfaiting\ExpenseController::class, 'store'])
+            ->middleware(['role:Admin'])->name('expenses.store');
+        Route::put('/expenses/{expense}/status', [\App\Http\Controllers\Forfaiting\ExpenseController::class, 'updateStatus'])
+            ->middleware(['role:Admin'])->name('expenses.update-status');
+        Route::delete('/expenses/{expense}', [\App\Http\Controllers\Forfaiting\ExpenseController::class, 'destroy'])
+            ->middleware(['role:Admin'])->name('expenses.destroy');
+
+        // Customers
+        Route::get('/customers', [\App\Http\Controllers\Forfaiting\CustomerController::class, 'index'])
+            ->middleware(['role:Admin'])->name('customers.index');
+        Route::get('/customers/{customer}', [\App\Http\Controllers\Forfaiting\CustomerController::class, 'show'])
+            ->middleware(['role:Admin'])->name('customers.show');
+        Route::post('/customers', [\App\Http\Controllers\Forfaiting\CustomerController::class, 'store'])
+            ->middleware(['role:Admin'])->name('customers.store');
+        Route::put('/customers/{customer}', [\App\Http\Controllers\Forfaiting\CustomerController::class, 'update'])
+            ->middleware(['role:Admin'])->name('customers.update');
+        Route::post('/customers/{customer}/documents', [\App\Http\Controllers\Forfaiting\CustomerController::class, 'uploadDocument'])
+            ->middleware(['role:Admin'])->name('customers.upload-document');
+
+        // Investors
+        Route::get('/investors', [\App\Http\Controllers\Forfaiting\InvestorController::class, 'index'])
+            ->middleware(['role:Admin'])->name('investors.index');
+        Route::get('/investors/dashboard', [\App\Http\Controllers\Forfaiting\InvestorController::class, 'dashboard'])
+            ->name('investors.dashboard');
+        Route::post('/investors/{user}/generate-id', [\App\Http\Controllers\Forfaiting\InvestorController::class, 'generateInvestorId'])
+            ->middleware(['role:Admin'])->name('investors.generate-id');
+
+        // Analytics
+        Route::get('/analytics', [\App\Http\Controllers\Forfaiting\AnalyticsController::class, 'index'])
+            ->middleware(['role:Admin'])->name('analytics.index');
+
+        // Contact Requests
+        Route::get('/contact-requests', [\App\Http\Controllers\Forfaiting\ContactRequestController::class, 'index'])
+            ->middleware(['role:Admin'])->name('contact-requests.index');
+        Route::post('/contact-requests', [\App\Http\Controllers\Forfaiting\ContactRequestController::class, 'store'])
+            ->name('contact-requests.store');
+        Route::put('/contact-requests/{contactRequest}/status', [\App\Http\Controllers\Forfaiting\ContactRequestController::class, 'updateStatus'])
+            ->middleware(['role:Admin'])->name('contact-requests.update-status');
+        Route::post('/contact-requests/{contactRequest}/assign', [\App\Http\Controllers\Forfaiting\ContactRequestController::class, 'assign'])
+            ->middleware(['role:Admin'])->name('contact-requests.assign');
+
+        // Notifications
+        Route::get('/notifications', [\App\Http\Controllers\Forfaiting\NotificationController::class, 'index'])
+            ->middleware(['role:Admin'])->name('notifications.index');
+        Route::post('/notifications', [\App\Http\Controllers\Forfaiting\NotificationController::class, 'store'])
+            ->middleware(['role:Admin'])->name('notifications.store');
+        Route::put('/notifications/{notification}/status', [\App\Http\Controllers\Forfaiting\NotificationController::class, 'updateStatus'])
+            ->middleware(['role:Admin'])->name('notifications.update-status');
+    });
+
     Route::get('/admin/kyb-queue/export', function (Request $request) {
         $headers = [
             'Content-Type' => 'text/csv',
@@ -885,9 +980,15 @@ Route::post('/webhooks/esign', [\App\Http\Controllers\AgreementController::class
 
 // Apply Now funnel
 Route::get('/apply', [\App\Http\Controllers\LeadController::class, 'create'])->name('apply.step1');
-Route::post('/apply', [\App\Http\Controllers\LeadController::class, 'store'])->name('apply.store');
+Route::post('/apply', [\App\Http\Controllers\LeadController::class, 'store'])->name('apply.register');
 Route::get('/apply/step2', [\App\Http\Controllers\LeadController::class, 'step2'])->name('apply.step2');
 Route::get('/apply/verify', [\App\Http\Controllers\LeadController::class, 'verify'])->name('apply.verify');
+
+// Google OAuth
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+});
 
 // KYC/KYB Onboarding Routes
 Route::middleware(['auth'])->group(function () {

@@ -89,6 +89,9 @@ class InvoiceReviewController extends Controller
         $validated = $request->validate([
             'notes' => ['nullable', 'string'],
             'priority' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'repayment_parts' => ['nullable', 'integer', 'min:1', 'max:12'], // 1-12 parts
+            'repayment_interval_days' => ['nullable', 'integer', 'min:1'], // Days between repayments (e.g., 30, 60, 90)
+            'extra_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'], // Extra interest percentage
         ]);
 
         $oldStatus = $invoice->status;
@@ -99,7 +102,21 @@ class InvoiceReviewController extends Controller
             'reviewed_at' => now(),
             'review_notes' => $validated['notes'] ?? null,
             'priority' => $validated['priority'] ?? $invoice->priority,
+            'repayment_parts' => $validated['repayment_parts'] ?? null,
+            'repayment_interval_days' => $validated['repayment_interval_days'] ?? null,
+            'extra_percentage' => $validated['extra_percentage'] ?? 0,
         ]);
+
+        // Create repayment schedule if repayment_parts and repayment_interval_days are set
+        if (isset($validated['repayment_parts']) && $validated['repayment_parts'] > 0 
+            && isset($validated['repayment_interval_days']) && $validated['repayment_interval_days'] > 0) {
+            $this->createRepaymentSchedule(
+                $invoice, 
+                $validated['repayment_parts'], 
+                $validated['repayment_interval_days'],
+                $validated['extra_percentage'] ?? 0
+            );
+        }
 
         AuditEvent::create([
             'actor_type' => \App\Models\User::class,
@@ -109,11 +126,44 @@ class InvoiceReviewController extends Controller
             'action' => 'invoice_approved',
             'diff_json' => [
                 'old_values' => ['status' => $oldStatus],
-                'new_values' => ['status' => 'approved', 'reviewed_by' => auth()->id()],
+                'new_values' => [
+                    'status' => 'approved',
+                    'reviewed_by' => auth()->id(),
+                    'repayment_parts' => $validated['repayment_parts'] ?? null,
+                    'extra_percentage' => $validated['extra_percentage'] ?? 0,
+                ],
             ],
         ]);
 
         return response()->json(['success' => true, 'message' => 'Invoice approved']);
+    }
+
+    private function createRepaymentSchedule(Invoice $invoice, int $parts, int $intervalDays, float $extraPercentage): void
+    {
+        // Calculate total amount with extra percentage
+        $baseAmount = (float) $invoice->amount;
+        $totalAmount = $baseAmount + ($baseAmount * $extraPercentage / 100);
+        $partAmount = $totalAmount / $parts;
+
+        // Delete existing expected repayments for this invoice
+        \App\Modules\Repayments\Models\ExpectedRepayment::where('invoice_id', $invoice->id)->delete();
+
+        // Create repayment schedule - repayments occur AFTER invoice due date
+        // Start from invoice due date + interval days
+        $startDate = $invoice->due_date->copy();
+        
+        for ($i = 1; $i <= $parts; $i++) {
+            // Each repayment is due after the invoice due date, spaced by interval days
+            $dueDate = $startDate->copy()->addDays($intervalDays * $i);
+            
+            \App\Modules\Repayments\Models\ExpectedRepayment::create([
+                'invoice_id' => $invoice->id,
+                'buyer_id' => $invoice->buyer_id,
+                'amount' => $partAmount,
+                'due_date' => $dueDate,
+                'status' => 'open',
+            ]);
+        }
     }
 
     public function reject(Request $request, Invoice $invoice)

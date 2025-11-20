@@ -18,9 +18,12 @@ class SendRepaymentDueReminders implements ShouldQueue
 
     public function handle(): void
     {
-        // Find repayments due in next 7 days
+        // Get admin-configurable settings
+        $daysBeforeDue = \App\Models\AppSetting::get('reminder_email_days_before_due', 7);
+        
+        // Find repayments due within the configured days
         $dueRepayments = ExpectedRepayment::whereIn('status', ['open', 'partial'])
-            ->whereBetween('due_date', [now(), now()->addDays(7)])
+            ->whereBetween('due_date', [now(), now()->addDays($daysBeforeDue)])
             ->with(['invoice.supplier'])
             ->get();
 
