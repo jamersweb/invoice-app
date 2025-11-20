@@ -27,6 +27,11 @@ class LeadController extends Controller
      */
     public function create(): Response
     {
+        // Ensure user is not authenticated (guest middleware should handle this, but adding extra safeguard)
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+        
         return Inertia::render('Apply/Step1');
     }
 
