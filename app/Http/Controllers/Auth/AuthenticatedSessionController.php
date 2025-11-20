@@ -34,19 +34,29 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Check if user has supplier profile and redirect to onboarding if needed
+        // Check user role and redirect to appropriate dashboard
         $user = Auth::user();
-        $supplier = Supplier::where('contact_email', $user->email)->first();
-
-        // If no supplier profile or KYB not approved, redirect to onboarding
-        // Skip redirect for Admin/Analyst roles
-        if (!$user->hasAnyRole(['Admin', 'Analyst'])) {
+        
+        // Admin users go to admin dashboard
+        if ($user->hasRole('Admin')) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+        
+        // Supplier users
+        if ($user->hasRole('Supplier')) {
+            $supplier = Supplier::where('contact_email', $user->email)->first();
+            
+            // If no supplier profile or KYB not approved, redirect to onboarding
             if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
                 return redirect()->route('onboarding.kyc');
             }
+            
+            // Redirect to supplier dashboard
+            return redirect()->intended(route('supplier.dashboard', absolute: false));
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Default fallback - redirect to supplier dashboard
+        return redirect()->intended(route('supplier.dashboard', absolute: false));
     }
 
     /**

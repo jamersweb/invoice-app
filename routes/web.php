@@ -791,21 +791,54 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     })->name('api.collections.remind');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard', [
-        't' => [
-            'dashboard' => __('messages.dashboard'),
-            'total_funded' => __('messages.total_funded'),
-            'total_repaid' => __('messages.total_repaid'),
-            'outstanding' => __('messages.outstanding'),
-            'overdue' => __('messages.overdue'),
-            'revenue' => __('messages.revenue'),
-            'overview_new_invoices' => __('messages.overview_new_invoices'),
-            'overview_kyb_pending' => __('messages.overview_kyb_pending'),
-            'overview_funding_approvals' => __('messages.overview_funding_approvals'),
-        ],
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Dashboard routes - Role-based access
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Supplier Dashboard
+    Route::get('/supplier/dashboard', function () {
+        return Inertia::render('Supplier/Dashboard', [
+            't' => [
+                'dashboard' => __('messages.dashboard'),
+                'total_funded' => __('messages.total_funded'),
+                'total_repaid' => __('messages.total_repaid'),
+                'outstanding' => __('messages.outstanding'),
+                'overdue' => __('messages.overdue'),
+                'revenue' => __('messages.revenue'),
+                'overview_new_invoices' => __('messages.overview_new_invoices'),
+                'overview_kyb_pending' => __('messages.overview_kyb_pending'),
+                'overview_funding_approvals' => __('messages.overview_funding_approvals'),
+            ],
+        ]);
+    })->middleware(['role:Supplier'])->name('supplier.dashboard');
+
+    // Admin Dashboard
+    Route::get('/admin/dashboard', function () {
+        return Inertia::render('Admin/Dashboard', [
+            't' => [
+                'dashboard' => __('messages.dashboard'),
+                'total_funded' => __('messages.total_funded'),
+                'total_repaid' => __('messages.total_repaid'),
+                'outstanding' => __('messages.outstanding'),
+                'overdue' => __('messages.overdue'),
+                'revenue' => __('messages.revenue'),
+                'overview_new_invoices' => __('messages.overview_new_invoices'),
+                'overview_kyb_pending' => __('messages.overview_kyb_pending'),
+                'overview_funding_approvals' => __('messages.overview_funding_approvals'),
+            ],
+        ]);
+    })->middleware(['role:Admin'])->name('admin.dashboard');
+
+    // Legacy dashboard route - redirects based on role
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        if ($user->hasRole('Admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->hasRole('Supplier')) {
+            return redirect()->route('supplier.dashboard');
+        }
+        // Default fallback
+        return redirect()->route('supplier.dashboard');
+    })->name('dashboard');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/customer/dashboard', function () {
@@ -978,11 +1011,13 @@ Route::middleware('auth')->group(function () {
 // E-sign provider webhook (token header required)
 Route::post('/webhooks/esign', [\App\Http\Controllers\AgreementController::class, 'webhook'])->name('webhooks.esign');
 
-// Apply Now funnel
-Route::get('/apply', [\App\Http\Controllers\LeadController::class, 'create'])->name('apply.step1');
-Route::post('/apply', [\App\Http\Controllers\LeadController::class, 'store'])->name('apply.register');
-Route::get('/apply/step2', [\App\Http\Controllers\LeadController::class, 'step2'])->name('apply.step2');
-Route::get('/apply/verify', [\App\Http\Controllers\LeadController::class, 'verify'])->name('apply.verify');
+// Apply Now funnel (Public - No authentication required)
+Route::middleware('guest')->group(function () {
+    Route::get('/apply', [\App\Http\Controllers\LeadController::class, 'create'])->name('apply.step1');
+    Route::post('/apply', [\App\Http\Controllers\LeadController::class, 'store'])->name('apply.register');
+    Route::get('/apply/step2', [\App\Http\Controllers\LeadController::class, 'step2'])->name('apply.step2');
+    Route::get('/apply/verify', [\App\Http\Controllers\LeadController::class, 'verify'])->name('apply.verify');
+});
 
 // Google OAuth
 Route::middleware('guest')->group(function () {

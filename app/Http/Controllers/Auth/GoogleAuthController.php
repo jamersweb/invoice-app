@@ -101,7 +101,12 @@ class GoogleAuthController extends Controller
             // Login user
             Auth::login($user);
 
-            // Check if supplier profile exists and redirect accordingly
+            // Check user role and redirect to appropriate dashboard
+            if ($user->hasRole('Admin')) {
+                return redirect()->route('admin.dashboard', absolute: false);
+            }
+            
+            // Supplier users
             $supplier = Supplier::where('contact_email', $user->email)->first();
             
             if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
@@ -109,7 +114,7 @@ class GoogleAuthController extends Controller
                 return redirect()->route('onboarding.kyc');
             }
 
-            return redirect()->route('dashboard', absolute: false);
+            return redirect()->route('supplier.dashboard', absolute: false);
         } catch (\Exception $e) {
             \Log::error('Google OAuth error: ' . $e->getMessage());
             return redirect()->route('apply.step1')

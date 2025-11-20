@@ -13,6 +13,14 @@ const searchQuery = ref('');
 
 const page = usePage();
 const user = computed(() => (page.props as any).auth?.user);
+const isAdmin = computed(() => {
+    const userRoles = (user.value as any)?.roles || [];
+    return userRoles.some((r: any) => r.name === 'Admin');
+});
+const isSupplier = computed(() => {
+    const userRoles = (user.value as any)?.roles || [];
+    return userRoles.some((r: any) => r.name === 'Supplier');
+});
 
 interface NavItem {
     name: string;
@@ -23,16 +31,16 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-    // Main navigation
-    { name: 'Dashboard', href: 'dashboard', icon: '📊', section: 'main' },
+    // Main navigation - Dashboard link will be set dynamically based on role
+    { name: 'Dashboard', href: '', icon: '📊', section: 'main' },
     { name: 'Invoices', href: 'invoices.index', icon: '🧾', section: 'main' },
     { name: 'Customers', href: 'customers.index', icon: '👥', section: 'main' },
     { name: 'Reports', href: 'reports.index', icon: '📈', section: 'main' },
-    
+
     // Other navigation (bottom)
     { name: 'Settings', href: 'profile.edit', icon: '⚙️', section: 'bottom' },
     { name: 'Help', href: '#', icon: '❓', section: 'bottom' },
-    
+
     // Admin routes - organized as shown in images
     { name: 'KYC/KYB Form', href: 'onboarding.kyc', icon: '📋', section: 'admin' },
     { name: 'KYC Status', href: 'supplier.kyc.status', icon: '📈', section: 'admin' },
@@ -52,9 +60,26 @@ const navigation: NavItem[] = [
     { name: 'Agreements', href: 'agreements.index', icon: '📜', section: 'admin' },
 ];
 
-const mainNav = computed(() => navigation.filter(n => n.section === 'main'));
+const mainNav = computed(() => {
+    const nav = navigation.filter(n => n.section === 'main').map(item => {
+        // Set dashboard href based on user role
+        if (item.name === 'Dashboard') {
+            if (isAdmin.value) {
+                item.href = 'admin.dashboard';
+            } else if (isSupplier.value) {
+                item.href = 'supplier.dashboard';
+            } else {
+                item.href = 'supplier.dashboard'; // Default fallback
+            }
+        }
+        return item;
+    });
+    return nav;
+});
 const bottomNav = computed(() => navigation.filter(n => n.section === 'bottom'));
 const adminNav = computed(() => {
+    // Only show admin nav if user is admin
+    if (!isAdmin.value) return [];
     return navigation.filter(n => n.section === 'admin');
 });
 
@@ -80,7 +105,7 @@ function currentRoute(routeName: string) {
             <div class="flex h-full flex-col">
                 <!-- Logo -->
                 <div class="flex h-16 shrink-0 items-center px-6 border-b border-dark-border">
-                    <Link :href="route('dashboard')" class="flex items-center gap-2">
+                    <Link :href="isAdmin ? route('admin.dashboard') : route('supplier.dashboard')" class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded bg-purple-accent flex items-center justify-center">
                             <span class="text-white text-xs font-bold">+</span>
                         </div>

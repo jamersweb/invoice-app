@@ -47,14 +47,18 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // Check if supplier profile exists and redirect to onboarding if not
+        // Check user role and redirect to appropriate dashboard
+        if ($user->hasRole('Admin')) {
+            return redirect()->route('admin.dashboard', absolute: false);
+        }
+        
+        // Supplier users
         $supplier = Supplier::where('contact_email', $user->email)->first();
-
-        // If no supplier profile or KYB not approved, redirect to onboarding
+        
         if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
             return redirect()->route('onboarding.kyc');
         }
-
-        return redirect(route('dashboard', absolute: false));
+        
+        return redirect()->route('supplier.dashboard', absolute: false);
     }
 }

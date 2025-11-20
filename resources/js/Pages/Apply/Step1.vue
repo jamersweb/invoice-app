@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const form = useForm({ 
@@ -24,10 +24,7 @@ const loginWithGoogle = () => {
 
 <template>
   <Head title="Apply Now - Registration" />
-  <AuthenticatedLayout>
-    <template #header>
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Apply Now</h2>
-    </template>
+  <GuestLayout>
     <div class="mx-auto max-w-lg py-8 px-4 sm:px-6 lg:px-8">
       <div class="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
         <div class="mb-4 text-base font-semibold text-gray-900 dark:text-white">Step 1: Create Your Account</div>
@@ -110,5 +107,5 @@ const loginWithGoogle = () => {
         </button>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </GuestLayout>
 </template>

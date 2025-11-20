@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import GuestLayout from '@/Layouts/GuestLayout.vue'
 
 const props = defineProps<{ 
   token: string | null,
@@ -11,10 +11,7 @@ const props = defineProps<{
 
 <template>
   <Head title="Verify Your Email" />
-  <AuthenticatedLayout>
-    <template #header>
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Verify Your Email</h2>
-    </template>
+  <GuestLayout>
     <div class="mx-auto max-w-lg py-8 px-4 sm:px-6 lg:px-8">
       <div class="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
         <div v-if="!verified" class="space-y-4">
@@ -56,5 +53,5 @@ const props = defineProps<{
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </GuestLayout>
 </template>
