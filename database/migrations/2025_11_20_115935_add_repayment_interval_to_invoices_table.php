@@ -16,8 +16,19 @@ return new class extends Migration
             return; // Skip this migration if invoices table doesn't exist yet
         }
 
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->integer('repayment_interval_days')->nullable()->after('repayment_parts')->comment('Days between each repayment (e.g., 30, 60, 90)');
+        // Check if column already exists
+        if (Schema::hasColumn('invoices', 'repayment_interval_days')) {
+            return; // Column already exists, skip
+        }
+
+        // Determine which column to add after
+        $afterColumn = 'due_date'; // Default
+        if (Schema::hasColumn('invoices', 'repayment_parts')) {
+            $afterColumn = 'repayment_parts';
+        }
+
+        Schema::table('invoices', function (Blueprint $table) use ($afterColumn) {
+            $table->integer('repayment_interval_days')->nullable()->after($afterColumn)->comment('Days between each repayment (e.g., 30, 60, 90)');
         });
     }
 
