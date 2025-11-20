@@ -93,7 +93,7 @@
                         />
                         <button
                             type="button"
-                            @click="$refs.fileInput.click()"
+                            @click="fileInput?.click()"
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                         >
                             Upload Document

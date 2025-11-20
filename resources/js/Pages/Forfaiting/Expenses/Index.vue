@@ -222,7 +222,7 @@
                             <a
                                 v-for="link in expenses.links"
                                 :key="link.label"
-                                :href="link.url"
+                                :href="link.url ?? undefined"
                                 v-html="link.label"
                                 :class="[
                                     'px-3 py-1 rounded text-sm',
