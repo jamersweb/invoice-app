@@ -146,6 +146,11 @@ class LeadController extends Controller
             \Illuminate\Support\Facades\Auth::login($user);
         }
 
+        // After email verification, redirect to KYC/KYB onboarding
+        if ($user && $user->hasRole('Supplier')) {
+            return redirect()->route('onboarding.kyc')->with('verified', true);
+        }
+
         return redirect()->route('apply.step2', [
             'token' => $lead->verify_token,
             'email' => $lead->company_email,

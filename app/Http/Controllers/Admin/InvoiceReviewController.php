@@ -108,14 +108,25 @@ class InvoiceReviewController extends Controller
         ]);
 
         // Create repayment schedule if repayment_parts and repayment_interval_days are set
+        $repaymentParts = null;
         if (isset($validated['repayment_parts']) && $validated['repayment_parts'] > 0 
             && isset($validated['repayment_interval_days']) && $validated['repayment_interval_days'] > 0) {
+            $repaymentParts = $validated['repayment_parts'];
             $this->createRepaymentSchedule(
                 $invoice, 
                 $validated['repayment_parts'], 
                 $validated['repayment_interval_days'],
                 $validated['extra_percentage'] ?? 0
             );
+        }
+
+        // Send notification to supplier
+        $notificationService = new \App\Services\InvoiceStatusNotificationService();
+        $notificationService->notifyStatusChange($invoice, $oldStatus, 'approved');
+        
+        // If repayment schedule was created, send additional notification
+        if ($repaymentParts) {
+            $notificationService->notifyRepaymentScheduleCreated($invoice, $repaymentParts);
         }
 
         AuditEvent::create([
@@ -182,6 +193,10 @@ class InvoiceReviewController extends Controller
             'reviewed_at' => now(),
             'review_notes' => $validated['notes'],
         ]);
+
+        // Send notification to supplier
+        $notificationService = new \App\Services\InvoiceStatusNotificationService();
+        $notificationService->notifyStatusChange($invoice, $oldStatus, 'rejected');
 
         AuditEvent::create([
             'actor_type' => \App\Models\User::class,

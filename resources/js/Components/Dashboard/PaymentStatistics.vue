@@ -11,17 +11,44 @@ const props = defineProps<{
 // Simple pie chart calculation for display
 const paidPercentage = computed(() => {
   const total = props.total || 1;
-  return (props.paid / total) * 100;
+  return Math.min((props.paid / total) * 100, 100);
 });
 
 const partiallyPaidPercentage = computed(() => {
   const total = props.total || 1;
-  return (props.partiallyPaid / total) * 100;
+  return Math.min((props.partiallyPaid / total) * 100, 100);
 });
 
 const overduePercentage = computed(() => {
   const total = props.total || 1;
-  return (props.overdue / total) * 100;
+  return Math.min((props.overdue / total) * 100, 100);
+});
+
+const circumference = 2 * Math.PI * 40; // radius is 40
+const paidDashArray = computed(() => {
+  const percentage = paidPercentage.value;
+  const dashLength = (percentage / 100) * circumference;
+  return `${dashLength} ${circumference}`;
+});
+
+const partiallyPaidDashArray = computed(() => {
+  const percentage = partiallyPaidPercentage.value;
+  const dashLength = (percentage / 100) * circumference;
+  return `${dashLength} ${circumference}`;
+});
+
+const partiallyPaidDashOffset = computed(() => {
+  return -((paidPercentage.value / 100) * circumference);
+});
+
+const overdueDashArray = computed(() => {
+  const percentage = overduePercentage.value;
+  const dashLength = (percentage / 100) * circumference;
+  return `${dashLength} ${circumference}`;
+});
+
+const overdueDashOffset = computed(() => {
+  return -(((paidPercentage.value + partiallyPaidPercentage.value) / 100) * circumference);
 });
 </script>
 
@@ -41,7 +68,7 @@ const overduePercentage = computed(() => {
             fill="none"
             stroke="#10B981"
             stroke-width="20"
-            :stroke-dasharray="`${paidPercentage * 2.51} 251`"
+            :stroke-dasharray="paidDashArray"
             class="transition-all duration-500"
           />
           <!-- Partially Paid (yellow) -->
@@ -52,8 +79,8 @@ const overduePercentage = computed(() => {
             fill="none"
             stroke="#F59E0B"
             stroke-width="20"
-            :stroke-dasharray="`${partiallyPaidPercentage * 2.51} 251`"
-            :stroke-dashoffset="`-${paidPercentage * 2.51}`"
+            :stroke-dasharray="partiallyPaidDashArray"
+            :stroke-dashoffset="partiallyPaidDashOffset"
             class="transition-all duration-500"
           />
           <!-- Overdue (red) -->
@@ -64,8 +91,8 @@ const overduePercentage = computed(() => {
             fill="none"
             stroke="#EF4444"
             stroke-width="20"
-            :stroke-dasharray="`${overduePercentage * 2.51} 251`"
-            :stroke-dashoffset="`-${(paidPercentage + partiallyPaidPercentage) * 2.51}`"
+            :stroke-dasharray="overdueDashArray"
+            :stroke-dashoffset="overdueDashOffset"
             class="transition-all duration-500"
           />
         </svg>

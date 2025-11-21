@@ -42,16 +42,20 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
         
-        // Supplier users
+        // Supplier users - check onboarding status
         if ($user->hasRole('Supplier')) {
-            $supplier = Supplier::where('contact_email', $user->email)->first();
+            // Step 1: Check email verification
+            if (!$user->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
             
-            // If no supplier profile or KYB not approved, redirect to onboarding
+            // Step 2: Check KYC/KYB completion
+            $supplier = Supplier::where('contact_email', $user->email)->first();
             if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
                 return redirect()->route('onboarding.kyc');
             }
             
-            // Redirect to supplier dashboard
+            // All checks passed - redirect to supplier dashboard
             return redirect()->intended(route('supplier.dashboard', absolute: false));
         }
 

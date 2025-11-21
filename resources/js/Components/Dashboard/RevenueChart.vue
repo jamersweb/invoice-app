@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   title?: string;
@@ -17,9 +17,15 @@ const chartData = computed(() => {
   if (!props.series || props.series.length === 0) return { funded: [], repaid: [], labels: [] };
 
   return {
-    funded: props.series.map(s => s.funded),
-    repaid: props.series.map(s => s.repaid),
-    labels: props.series.map(s => new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
+    funded: props.series.map(s => s.funded || 0),
+    repaid: props.series.map(s => s.repaid || 0),
+    labels: props.series.map(s => {
+      try {
+        return new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      } catch {
+        return s.date || '';
+      }
+    })
   };
 });
 
@@ -29,11 +35,39 @@ watch(() => props.series, () => {
   }
 }, { deep: true });
 
+let resizeObserver: ResizeObserver | null = null;
+
 onMounted(() => {
   if (chartRef.value && props.series && props.series.length > 0) {
     setTimeout(() => drawChart(), 100);
   }
+  
+  // Watch for container resize
+  if (chartRef.value && window.ResizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      if (props.series && props.series.length > 0) {
+        drawChart();
+      }
+    });
+    resizeObserver.observe(chartRef.value.parentElement || chartRef.value);
+  }
+  
+  // Fallback: window resize listener
+  window.addEventListener('resize', handleResize);
 });
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+  window.removeEventListener('resize', handleResize);
+});
+
+function handleResize() {
+  if (props.series && props.series.length > 0) {
+    setTimeout(() => drawChart(), 100);
+  }
+}
 
 function drawChart() {
   if (!chartRef.value) return;
@@ -46,17 +80,23 @@ function drawChart() {
   const maxValue = maxVal.value;
 
   // Set canvas size
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-
+  const rect = canvas.getBoundingClientRect();
+  const displayWidth = rect.width;
+  const displayHeight = rect.height;
+  const dpr = window.devicePixelRatio || 1;
+  
+  canvas.width = displayWidth * dpr;
+  canvas.height = displayHeight * dpr;
+  ctx.scale(dpr, dpr);
+  
   // Clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, displayWidth, displayHeight);
 
   // Chart dimensions
   const padding = 50;
-  const chartWidth = canvas.width - (padding * 2);
-  const chartHeight = canvas.height - (padding * 2);
-  const barWidth = chartWidth / funded.length;
+  const chartWidth = displayWidth - (padding * 2);
+  const chartHeight = displayHeight - (padding * 2);
+  const barWidth = funded.length > 0 ? chartWidth / funded.length : 0;
 
   // Draw grid lines
   ctx.strokeStyle = '#3A3A3A';
@@ -101,8 +141,9 @@ function drawChart() {
   ctx.textAlign = 'center';
 
   labels.forEach((label, index) => {
+    if (barWidth === 0) return;
     const x = padding + (index * barWidth) + (barWidth / 2);
-    const y = canvas.height - 15;
+    const y = displayHeight - 15;
     ctx.fillText(label, x, y);
   });
 }
@@ -128,8 +169,7 @@ function drawChart() {
       <canvas
         ref="chartRef"
         class="h-full w-full"
-        :width="600"
-        :height="256"
+        style="width: 100%; height: 100%;"
       ></canvas>
     </div>
 

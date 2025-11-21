@@ -316,6 +316,129 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         ]);
     })->name('api.dashboard.metrics');
 
+    Route::get('/dashboard/payment-stats', function () {
+        $totalInvoiced = (float) (Invoice::query()->sum('amount') ?? 0);
+        $paid = (float) (Invoice::query()->where('status', 'paid')->sum('amount') ?? 0);
+        $partiallyPaid = (float) (Invoice::query()->where('status', 'partial')->sum('amount') ?? 0);
+        $overdue = (float) (Invoice::query()->where('status', 'overdue')->sum('amount') ?? 0);
+        
+        return response()->json([
+            'total' => $totalInvoiced,
+            'paid' => $paid,
+            'partiallyPaid' => $partiallyPaid,
+            'overdue' => $overdue,
+        ]);
+    })->name('api.dashboard.payment-stats');
+
+    Route::get('/dashboard/overview', function () {
+        $today = now()->startOfDay();
+        $newInvoicesToday = Invoice::query()->whereDate('created_at', $today)->count();
+        $kybPending = \App\Models\Supplier::query()->where('kyb_status', 'pending')->count();
+        $fundingApprovals = Funding::query()->where('status', 'approved')->whereDate('created_at', $today)->count();
+        
+        return response()->json([
+            'items' => [
+                [
+                    'title' => 'New invoices today',
+                    'value' => $newInvoicesToday,
+                    'icon' => '🧾',
+                    'status' => 'success',
+                ],
+                [
+                    'title' => 'KYB pending',
+                    'value' => $kybPending,
+                    'icon' => '🪪',
+                    'status' => 'warning',
+                ],
+                [
+                    'title' => 'Funding approvals today',
+                    'value' => $fundingApprovals,
+                    'icon' => '✅',
+                    'status' => 'info',
+                ],
+            ],
+        ]);
+    })->name('api.dashboard.overview');
+
+    Route::get('/dashboard/recent-activity', function () {
+        $activities = [];
+        $limit = 10;
+        
+        try {
+            // Recent fundings
+            $fundings = Funding::query()
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
+            foreach ($fundings as $funding) {
+                $invoice = Invoice::find($funding->invoice_id);
+                $invoiceNumber = $invoice ? ($invoice->invoice_number ?? $invoice->id) : $funding->invoice_id;
+                $activities[] = [
+                    'id' => $funding->id,
+                    'type' => 'funding',
+                    'title' => 'Funding Approved',
+                    'description' => 'Invoice #' . $invoiceNumber . ' was funded',
+                    'amount' => (float) $funding->amount,
+                    'date' => $funding->created_at->toISOString(),
+                    'status' => 'success',
+                ];
+            }
+        } catch (\Exception $e) {
+            // Silently fail if fundings table doesn't exist or has issues
+        }
+        
+        try {
+            // Recent repayments
+            $repayments = ReceivedRepayment::query()
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
+            foreach ($repayments as $repayment) {
+                $activities[] = [
+                    'id' => $repayment->id + 1000000, // Offset to avoid ID conflicts
+                    'type' => 'repayment',
+                    'title' => 'Repayment Received',
+                    'description' => 'Payment received from buyer',
+                    'amount' => (float) $repayment->amount,
+                    'date' => $repayment->created_at->toISOString(),
+                    'status' => 'success',
+                ];
+            }
+        } catch (\Exception $e) {
+            // Silently fail if repayments table doesn't exist or has issues
+        }
+        
+        try {
+            // Recent invoices
+            $invoices = Invoice::query()
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
+            foreach ($invoices as $invoice) {
+                $activities[] = [
+                    'id' => $invoice->id + 2000000, // Offset to avoid ID conflicts
+                    'type' => 'invoice',
+                    'title' => 'New Invoice',
+                    'description' => 'Invoice #' . ($invoice->invoice_number ?? $invoice->id) . ' created',
+                    'amount' => (float) $invoice->amount,
+                    'date' => $invoice->created_at->toISOString(),
+                    'status' => $invoice->status === 'overdue' ? 'error' : ($invoice->status === 'paid' ? 'success' : 'info'),
+                ];
+            }
+        } catch (\Exception $e) {
+            // Silently fail if invoices table doesn't exist or has issues
+        }
+        
+        // Sort by date and limit
+        usort($activities, function($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+        
+        return response()->json([
+            'items' => array_slice($activities, 0, $limit),
+        ]);
+    })->name('api.dashboard.recent-activity');
+
     // Repayments: received posting and allocation
     // e-ID/KYC verification (adapter-backed, mock provider default)
     Route::post('/kyc/verify', function (Request $request) {
@@ -795,6 +918,19 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Supplier Dashboard
     Route::get('/supplier/dashboard', function () {
+        $user = auth()->user();
+        
+        // Ensure email is verified
+        if (!$user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+        
+        // Ensure KYC/KYB is completed
+        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
+            return redirect()->route('onboarding.kyc');
+        }
+        
         return Inertia::render('Supplier/Dashboard', [
             't' => [
                 'dashboard' => __('messages.dashboard'),
@@ -833,6 +969,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         if ($user->hasRole('Admin')) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->hasRole('Supplier')) {
+            // Check onboarding status for suppliers
+            // Step 1: Email verification
+            if (!$user->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
+            
+            // Step 2: KYC/KYB completion
+            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
+                return redirect()->route('onboarding.kyc');
+            }
+            
             return redirect()->route('supplier.dashboard');
         }
         // Default fallback
@@ -870,6 +1018,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Reports/Index');
     })->name('reports.index');
     Route::post('/invoices', [InvoicesController::class, 'store'])->middleware('throttle:uploads')->name('invoices.store');
+    Route::post('/invoices/bulk', [InvoicesController::class, 'bulkStore'])->middleware('throttle:uploads')->name('invoices.bulk.store');
     Route::post('/offers/issue', [OffersController::class, 'issue'])->middleware('throttle:60,1')->name('offers.issue');
     Route::post('/offers/accept', [OffersController::class, 'accept'])->middleware('throttle:30,1')->name('offers.accept');
     Route::post('/offers/decline', [OffersController::class, 'decline'])->middleware('throttle:30,1')->name('offers.decline');
