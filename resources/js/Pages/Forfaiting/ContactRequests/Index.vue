@@ -83,7 +83,7 @@
                   </td>
                   <td class="text-right p-3">
                     <select
-                      @change="updateStatus(request.id, $event.target.value)"
+                      @change="(e) => updateStatus(request.id, (e.target as HTMLSelectElement).value)"
                       :value="request.status"
                       class="rounded border border-slate-600 bg-slate-800/50 p-1 text-white text-xs"
                     >

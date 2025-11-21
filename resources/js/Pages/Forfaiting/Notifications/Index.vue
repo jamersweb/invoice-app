@@ -161,7 +161,7 @@
                   </td>
                   <td class="text-right p-3">
                     <select
-                      @change="updateStatus(notification.id, $event.target.value)"
+                      @change="(e) => updateStatus(notification.id, (e.target as HTMLSelectElement).value)"
                       :value="notification.status"
                       class="rounded border border-slate-600 bg-slate-800/50 p-1 text-white text-xs"
                     >
