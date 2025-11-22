@@ -24,7 +24,8 @@ const isLoadingOverview = ref(false);
 
 // Data refs
 const paymentStats = ref<{ total: number; paid: number; partiallyPaid: number; overdue: number } | null>(null);
-const overviewItems = ref<Array<{ title: string; value: number; icon: string; status: string }>>([]);
+type OverviewItem = { icon?: string; title: string; value: string | number; status?: 'success' | 'warning' | 'error' | 'info' };
+const overviewItems = ref<OverviewItem[]>([]);
 const aging = ref<{ current: number; d1_30: number; d31_60: number; d60p: number } | null>(null);
 const topSuppliers = ref<Array<{ supplier_id: number; total: number }>>([]);
 
@@ -67,7 +68,16 @@ const fetchOverview = async () => {
         const response = await fetch('/api/v1/dashboard/overview', { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
-            overviewItems.value = data.items || [];
+            // Type-safe assignment: ensure status values are valid
+            const items: OverviewItem[] = (data.items || []).map((item: any) => ({
+                icon: item.icon,
+                title: item.title,
+                value: item.value,
+                status: ['success', 'warning', 'error', 'info'].includes(item.status) 
+                    ? item.status as 'success' | 'warning' | 'error' | 'info'
+                    : undefined
+            }));
+            overviewItems.value = items;
         }
     } catch (error) {
         console.error('Failed to fetch overview:', error);
