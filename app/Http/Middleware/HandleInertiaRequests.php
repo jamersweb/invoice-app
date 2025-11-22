@@ -38,10 +38,17 @@ class HandleInertiaRequests extends Middleware
         // Store in request for logging
         $request->headers->set('X-Correlation-ID', $correlationId);
 
+        $user = $request->user();
+        
+        // Load roles relationship if user exists
+        if ($user) {
+            $user->load('roles');
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

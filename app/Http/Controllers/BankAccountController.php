@@ -18,6 +18,12 @@ class BankAccountController extends Controller
     public function index(): Response
     {
         $user = auth()->user();
+        
+        // Redirect admin users to admin banking page
+        if ($user->hasRole('Admin')) {
+            return redirect()->route('admin.bank');
+        }
+        
         $supplier = Supplier::where('contact_email', $user->email)->first();
 
         if (!$supplier) {

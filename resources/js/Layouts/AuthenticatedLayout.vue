@@ -10,6 +10,7 @@ import DarkInput from '@/Components/DarkInput.vue';
 const showingNavigationDropdown = ref(false);
 const sidebarOpen = ref(false);
 const searchQuery = ref('');
+const forfaitingExpanded = ref(true);
 
 const page = usePage();
 const user = computed(() => (page.props as any).auth?.user);
@@ -26,7 +27,7 @@ interface NavItem {
     name: string;
     href: string;
     icon: string;
-    section: 'main' | 'bottom' | 'admin';
+    section: 'main' | 'bottom' | 'admin' | 'forfaiting';
     isUrl?: boolean;
     badge?: number | string;
     dot?: boolean;
@@ -44,10 +45,7 @@ const navigation: NavItem[] = [
     { name: 'Help', href: '#', icon: '❓', section: 'bottom' },
 
     // Admin routes - organized as shown in images
-    { name: 'KYC/KYB Form', href: 'onboarding.kyc', icon: '📋', section: 'admin' },
-    { name: 'KYC Status', href: 'supplier.kyc.status', icon: '📈', section: 'admin' },
     { name: 'Customer Dashboard', href: 'admin.buyers', icon: '👔', section: 'admin' },
-    { name: 'Supplier', href: 'admin.buyers', icon: '🏢', section: 'admin' },
     { name: 'KYB Queue', href: 'admin.kyb.queue', icon: '🪪', section: 'admin', dot: true },
     { name: 'Collections', href: 'admin.collections', icon: '💰', section: 'admin', dot: true },
     { name: 'CMS', href: 'admin.cms', icon: '⭐', section: 'admin' },
@@ -60,6 +58,18 @@ const navigation: NavItem[] = [
     { name: 'Funding Logs', href: 'admin.funding-logs', icon: '💵', section: 'admin' },
     { name: 'Audit Log', href: 'admin.audit-log', icon: '📋', section: 'admin' },
     { name: 'Agreements', href: 'agreements.index', icon: '📜', section: 'admin' },
+    
+    // Forfaiting routes - grouped separately
+    { name: 'Dashboard', href: 'forfaiting.dashboard', icon: '📈', section: 'forfaiting' },
+    { name: 'Investments', href: 'forfaiting.investments.index', icon: '💼', section: 'forfaiting' },
+    { name: 'Transactions', href: 'forfaiting.transactions.index', icon: '💳', section: 'forfaiting' },
+    { name: 'Profit Allocations', href: 'forfaiting.profit-allocations.index', icon: '💰', section: 'forfaiting' },
+    { name: 'Expenses', href: 'forfaiting.expenses.index', icon: '💸', section: 'forfaiting' },
+    { name: 'Customers', href: 'forfaiting.customers.index', icon: '👥', section: 'forfaiting' },
+    { name: 'Investors', href: 'forfaiting.investors.index', icon: '🤝', section: 'forfaiting' },
+    { name: 'Analytics', href: 'forfaiting.analytics.index', icon: '📊', section: 'forfaiting' },
+    { name: 'Contact Requests', href: 'forfaiting.contact-requests.index', icon: '📧', section: 'forfaiting' },
+    { name: 'Notifications', href: 'forfaiting.notifications.index', icon: '🔔', section: 'forfaiting' },
 ];
 
 const mainNav = computed(() => {
@@ -82,7 +92,19 @@ const bottomNav = computed(() => navigation.filter(n => n.section === 'bottom'))
 const adminNav = computed(() => {
     // Only show admin nav if user is admin
     if (!isAdmin.value) return [];
-    return navigation.filter(n => n.section === 'admin');
+    // Map navigation items and adjust routes for admin users
+    return navigation.filter(n => n.section === 'admin').map(item => {
+        // Admin users should use admin.bank instead of bank.index
+        if (item.href === 'bank.index') {
+            return { ...item, href: 'admin.bank' };
+        }
+        return item;
+    });
+});
+const forfaitingNav = computed(() => {
+    // Only show forfaiting nav if user is admin
+    if (!isAdmin.value) return [];
+    return navigation.filter(n => n.section === 'forfaiting');
 });
 
 function currentRoute(routeName: string) {
@@ -182,6 +204,46 @@ function currentRoute(routeName: string) {
                         <div class="space-y-1">
                             <Link
                                 v-for="item in adminNav"
+                                :key="item.name"
+                                :href="item.isUrl ? item.href : (route().has(item.href) ? route(item.href) : '#')"
+                                :class="[
+                                    currentRoute(item.href)
+                                        ? 'bg-purple-accent/20 text-purple-accent border-l-2 border-purple-accent'
+                                        : 'text-dark-text-secondary hover:bg-dark-tertiary hover:text-dark-text-primary',
+                                    'group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
+                                ]"
+                            >
+                                <div class="flex items-center">
+                                    <span class="mr-3 text-base">{{ item.icon }}</span>
+                                    {{ item.name }}
+                                </div>
+                                <span v-if="item.badge" class="ml-2 rounded-full bg-purple-accent px-2 py-0.5 text-xs font-semibold text-white">{{ item.badge }}</span>
+                                <span v-else-if="item.dot" class="ml-2 h-2 w-2 rounded-full bg-purple-accent"></span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- Forfaiting Menu (if admin) -->
+                    <div v-if="forfaitingNav.length > 0">
+                        <div class="border-t border-dark-border my-6"></div>
+                        <button
+                            @click="forfaitingExpanded = !forfaitingExpanded"
+                            class="mb-4 flex w-full items-center justify-between text-xs font-semibold text-dark-text-muted uppercase tracking-wider hover:text-dark-text-primary transition-colors"
+                        >
+                            <span>Forfaiting</span>
+                            <svg
+                                class="h-4 w-4 transition-transform"
+                                :class="{ 'rotate-180': forfaitingExpanded }"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div v-show="forfaitingExpanded" class="space-y-1">
+                            <Link
+                                v-for="item in forfaitingNav"
                                 :key="item.name"
                                 :href="item.isUrl ? item.href : (route().has(item.href) ? route(item.href) : '#')"
                                 :class="[
