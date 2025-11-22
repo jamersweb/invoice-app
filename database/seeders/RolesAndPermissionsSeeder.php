@@ -38,8 +38,11 @@ class RolesAndPermissionsSeeder extends Seeder
             ]);
         }
 
+        // Get all permissions for Admin role (dynamic - includes any new permissions)
+        $allPermissions = Permission::where('guard_name', 'web')->pluck('name')->toArray();
+
         $roles = [
-            'Admin' => $permissions, // full access
+            'Admin' => $allPermissions, // full access to all permissions
             'Analyst' => [
                 'view_leads', 'manage_suppliers', 'review_documents', 'manage_pricing', 'view_audit'
             ],

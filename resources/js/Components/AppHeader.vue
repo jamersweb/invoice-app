@@ -8,6 +8,7 @@
           <a href="/how-it-works" class="hover:text-gray-900">How it works</a>
           <a href="/faqs" class="hover:text-gray-900">FAQs</a>
           <a href="/contact" class="hover:text-gray-900">Contact</a>
+          <a href="/login" class="hover:text-gray-900">Sign In</a>
           <a href="/apply" class="rounded-lg bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-700">Apply Now</a>
         </nav>
       </div>

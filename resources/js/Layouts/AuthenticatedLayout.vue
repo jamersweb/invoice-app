@@ -28,6 +28,8 @@ interface NavItem {
     icon: string;
     section: 'main' | 'bottom' | 'admin';
     isUrl?: boolean;
+    badge?: number | string;
+    dot?: boolean;
 }
 
 const navigation: NavItem[] = [
@@ -46,13 +48,13 @@ const navigation: NavItem[] = [
     { name: 'KYC Status', href: 'supplier.kyc.status', icon: '📈', section: 'admin' },
     { name: 'Customer Dashboard', href: 'admin.buyers', icon: '👔', section: 'admin' },
     { name: 'Supplier', href: 'admin.buyers', icon: '🏢', section: 'admin' },
-    { name: 'KYB Queue', href: 'admin.kyb.queue', icon: '🪪', section: 'admin' },
-    { name: 'Collections', href: 'admin.collections', icon: '💰', section: 'admin' },
+    { name: 'KYB Queue', href: 'admin.kyb.queue', icon: '🪪', section: 'admin', dot: true },
+    { name: 'Collections', href: 'admin.collections', icon: '💰', section: 'admin', dot: true },
     { name: 'CMS', href: 'admin.cms', icon: '⭐', section: 'admin' },
     { name: 'KYB Checklist', href: 'admin.kyb.checklist', icon: '✅', section: 'admin' },
     { name: 'Pricing Rules', href: 'admin.pricing.rules', icon: '📊', section: 'admin' },
-    { name: 'Leads', href: 'admin.leads', icon: '🧲', section: 'admin' },
-    { name: 'Doc Requests', href: 'admin.doc_requests', icon: '📥', section: 'admin' },
+    { name: 'Leads', href: 'admin.leads', icon: '🧲', section: 'admin', dot: true },
+    { name: 'Doc Requests', href: 'admin.doc_requests', icon: '📥', section: 'admin', dot: true },
     { name: 'Agreement Templates', href: 'admin.agreements.templates', icon: '📄', section: 'admin' },
     { name: 'Banking', href: 'bank.index', icon: '🏦', section: 'admin' },
     { name: 'Funding Logs', href: 'admin.funding-logs', icon: '💵', section: 'admin' },
@@ -129,11 +131,15 @@ function currentRoute(routeName: string) {
                                     currentRoute(item.href)
                                         ? 'bg-purple-accent/20 text-purple-accent border-l-2 border-purple-accent'
                                         : 'text-dark-text-secondary hover:bg-dark-tertiary hover:text-dark-text-primary',
-                                    'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
+                                    'group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
                                 ]"
                             >
-                                <span class="mr-3 text-base">{{ item.icon }}</span>
-                                {{ item.name }}
+                                <div class="flex items-center">
+                                    <span class="mr-3 text-base">{{ item.icon }}</span>
+                                    {{ item.name }}
+                                </div>
+                                <span v-if="item.badge" class="ml-2 rounded-full bg-purple-accent px-2 py-0.5 text-xs font-semibold text-white">{{ item.badge }}</span>
+                                <span v-else-if="item.dot" class="ml-2 h-2 w-2 rounded-full bg-purple-accent"></span>
                             </Link>
                         </div>
                     </div>
@@ -154,11 +160,15 @@ function currentRoute(routeName: string) {
                                     currentRoute(item.href)
                                         ? 'bg-purple-accent/20 text-purple-accent border-l-2 border-purple-accent'
                                         : 'text-dark-text-secondary hover:bg-dark-tertiary hover:text-dark-text-primary',
-                                    'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
+                                    'group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
                                 ]"
                             >
-                                <span class="mr-3 text-base">{{ item.icon }}</span>
-                                {{ item.name }}
+                                <div class="flex items-center">
+                                    <span class="mr-3 text-base">{{ item.icon }}</span>
+                                    {{ item.name }}
+                                </div>
+                                <span v-if="item.badge" class="ml-2 rounded-full bg-purple-accent px-2 py-0.5 text-xs font-semibold text-white">{{ item.badge }}</span>
+                                <span v-else-if="item.dot" class="ml-2 h-2 w-2 rounded-full bg-purple-accent"></span>
                             </Link>
                         </div>
                     </div>
@@ -178,11 +188,15 @@ function currentRoute(routeName: string) {
                                     currentRoute(item.href)
                                         ? 'bg-purple-accent/20 text-purple-accent border-l-2 border-purple-accent'
                                         : 'text-dark-text-secondary hover:bg-dark-tertiary hover:text-dark-text-primary',
-                                    'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
+                                    'group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
                                 ]"
                             >
-                                <span class="mr-3 text-base">{{ item.icon }}</span>
-                                {{ item.name }}
+                                <div class="flex items-center">
+                                    <span class="mr-3 text-base">{{ item.icon }}</span>
+                                    {{ item.name }}
+                                </div>
+                                <span v-if="item.badge" class="ml-2 rounded-full bg-purple-accent px-2 py-0.5 text-xs font-semibold text-white">{{ item.badge }}</span>
+                                <span v-else-if="item.dot" class="ml-2 h-2 w-2 rounded-full bg-purple-accent"></span>
                             </Link>
                         </div>
                     </div>
