@@ -6,6 +6,9 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 import DarkInput from '@/Components/DarkInput.vue';
+import Notification from '@/Components/Notification.vue';
+import { useNotificationStore } from '@/stores/notification';
+import { watch } from 'vue';
 
 const showingNavigationDropdown = ref(false);
 const sidebarOpen = ref(false);
@@ -14,14 +17,18 @@ const forfaitingExpanded = ref(true);
 
 const page = usePage();
 const user = computed(() => (page.props as any).auth?.user);
+const supplier = computed(() => (page.props as any).auth?.supplier);
+
 const isAdmin = computed(() => {
     const userRoles = (user.value as any)?.roles || [];
     return userRoles.some((r: any) => r.name === 'Admin');
 });
+
 const isSupplier = computed(() => {
     const userRoles = (user.value as any)?.roles || [];
     return userRoles.some((r: any) => r.name === 'Supplier');
 });
+
 
 interface NavItem {
     name: string;
@@ -46,6 +53,7 @@ const navigation: NavItem[] = [
 
     // Admin routes - organized as shown in images
     { name: 'Customer Dashboard', href: 'admin.buyers', icon: '👔', section: 'admin' },
+    { name: 'Suppliers', href: 'admin.suppliers.index', icon: '🏪', section: 'admin' },
     { name: 'KYB Queue', href: 'admin.kyb.queue', icon: '🪪', section: 'admin', dot: true },
     { name: 'Collections', href: 'admin.collections', icon: '💰', section: 'admin', dot: true },
     { name: 'CMS', href: 'admin.cms', icon: '⭐', section: 'admin' },
@@ -107,6 +115,24 @@ const forfaitingNav = computed(() => {
     return navigation.filter(n => n.section === 'forfaiting');
 });
 
+const notificationStore = useNotificationStore();
+
+// Watch for Inertia errors
+watch(() => page.props.errors, (errors: any) => {
+    if (errors && Object.keys(errors).length > 0) {
+        Object.keys(errors).forEach(key => {
+            notificationStore.error(errors[key]);
+        });
+    }
+}, { deep: true, immediate: true });
+
+// Watch for flash messages
+watch(() => (page.props as any).flash, (flash: any) => {
+    if (flash?.success) notificationStore.success(flash.success);
+    if (flash?.error) notificationStore.error(flash.error);
+    if (flash?.warning) notificationStore.warning(flash.warning);
+}, { deep: true, immediate: true });
+
 function currentRoute(routeName: string) {
     try {
         if (routeName.startsWith('/')) {
@@ -121,6 +147,8 @@ function currentRoute(routeName: string) {
 
 <template>
     <div class="min-h-screen bg-dark-primary">
+        <!-- Global Notifications -->
+        <Notification />
         <!-- Sidebar -->
         <div
             class="fixed inset-y-0 left-0 z-50 w-[275px] bg-dark-secondary border-r border-dark-border transform transition-transform duration-300 ease-in-out lg:translate-x-0"
@@ -365,5 +393,6 @@ function currentRoute(routeName: string) {
                 </div>
             </main>
         </div>
+
     </div>
 </template>

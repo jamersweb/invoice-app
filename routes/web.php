@@ -17,11 +17,11 @@ Route::get('/', function () {
     $blocks = \App\Models\CmsBlock::query()
         ->where('locale', $locale)
         ->where('is_active', true)
-        ->whereIn('key', ['hero_primary','hero_secondary','features_1','features_2','features_3','footer_cta'])
+        ->whereIn('key', ['hero_primary', 'hero_secondary', 'features_1', 'features_2', 'features_3', 'footer_cta'])
         ->get()
         ->keyBy('key');
     return Inertia::render('Public/Home', [
-        'cms' => $blocks->map->only(['key','title','body','cta_text','cta_href','image_url'])
+        'cms' => $blocks->map->only(['key', 'title', 'body', 'cta_text', 'cta_href', 'image_url'])
     ]);
 });
 
@@ -39,14 +39,15 @@ Route::get('/contact', function () {
 
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
     $data = $request->validate([
-        'name' => ['required','string','max:120'],
-        'email' => ['required','email'],
-        'message' => ['required','string','max:2000'],
+        'name' => ['required', 'string', 'max:120'],
+        'email' => ['required', 'email'],
+        'message' => ['required', 'string', 'max:2000'],
     ]);
     try {
         \Illuminate\Support\Facades\Mail::raw(
             "Contact form from {$data['name']} ({$data['email']}):\n\n{$data['message']}",
-            function ($m) { $m->to(config('mail.from.address'))->subject('Contact Form'); }
+            function ($m) {
+                $m->to(config('mail.from.address'))->subject('Contact Form'); }
         );
     } catch (\Throwable $e) {
         // ignore mail failures in minimal setup
@@ -65,7 +66,8 @@ Route::get('/api/v1/analytics/pv', function (\Illuminate\Http\Request $request) 
             'ip' => $request->ip(),
             'ua' => (string) $request->userAgent(),
         ]);
-    } catch (\Throwable $e) {}
+    } catch (\Throwable $e) {
+    }
     return response()->json(['ok' => true]);
 })->name('api.analytics.pv');
 
@@ -76,7 +78,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
         if ($status = $request->query('status')) {
             $query->where('status', $status);
         } else {
-            $query->whereIn('status', ['pending','pending_review','under_review']);
+            $query->whereIn('status', ['pending', 'pending_review', 'under_review']);
         }
         if ($assigned = $request->query('assigned_to')) {
             $query->where('assigned_to', $assigned);
@@ -87,7 +89,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
         if ($age = $request->query('age')) {
             // age in hours or days like "24h" / "2d"
             if (preg_match('/^(\d+)([hd])$/', $age, $m)) {
-                $val = (int)$m[1];
+                $val = (int) $m[1];
                 $col = $m[2] === 'h' ? now()->subHours($val) : now()->subDays($val);
                 $query->where('created_at', '<=', $col);
             }
@@ -99,7 +101,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
         } else {
             $query->orderBy($sort, $dir);
         }
-        $docs = $query->paginate(20, ['id','document_type_id','status','owner_type','owner_id','created_at','assigned_to','priority','vip']);
+        $docs = $query->paginate(20, ['id', 'document_type_id', 'status', 'owner_type', 'owner_id', 'created_at', 'assigned_to', 'priority', 'vip']);
         return response()->json($docs);
     })->name('api.kyb.queue');
 
@@ -123,7 +125,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
 
     Route::post('/admin/kyb-queue/{document}/reassign', function (\App\Models\Document $document, Request $request) {
         abort_unless(auth()->user()?->can('assign', $document), 403);
-        $request->validate(['assigned_to' => ['required','integer']]);
+        $request->validate(['assigned_to' => ['required', 'integer']]);
         $old = ['assigned_to' => $document->assigned_to];
         $document->assigned_to = $request->integer('assigned_to');
         $document->save();
@@ -214,7 +216,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
         $oldStatus = $document->status;
 
         // Update document status
-        $request->validate(['notes' => ['required','string']]);
+        $request->validate(['notes' => ['required', 'string']]);
         $document->update([
             'status' => 'rejected',
             'reviewed_by' => $user->id,
@@ -259,14 +261,14 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
 
     // Document details + history
     Route::get('/admin/documents/{document}', function (\App\Models\Document $document) {
-        $doc = $document->only(['id','document_type_id','status','file_path','owner_type','owner_id','created_at','assigned_to','priority','vip','review_notes']);
+        $doc = $document->only(['id', 'document_type_id', 'status', 'file_path', 'owner_type', 'owner_id', 'created_at', 'assigned_to', 'priority', 'vip', 'review_notes']);
         $doc['document_type'] = optional(\App\Models\DocumentType::find($document->document_type_id))->name;
         $history = \App\Models\AuditEvent::query()
             ->where('entity_type', \App\Models\Document::class)
             ->where('entity_id', $document->id)
             ->latest()
             ->limit(50)
-            ->get(['id','action','created_at','actor_id','diff_json'])
+            ->get(['id', 'action', 'created_at', 'actor_id', 'diff_json'])
             ->map(function ($h) {
                 $h->actor_name = optional(\App\Models\User::find($h->actor_id))->name;
                 return $h;
@@ -276,7 +278,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
 
     // Reviewers list (Admins/Analysts)
     Route::get('/admin/reviewers', function () {
-        $reviewers = User::role(['Admin','Analyst'])->get(['id','name']);
+        $reviewers = User::role(['Admin', 'Analyst'])->get(['id', 'name']);
         return response()->json($reviewers);
     })->name('api.kyb.reviewers');
 });
@@ -321,7 +323,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         $paid = (float) (Invoice::query()->where('status', 'paid')->sum('amount') ?? 0);
         $partiallyPaid = (float) (Invoice::query()->where('status', 'partial')->sum('amount') ?? 0);
         $overdue = (float) (Invoice::query()->where('status', 'overdue')->sum('amount') ?? 0);
-        
+
         return response()->json([
             'total' => $totalInvoiced,
             'paid' => $paid,
@@ -335,7 +337,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         $newInvoicesToday = Invoice::query()->whereDate('created_at', $today)->count();
         $kybPending = \App\Models\Supplier::query()->where('kyb_status', 'pending')->count();
         $fundingApprovals = Funding::query()->where('status', 'approved')->whereDate('created_at', $today)->count();
-        
+
         return response()->json([
             'items' => [
                 [
@@ -363,7 +365,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     Route::get('/dashboard/recent-activity', function () {
         $activities = [];
         $limit = 10;
-        
+
         try {
             // Recent fundings
             $fundings = Funding::query()
@@ -386,7 +388,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         } catch (\Exception $e) {
             // Silently fail if fundings table doesn't exist or has issues
         }
-        
+
         try {
             // Recent repayments
             $repayments = ReceivedRepayment::query()
@@ -407,7 +409,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         } catch (\Exception $e) {
             // Silently fail if repayments table doesn't exist or has issues
         }
-        
+
         try {
             // Recent invoices
             $invoices = Invoice::query()
@@ -428,12 +430,12 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         } catch (\Exception $e) {
             // Silently fail if invoices table doesn't exist or has issues
         }
-        
+
         // Sort by date and limit
-        usort($activities, function($a, $b) {
+        usort($activities, function ($a, $b) {
             return strtotime($b['date']) - strtotime($a['date']);
         });
-        
+
         return response()->json([
             'items' => array_slice($activities, 0, $limit),
         ]);
@@ -443,14 +445,15 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     // e-ID/KYC verification (adapter-backed, mock provider default)
     Route::post('/kyc/verify', function (Request $request) {
         $data = $request->validate([
-            'name' => ['required','string','max:190'],
-            'id_number' => ['required','string','max:190'],
-            'document_url' => ['nullable','string','max:190'],
+            'name' => ['required', 'string', 'max:190'],
+            'id_number' => ['required', 'string', 'max:190'],
+            'document_url' => ['nullable', 'string', 'max:190'],
         ]);
         $provider = app(\App\Services\KycProviderInterface::class, []);
-        if (!$provider) $provider = new \App\Services\MockKycProvider();
+        if (!$provider)
+            $provider = new \App\Services\MockKycProvider();
         $result = $provider->verify($data);
-        $supplier = \App\Models\Supplier::firstOrCreate(['contact_email'=>auth()->user()->email], ['kyb_status'=>'pending']);
+        $supplier = \App\Models\Supplier::firstOrCreate(['contact_email' => auth()->user()->email], ['kyb_status' => 'pending']);
         $kycData = $supplier->kyc_data ?? [];
         $kycData['eid'] = $result;
         $supplier->kyc_data = $kycData;
@@ -458,12 +461,12 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         return response()->json($result);
     })->name('api.kyc.verify');
     Route::post('/admin/repayments', function (Request $request) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $data = $request->validate([
-            'buyer_id' => ['required','integer'],
-            'amount' => ['required','numeric','min:0.01'],
-            'received_date' => ['required','date'],
-            'bank_reference' => ['nullable','string','max:190'],
+            'buyer_id' => ['required', 'integer'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            'received_date' => ['required', 'date'],
+            'bank_reference' => ['nullable', 'string', 'max:190'],
         ]);
         $rr = \App\Modules\Repayments\Models\ReceivedRepayment::create([
             'buyer_id' => $data['buyer_id'],
@@ -478,14 +481,16 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         $remaining = (float) $rr->unallocated_amount;
         $expecteds = \App\Modules\Repayments\Models\ExpectedRepayment::query()
             ->where('buyer_id', $rr->buyer_id)
-            ->whereIn('status', ['open','partial','overdue'])
+            ->whereIn('status', ['open', 'partial', 'overdue'])
             ->orderBy('due_date')
             ->get();
         foreach ($expecteds as $er) {
-            if ($remaining <= 0) break;
+            if ($remaining <= 0)
+                break;
             $alreadyAllocated = (float) (\App\Modules\Repayments\Models\RepaymentAllocation::where('expected_repayment_id', $er->id)->sum('amount') ?? 0);
-            $due = max((float)$er->amount - $alreadyAllocated, 0);
-            if ($due <= 0) continue;
+            $due = max((float) $er->amount - $alreadyAllocated, 0);
+            if ($due <= 0)
+                continue;
             $alloc = min($due, $remaining);
             \App\Modules\Repayments\Models\RepaymentAllocation::create([
                 'received_repayment_id' => $rr->id,
@@ -524,25 +529,26 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         $rr->unallocated_amount = $remaining;
         $rr->save();
 
-        return response()->json(['id' => $rr->id, 'allocated' => (float)$rr->allocated_amount, 'unallocated' => (float)$rr->unallocated_amount]);
+        return response()->json(['id' => $rr->id, 'allocated' => (float) $rr->allocated_amount, 'unallocated' => (float) $rr->unallocated_amount]);
     })->name('api.admin.repayments.store');
 
     Route::get('/admin/repayments/unallocated', function () {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $rows = \App\Modules\Repayments\Models\ReceivedRepayment::where('unallocated_amount', '>', 0)->orderByDesc('id')->paginate(20);
         return response()->json($rows);
     })->name('api.admin.repayments.unallocated');
 
     Route::post('/admin/repayments/{id}/allocate', function (Request $request, $id) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $data = $request->validate([
-            'expected_id' => ['required','integer','exists:expected_repayments,id'],
-            'amount' => ['required','numeric','min:0.01'],
+            'expected_id' => ['required', 'integer', 'exists:expected_repayments,id'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
         ]);
         $rr = \App\Modules\Repayments\Models\ReceivedRepayment::findOrFail($id);
         $er = \App\Modules\Repayments\Models\ExpectedRepayment::findOrFail($data['expected_id']);
-        $allocAmt = min((float)$data['amount'], (float)$rr->unallocated_amount);
-        if ($allocAmt <= 0) return response()->json(['error' => 'Nothing to allocate'], 422);
+        $allocAmt = min((float) $data['amount'], (float) $rr->unallocated_amount);
+        if ($allocAmt <= 0)
+            return response()->json(['error' => 'Nothing to allocate'], 422);
         \App\Modules\Repayments\Models\RepaymentAllocation::create([
             'received_repayment_id' => $rr->id,
             'expected_repayment_id' => $er->id,
@@ -552,7 +558,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         $rr->unallocated_amount -= $allocAmt;
         $rr->save();
         $alreadyAllocated = (float) (\App\Modules\Repayments\Models\RepaymentAllocation::where('expected_repayment_id', $er->id)->sum('amount') ?? 0);
-        $due = max((float)$er->amount - $alreadyAllocated, 0);
+        $due = max((float) $er->amount - $alreadyAllocated, 0);
         $er->status = $due <= 0 ? 'settled' : 'partial';
         $er->save();
         return response()->json(['ok' => true]);
@@ -560,7 +566,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 
     // Overdue updater
     Route::post('/admin/expected-repayments/overdue/run', function () {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $count = \App\Modules\Repayments\Models\ExpectedRepayment::whereDate('due_date', '<', now()->toDateString())
             ->where('status', 'open')->update(['status' => 'overdue']);
         return response()->json(['updated' => $count]);
@@ -568,10 +574,11 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 
     // OCR extraction endpoint (for invoice files)
     Route::post('/invoices/ocr', function (Request $request) {
-        $request->validate(['file' => ['required','file']]);
+        $request->validate(['file' => ['required', 'file']]);
         $file = $request->file('file');
         $ocr = app(\App\Services\OcrServiceInterface::class, []);
-        if (!$ocr) $ocr = new \App\Services\TesseractOcrService();
+        if (!$ocr)
+            $ocr = new \App\Services\TesseractOcrService();
         $data = $ocr->extract($file);
         return response()->json(['data' => $data]);
     })->name('api.invoices.ocr');
@@ -611,36 +618,38 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 // Funding Queue & Batches
 Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     Route::get('/admin/funding-queue', function () {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $rows = \App\Modules\Funding\Models\Funding::query()
             ->where('status', 'queued')
             ->with('invoice')
             ->orderByDesc('id')
             ->limit(100)
-            ->get(['id','invoice_id','offer_id','amount','status','created_at']);
+            ->get(['id', 'invoice_id', 'offer_id', 'amount', 'status', 'created_at']);
         return response()->json(['data' => $rows]);
     })->name('api.admin.funding.queue');
 
     Route::post('/admin/funding-batches', function (Request $request) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $validated = $request->validate([
-            'max_items' => ['nullable','integer','min:1','max:50'],
-            'max_total' => ['nullable','numeric','min:0'],
+            'max_items' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'max_total' => ['nullable', 'numeric', 'min:0'],
         ]);
         $maxItems = $validated['max_items'] ?? 50;
         $maxTotal = $validated['max_total'] ?? 10000000; // 10M default
 
         $queued = \App\Modules\Funding\Models\Funding::query()
-            ->whereNull('batch_id')->where('status','queued')
+            ->whereNull('batch_id')->where('status', 'queued')
             ->orderByDesc('id')->get();
 
         $picked = [];
         $total = 0.0;
         foreach ($queued as $f) {
-            if (count($picked) >= $maxItems) break;
-            if ($total + (float)$f->amount > $maxTotal) continue;
+            if (count($picked) >= $maxItems)
+                break;
+            if ($total + (float) $f->amount > $maxTotal)
+                continue;
             $picked[] = $f;
-            $total += (float)$f->amount;
+            $total += (float) $f->amount;
         }
         if (empty($picked)) {
             return response()->json(['error' => 'No items to batch'], 422);
@@ -655,13 +664,13 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
             $f->status = 'validated';
             $f->save();
         }
-        return response()->json(['id' => $batch->id, 'total_amount' => (float)$batch->total_amount, 'count' => count($picked)]);
+        return response()->json(['id' => $batch->id, 'total_amount' => (float) $batch->total_amount, 'count' => count($picked)]);
     })->name('api.admin.funding_batches.store');
 
     Route::get('/admin/funding-batches/{id}', function ($id) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $batch = \App\Modules\Funding\Models\FundingBatch::findOrFail($id);
-        $items = \App\Modules\Funding\Models\Funding::where('batch_id', $batch->id)->get(['id','invoice_id','amount','status']);
+        $items = \App\Modules\Funding\Models\Funding::where('batch_id', $batch->id)->get(['id', 'invoice_id', 'amount', 'status']);
         return response()->json(['batch' => $batch, 'items' => $items]);
     })->name('api.admin.funding_batches.show');
 
@@ -684,7 +693,8 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         $missingBankAccounts = [];
         foreach ($items as $f) {
             $invoice = \App\Modules\Invoices\Models\Invoice::find($f->invoice_id);
-            if (!$invoice) continue;
+            if (!$invoice)
+                continue;
 
             $supplier = \App\Models\Supplier::find($invoice->supplier_id);
             if ($supplier) {
@@ -708,7 +718,8 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 
         foreach ($items as $f) {
             $invoice = \App\Modules\Invoices\Models\Invoice::find($f->invoice_id);
-            if (!$invoice) continue;
+            if (!$invoice)
+                continue;
             $old = $invoice->status;
             $invoice->status = 'funded';
             $invoice->save();
@@ -764,27 +775,27 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     })->name('api.admin.fundings.record');
 
     Route::patch('/admin/fundings/{id}/status', function (Request $request, $id) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
-        $request->validate(['status' => ['required','in:queued,validated,approved,executed,failed']]);
-        \App\Modules\Funding\Models\Funding::where('id',$id)->update(['status' => $request->string('status')]);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
+        $request->validate(['status' => ['required', 'in:queued,validated,approved,executed,failed']]);
+        \App\Modules\Funding\Models\Funding::where('id', $id)->update(['status' => $request->string('status')]);
         return response()->json(['ok' => true]);
     })->name('api.admin.fundings.status');
 
     Route::get('/suppliers/{id}/fundings', function ($id) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
-        $invoices = \App\Modules\Invoices\Models\Invoice::where('supplier_id',$id)->pluck('id');
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
+        $invoices = \App\Modules\Invoices\Models\Invoice::where('supplier_id', $id)->pluck('id');
         $fundings = \App\Modules\Funding\Models\Funding::whereIn('invoice_id', $invoices)->orderByDesc('id')->get();
         return response()->json(['data' => $fundings]);
     })->name('api.suppliers.fundings.index');
 
     Route::get('/fundings/{id}/documents', function ($id) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         return response()->json(['data' => []]);
     })->name('api.fundings.documents');
 
     Route::post('/admin/fundings/{id}/retry', function ($id) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
-        \App\Modules\Funding\Models\Funding::where('id',$id)->update(['status' => 'approved']);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
+        \App\Modules\Funding\Models\Funding::where('id', $id)->update(['status' => 'approved']);
         return response()->json(['ok' => true]);
     })->name('api.admin.fundings.retry');
 });
@@ -792,7 +803,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 // Admin Reporting Widgets (basic)
 Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     Route::get('/admin/reporting/aging', function () {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $today = now()->toDateString();
         $rows = \App\Modules\Repayments\Models\ExpectedRepayment::selectRaw(
             "sum(case when status='open' and due_date>=? then amount else 0 end) as current, " .
@@ -800,15 +811,15 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
             "sum(case when status in ('open','overdue') and julianday(?) - julianday(due_date) between 31 and 60 then amount else 0 end) as d31_60, " .
             "sum(case when status in ('open','overdue') and julianday(?) - julianday(due_date) > 60 then amount else 0 end) as d60p",
         )
-        ->setBindings([$today,$today,$today,$today,$today])
-        ->first();
+            ->setBindings([$today, $today, $today, $today, $today])
+            ->first();
         return response()->json($rows);
     })->name('api.admin.reporting.aging');
 
     Route::get('/admin/reporting/top-suppliers', function () {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Analyst']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Analyst']), 403);
         $rows = \App\Modules\Invoices\Models\Invoice::query()
-            ->join('fundings','fundings.invoice_id','=','invoices.id')
+            ->join('fundings', 'fundings.invoice_id', '=', 'invoices.id')
             ->selectRaw('invoices.supplier_id, sum(fundings.amount) as total')
             ->groupBy('invoices.supplier_id')
             ->orderByDesc('total')
@@ -821,23 +832,25 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
 // API v1 - Collections (overdue)
 Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     Route::get('/admin/collections', function (Request $request) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Collector']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Collector']), 403);
         $q = Invoice::query()->where('status', 'overdue');
-        if ($assigned = $request->query('assigned_to')) $q->where('assigned_to', $assigned);
-        if ($min = $request->query('min_amount')) $q->where('amount', '>=', (float) $min);
+        if ($assigned = $request->query('assigned_to'))
+            $q->where('assigned_to', $assigned);
+        if ($min = $request->query('min_amount'))
+            $q->where('amount', '>=', (float) $min);
         if ($age = $request->query('age')) {
             if (preg_match('/^(\d+)([hd])$/', $age, $m)) {
-                $val = (int)$m[1];
+                $val = (int) $m[1];
                 $col = $m[2] === 'h' ? now()->subHours($val) : now()->subDays($val);
                 $q->where('due_date', '<=', $col);
             }
         }
-        $q->orderBy('priority','desc')->orderBy('due_date');
-        return response()->json($q->paginate(20, ['id','invoice_number','amount','supplier_id','buyer_id','due_date','assigned_to','priority']));
+        $q->orderBy('priority', 'desc')->orderBy('due_date');
+        return response()->json($q->paginate(20, ['id', 'invoice_number', 'amount', 'supplier_id', 'buyer_id', 'due_date', 'assigned_to', 'priority']));
     })->name('api.collections.index');
 
     Route::post('/admin/collections/{invoice}/claim', function (Invoice $invoice) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Collector']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Collector']), 403);
 
         $oldAssignedTo = $invoice->assigned_to;
         $invoice->assigned_to = auth()->id();
@@ -860,8 +873,8 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     })->name('api.collections.claim');
 
     Route::post('/admin/collections/{invoice}/reassign', function (Invoice $invoice, Request $request) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Collector']), 403);
-        $request->validate(['assigned_to' => ['required','integer']]);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Collector']), 403);
+        $request->validate(['assigned_to' => ['required', 'integer']]);
 
         $oldAssignedTo = $invoice->assigned_to;
         $invoice->assigned_to = $request->integer('assigned_to');
@@ -884,7 +897,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
     })->name('api.collections.reassign');
 
     Route::post('/admin/collections/{invoice}/remind', function (Invoice $invoice) {
-        abort_unless(auth()->user()?->hasAnyRole(['Admin','Collector']), 403);
+        abort_unless(auth()->user()?->hasAnyRole(['Admin', 'Collector']), 403);
 
         // Get buyer contact email (placeholder for now)
         $buyerEmail = 'buyer@example.com'; // TODO: Get from buyer relationship
@@ -919,18 +932,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Supplier Dashboard
     Route::get('/supplier/dashboard', function () {
         $user = auth()->user();
-        
+
         // Ensure email is verified
         if (!$user->hasVerifiedEmail()) {
             return redirect()->route('verification.notice');
         }
-        
+
         // Ensure KYC/KYB is completed
         $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
         if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
             return redirect()->route('onboarding.kyc');
         }
-        
+
         return Inertia::render('Supplier/Dashboard', [
             't' => [
                 'dashboard' => __('messages.dashboard'),
@@ -974,13 +987,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             if (!$user->hasVerifiedEmail()) {
                 return redirect()->route('verification.notice');
             }
-            
+
             // Step 2: KYC/KYB completion
             $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
             if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
                 return redirect()->route('onboarding.kyc');
             }
-            
+
             return redirect()->route('supplier.dashboard');
         }
         // Default fallback
@@ -1132,23 +1145,27 @@ Route::middleware('auth')->group(function () {
         ];
         $callback = function () use ($request) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['id','document_type_id','status','owner_type','owner_id','created_at','assigned_to','priority','vip']);
+            fputcsv($out, ['id', 'document_type_id', 'status', 'owner_type', 'owner_id', 'created_at', 'assigned_to', 'priority', 'vip']);
             $q = \App\Models\Document::query();
-            if ($status = $request->query('status')) $q->where('status', $status);
-            else $q->whereIn('status', ['pending','pending_review','under_review']);
-            if ($assigned = $request->query('assigned_to')) $q->where('assigned_to', $assigned);
-            if (($vip = $request->boolean('vip', null)) !== null) $q->where('vip', $vip);
+            if ($status = $request->query('status'))
+                $q->where('status', $status);
+            else
+                $q->whereIn('status', ['pending', 'pending_review', 'under_review']);
+            if ($assigned = $request->query('assigned_to'))
+                $q->where('assigned_to', $assigned);
+            if (($vip = $request->boolean('vip', null)) !== null)
+                $q->where('vip', $vip);
             if ($age = $request->query('age')) {
                 if (preg_match('/^(\d+)([hd])$/', $age, $m)) {
-                    $val = (int)$m[1];
+                    $val = (int) $m[1];
                     $col = $m[2] === 'h' ? now()->subHours($val) : now()->subDays($val);
                     $q->where('created_at', '<=', $col);
                 }
             }
-            $q->orderBy('vip','desc')->orderBy('priority','desc')->orderBy('created_at');
+            $q->orderBy('vip', 'desc')->orderBy('priority', 'desc')->orderBy('created_at');
             $q->chunk(1000, function ($rows) use ($out) {
                 foreach ($rows as $r) {
-                    fputcsv($out, [$r->id,$r->document_type_id,$r->status,$r->owner_type,$r->owner_id,$r->created_at,$r->assigned_to,$r->priority,$r->vip]);
+                    fputcsv($out, [$r->id, $r->document_type_id, $r->status, $r->owner_type, $r->owner_id, $r->created_at, $r->assigned_to, $r->priority, $r->vip]);
                 }
             });
             fclose($out);
@@ -1191,10 +1208,21 @@ Route::middleware(['auth'])->group(function () {
 
         // Update supplier data
         $supplier->update($request->only([
-            'company_name', 'legal_name', 'tax_registration_number', 'website',
-            'business_type', 'industry', 'incorporation_date', 'country',
-            'state_province', 'city', 'address', 'postal_code', 'contact_email',
-            'contact_phone', 'kyc_data'
+            'company_name',
+            'legal_name',
+            'tax_registration_number',
+            'website',
+            'business_type',
+            'industry',
+            'incorporation_date',
+            'country',
+            'state_province',
+            'city',
+            'address',
+            'postal_code',
+            'contact_email',
+            'contact_phone',
+            'kyc_data'
         ]));
         // Inertia forms expect a redirect, not JSON
         if ($request->header('X-Inertia')) {
@@ -1296,7 +1324,7 @@ Route::middleware(['auth'])->group(function () {
                 throw new \Exception('Export file not found');
             }
 
-            $mimeType = match($format) {
+            $mimeType = match ($format) {
                 'excel' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'csv' => 'text/csv',
                 default => 'application/octet-stream'
@@ -1327,7 +1355,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/me/offers/active', function () {
             $user = auth()->user();
             $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
-            if (!$supplier) return response()->json(['data' => []]);
+            if (!$supplier)
+                return response()->json(['data' => []]);
             $offers = \App\Modules\Offers\Models\Offer::whereHas('invoice', function ($q) use ($supplier) {
                 $q->where('supplier_id', $supplier->id);
             })->where('status', 'issued')->orderByDesc('issued_at')->limit(10)->get();
@@ -1337,20 +1366,22 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/me/invoices/recent', function () {
             $user = auth()->user();
             $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
-            if (!$supplier) return response()->json(['data' => []]);
+            if (!$supplier)
+                return response()->json(['data' => []]);
             $invoices = \App\Modules\Invoices\Models\Invoice::where('supplier_id', $supplier->id)
-                ->orderByDesc('created_at')->limit(10)->get(['id','invoice_number','amount','status','created_at']);
+                ->orderByDesc('created_at')->limit(10)->get(['id', 'invoice_number', 'amount', 'status', 'created_at']);
             return response()->json(['data' => $invoices]);
         })->name('api.me.invoices.recent');
 
         Route::get('/me/repayments/schedule', function () {
             $user = auth()->user();
             $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
-            if (!$supplier) return response()->json(['data' => []]);
+            if (!$supplier)
+                return response()->json(['data' => []]);
             $expected = \App\Modules\Repayments\Models\ExpectedRepayment::where('supplier_id', $supplier->id)
-                ->whereIn('status', ['open','partial','overdue'])
+                ->whereIn('status', ['open', 'partial', 'overdue'])
                 ->orderBy('due_date')->limit(20)
-                ->get(['id','invoice_id','buyer_id','amount','due_date','status']);
+                ->get(['id', 'invoice_id', 'buyer_id', 'amount', 'due_date', 'status']);
             return response()->json(['data' => $expected]);
         })->name('api.me.repayments.schedule');
 
@@ -1364,11 +1395,11 @@ Route::middleware(['auth'])->group(function () {
                 ->whereIn('customer_type', [$type, 'Default'])
                 ->orderByRaw("case when customer_type=? then 0 else 1 end", [$type])
                 ->get();
-            $out = $rules->map(function($r){
+            $out = $rules->map(function ($r) {
                 return [
                     'document_type_id' => $r->document_type_id,
                     'document_type' => optional($r->documentType)->name,
-                    'is_required' => (bool)$r->is_required,
+                    'is_required' => (bool) $r->is_required,
                     'expires_in_days' => $r->expires_in_days,
                 ];
             });
@@ -1384,20 +1415,21 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/api/cms', function (Request $request) {
             $q = \App\Models\CmsBlock::query();
-            if ($locale = $request->query('locale')) $q->where('locale', $locale);
+            if ($locale = $request->query('locale'))
+                $q->where('locale', $locale);
             return response()->json($q->orderBy('key')->paginate(20));
         })->name('admin.api.cms.index');
 
         Route::post('/api/cms', function (Request $request) {
             $data = $request->validate([
-                'key' => ['required','string','max:120'],
-                'locale' => ['nullable','string','max:10'],
-                'title' => ['nullable','string','max:190'],
-                'body' => ['nullable','string'],
-                'cta_text' => ['nullable','string','max:120'],
-                'cta_href' => ['nullable','string','max:190'],
-                'image_url' => ['nullable','string','max:190'],
-                'is_active' => ['nullable','boolean'],
+                'key' => ['required', 'string', 'max:120'],
+                'locale' => ['nullable', 'string', 'max:10'],
+                'title' => ['nullable', 'string', 'max:190'],
+                'body' => ['nullable', 'string'],
+                'cta_text' => ['nullable', 'string', 'max:120'],
+                'cta_href' => ['nullable', 'string', 'max:190'],
+                'image_url' => ['nullable', 'string', 'max:190'],
+                'is_active' => ['nullable', 'boolean'],
             ]);
             $data['locale'] = $data['locale'] ?? app()->getLocale();
             $data['is_active'] = (bool) ($data['is_active'] ?? true);
@@ -1408,12 +1440,12 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/api/cms/{id}', function (Request $request, $id) {
             $row = \App\Models\CmsBlock::findOrFail($id);
             $data = $request->validate([
-                'title' => ['nullable','string','max:190'],
-                'body' => ['nullable','string'],
-                'cta_text' => ['nullable','string','max:120'],
-                'cta_href' => ['nullable','string','max:190'],
-                'image_url' => ['nullable','string','max:190'],
-                'is_active' => ['nullable','boolean'],
+                'title' => ['nullable', 'string', 'max:190'],
+                'body' => ['nullable', 'string'],
+                'cta_text' => ['nullable', 'string', 'max:120'],
+                'cta_href' => ['nullable', 'string', 'max:190'],
+                'image_url' => ['nullable', 'string', 'max:190'],
+                'is_active' => ['nullable', 'boolean'],
             ]);
             $row->update($data);
             return response()->json(['ok' => true]);
@@ -1424,6 +1456,11 @@ Route::middleware(['auth'])->group(function () {
             return response()->json(['ok' => true]);
         })->name('admin.api.cms.delete');
 
+        // Admin Supplier Review
+        Route::get('/suppliers', [\App\Http\Controllers\Admin\SupplierReviewController::class, 'index'])->name('admin.suppliers.index');
+        Route::get('/suppliers/{supplier}', [\App\Http\Controllers\Admin\SupplierReviewController::class, 'show'])->name('admin.suppliers.show');
+        Route::post('/suppliers/{supplier}/status', [\App\Http\Controllers\Admin\SupplierReviewController::class, 'updateStatus'])->name('admin.suppliers.status.update');
+
         // Admin KYB Checklist CRUD
         Route::get('/kyb-checklist', function () {
             return Inertia::render('Admin/KybChecklist');
@@ -1431,17 +1468,18 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/api/kyb-checklist', function (Request $request) {
             $q = \App\Models\KybChecklist::query()->with('documentType');
-            if ($ct = $request->query('customer_type')) $q->where('customer_type', $ct);
+            if ($ct = $request->query('customer_type'))
+                $q->where('customer_type', $ct);
             return response()->json($q->orderBy('customer_type')->orderBy('document_type_id')->paginate(50));
         })->name('admin.api.kyb_checklist.index');
 
         Route::post('/api/kyb-checklist', function (Request $request) {
             $data = $request->validate([
-                'customer_type' => ['required','string','max:120'],
-                'document_type_id' => ['required','integer','exists:document_types,id'],
-                'is_required' => ['nullable','boolean'],
-                'expires_in_days' => ['nullable','integer','min:0'],
-                'is_active' => ['nullable','boolean'],
+                'customer_type' => ['required', 'string', 'max:120'],
+                'document_type_id' => ['required', 'integer', 'exists:document_types,id'],
+                'is_required' => ['nullable', 'boolean'],
+                'expires_in_days' => ['nullable', 'integer', 'min:0'],
+                'is_active' => ['nullable', 'boolean'],
             ]);
             $row = \App\Models\KybChecklist::create([
                 'customer_type' => $data['customer_type'],
@@ -1456,9 +1494,9 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/api/kyb-checklist/{id}', function (Request $request, $id) {
             $row = \App\Models\KybChecklist::findOrFail($id);
             $data = $request->validate([
-                'is_required' => ['nullable','boolean'],
-                'expires_in_days' => ['nullable','integer','min:0'],
-                'is_active' => ['nullable','boolean'],
+                'is_required' => ['nullable', 'boolean'],
+                'expires_in_days' => ['nullable', 'integer', 'min:0'],
+                'is_active' => ['nullable', 'boolean'],
             ]);
             $row->update($data);
             return response()->json(['ok' => true]);
@@ -1478,33 +1516,33 @@ Route::middleware(['auth'])->group(function () {
         })->name('admin.api.pricing_rules.index');
         Route::post('/api/pricing-rules', function (Request $request) {
             $data = $request->validate([
-                'tenor_min' => ['required','integer','min:0'],
-                'tenor_max' => ['required','integer','gte:tenor_min'],
-                'amount_min' => ['required','numeric','min:0'],
-                'amount_max' => ['required','numeric','gte:amount_min'],
-                'base_rate' => ['required','numeric'],
-                'vip_adjust' => ['nullable','numeric'],
-                'is_active' => ['nullable','boolean'],
+                'tenor_min' => ['required', 'integer', 'min:0'],
+                'tenor_max' => ['required', 'integer', 'gte:tenor_min'],
+                'amount_min' => ['required', 'numeric', 'min:0'],
+                'amount_max' => ['required', 'numeric', 'gte:amount_min'],
+                'base_rate' => ['required', 'numeric'],
+                'vip_adjust' => ['nullable', 'numeric'],
+                'is_active' => ['nullable', 'boolean'],
             ]);
-            $row = \App\Models\PricingRule::create($data + ['is_active' => (bool)($data['is_active'] ?? true)]);
+            $row = \App\Models\PricingRule::create($data + ['is_active' => (bool) ($data['is_active'] ?? true)]);
             return response()->json($row, 201);
         })->name('admin.api.pricing_rules.store');
         Route::put('/api/pricing-rules/{id}', function (Request $request, $id) {
             $row = \App\Models\PricingRule::findOrFail($id);
             $data = $request->validate([
-                'tenor_min' => ['nullable','integer','min:0'],
-                'tenor_max' => ['nullable','integer'],
-                'amount_min' => ['nullable','numeric','min:0'],
-                'amount_max' => ['nullable','numeric'],
-                'base_rate' => ['nullable','numeric'],
-                'vip_adjust' => ['nullable','numeric'],
-                'is_active' => ['nullable','boolean'],
+                'tenor_min' => ['nullable', 'integer', 'min:0'],
+                'tenor_max' => ['nullable', 'integer'],
+                'amount_min' => ['nullable', 'numeric', 'min:0'],
+                'amount_max' => ['nullable', 'numeric'],
+                'base_rate' => ['nullable', 'numeric'],
+                'vip_adjust' => ['nullable', 'numeric'],
+                'is_active' => ['nullable', 'boolean'],
             ]);
             $row->update($data);
             return response()->json(['ok' => true]);
         })->name('admin.api.pricing_rules.update');
         Route::delete('/api/pricing-rules/{id}', function ($id) {
-            \App\Models\PricingRule::where('id',$id)->delete();
+            \App\Models\PricingRule::where('id', $id)->delete();
             return response()->json(['ok' => true]);
         })->name('admin.api.pricing_rules.delete');
 
@@ -1515,10 +1553,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/api/leads', function (Request $request) {
             $q = \App\Models\Lead::query();
             if ($s = $request->query('search')) {
-                $q->where(function($qq) use ($s){
-                    $qq->where('name','like',"%$s%");
-                    $qq->orWhere('email','like',"%$s%");
-                    $qq->orWhere('company','like',"%$s%");
+                $q->where(function ($qq) use ($s) {
+                    $qq->where('name', 'like', "%$s%");
+                    $qq->orWhere('email', 'like', "%$s%");
+                    $qq->orWhere('company', 'like', "%$s%");
                 });
             }
             return response()->json($q->orderByDesc('id')->paginate(20));
@@ -1530,9 +1568,10 @@ Route::middleware(['auth'])->group(function () {
             ];
             $callback = function () {
                 $out = fopen('php://output', 'w');
-                fputcsv($out, ['id','name','email','phone','company','created_at']);
-                \App\Models\Lead::orderByDesc('id')->chunk(1000, function($rows) use ($out){
-                    foreach ($rows as $r) fputcsv($out, [$r->id,$r->name,$r->email,$r->phone,$r->company,$r->created_at]);
+                fputcsv($out, ['id', 'name', 'email', 'phone', 'company', 'created_at']);
+                \App\Models\Lead::orderByDesc('id')->chunk(1000, function ($rows) use ($out) {
+                    foreach ($rows as $r)
+                        fputcsv($out, [$r->id, $r->name, $r->email, $r->phone, $r->company, $r->created_at]);
                 });
                 fclose($out);
             };
@@ -1548,11 +1587,11 @@ Route::middleware(['auth'])->group(function () {
         })->name('admin.api.agreements.templates.index');
         Route::post('/api/agreements/templates', function (Request $request) {
             $data = $request->validate([
-                'name' => ['required','string','max:190'],
-                'version' => ['required','string','max:50'],
-                'effective_from' => ['nullable','date'],
-                'effective_to' => ['nullable','date','after:effective_from'],
-                'content' => ['required','string'],
+                'name' => ['required', 'string', 'max:190'],
+                'version' => ['required', 'string', 'max:50'],
+                'effective_from' => ['nullable', 'date'],
+                'effective_to' => ['nullable', 'date', 'after:effective_from'],
+                'content' => ['required', 'string'],
             ]);
             $row = \App\Models\AgreementTemplate::create($data);
             return response()->json($row, 201);
@@ -1560,32 +1599,34 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/api/agreements/templates/{id}', function (Request $request, $id) {
             $row = \App\Models\AgreementTemplate::findOrFail($id);
             $data = $request->validate([
-                'name' => ['nullable','string','max:190'],
-                'version' => ['nullable','string','max:50'],
-                'effective_from' => ['nullable','date'],
-                'effective_to' => ['nullable','date','after:effective_from'],
-                'content' => ['nullable','string'],
+                'name' => ['nullable', 'string', 'max:190'],
+                'version' => ['nullable', 'string', 'max:50'],
+                'effective_from' => ['nullable', 'date'],
+                'effective_to' => ['nullable', 'date', 'after:effective_from'],
+                'content' => ['nullable', 'string'],
             ]);
             $row->update($data);
             return response()->json(['ok' => true]);
         })->name('admin.api.agreements.templates.update');
         Route::delete('/api/agreements/templates/{id}', function ($id) {
-            \App\Models\AgreementTemplate::where('id',$id)->delete();
+            \App\Models\AgreementTemplate::where('id', $id)->delete();
             return response()->json(['ok' => true]);
         })->name('admin.api.agreements.templates.delete');
 
         // Document Requests per supplier
-        Route::get('/doc-requests', function () { return Inertia::render('Admin/DocRequests'); })->name('admin.doc_requests');
+        Route::get('/doc-requests', function () {
+            return Inertia::render('Admin/DocRequests'); })->name('admin.doc_requests');
         Route::get('/api/doc-requests', function (Request $request) {
             $q = \App\Models\RequestedDocument::query();
-            if ($sid = $request->query('supplier_id')) $q->where('supplier_id', $sid);
+            if ($sid = $request->query('supplier_id'))
+                $q->where('supplier_id', $sid);
             return response()->json($q->orderByDesc('id')->paginate(50));
         })->name('admin.api.doc_requests.index');
         Route::post('/api/doc-requests', function (Request $request) {
             $data = $request->validate([
-                'supplier_id' => ['required','integer','exists:suppliers,id'],
-                'document_type_id' => ['required','integer','exists:document_types,id'],
-                'note' => ['nullable','string','max:190'],
+                'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
+                'document_type_id' => ['required', 'integer', 'exists:document_types,id'],
+                'note' => ['nullable', 'string', 'max:190'],
             ]);
             $row = \App\Models\RequestedDocument::create($data + [
                 'requested_by' => auth()->id(),
@@ -1694,4 +1735,4 @@ Route::middleware(['auth'])->group(function () {
 // Health Check (public)
 Route::get('/health', [\App\Http\Controllers\HealthController::class, 'check'])->name('health.check');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

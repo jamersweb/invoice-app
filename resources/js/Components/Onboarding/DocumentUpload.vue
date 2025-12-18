@@ -193,8 +193,9 @@ const updateNote = () => emit('version-note', versionNote.value);
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
+      @click="openFileDialog"
       :class="[
-        'mt-4 rounded-lg border-2 border-dashed p-6 text-center transition-colors',
+        'mt-4 rounded-lg border-2 border-dashed p-6 text-center transition-colors cursor-pointer',
         isDragOver ? 'border-indigo-400 bg-indigo-50' : 'border-gray-300 hover:border-gray-400'
       ]"
     >

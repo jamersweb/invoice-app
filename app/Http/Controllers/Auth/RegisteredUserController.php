@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -43,22 +43,31 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign Supplier role
+        $user->assignRole('Supplier');
+
+        // Create supplier profile linked to user
+        Supplier::updateOrCreate(
+            ['contact_email' => $user->email],
+            [
+                'company_name' => $request->name,
+                'kyb_status' => 'pending',
+            ]
+        );
+
         event(new Registered($user));
+
+        // Generate OTP
+        $otp = (string) rand(100000, 999999);
+        $user->update([
+            'otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        $user->notify(new \App\Notifications\Auth\EmailVerificationOtpNotification($otp));
 
         Auth::login($user);
 
-        // Check user role and redirect to appropriate dashboard
-        if ($user->hasRole('Admin')) {
-            return redirect()->route('admin.dashboard', absolute: false);
-        }
-        
-        // Supplier users
-        $supplier = Supplier::where('contact_email', $user->email)->first();
-        
-        if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
-            return redirect()->route('onboarding.kyc');
-        }
-        
-        return redirect()->route('supplier.dashboard', absolute: false);
+        return redirect()->route('verification.otp');
     }
 }

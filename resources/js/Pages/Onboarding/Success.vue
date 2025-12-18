@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+import GradientButton from '@/Components/GradientButton.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 
@@ -23,15 +24,15 @@ onMounted(async () => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'pending':
-      return 'bg-yellow-100 text-yellow-800';
+      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
     case 'under_review':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
     case 'approved':
-      return 'bg-green-100 text-green-800';
+      return 'bg-green-500/20 text-green-400 border-green-500/30';
     case 'rejected':
-      return 'bg-red-100 text-red-800';
+      return 'bg-red-500/20 text-red-400 border-red-500/30';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   }
 };
 
@@ -54,162 +55,115 @@ const getStatusText = (status: string) => {
 <template>
   <Head title="Application Submitted" />
 
-  <AuthenticatedLayout>
+  <GuestLayout>
     <template #header>
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900">Application Submitted</h2>
-          <p class="mt-1 text-sm text-gray-500">Your KYC/KYB application has been successfully submitted</p>
-        </div>
-      </div>
-    </template>
-
-    <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <!-- Success Message -->
-      <div class="rounded-xl border border-green-200 bg-green-50 p-8 text-center">
-        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="text-center mb-10">
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 border border-green-500/30 mb-6">
+          <svg class="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
         </div>
-        <h3 class="mt-4 text-lg font-semibold text-green-900">Application Submitted Successfully!</h3>
-        <p class="mt-2 text-sm text-green-700">
-          Thank you for submitting your KYC/KYB application. Our team will review your information and documents.
+        <h2 class="text-3xl font-bold text-dark-text-primary mb-2">Application Submitted!</h2>
+        <p class="text-sm text-dark-text-secondary max-w-md mx-auto">
+          Your KYC/KYB application has been successfully received. Our compliance team is now reviewing your information.
         </p>
       </div>
+    </template>
 
-      <!-- Application Status -->
-      <div v-if="!loading && supplier" class="mt-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-gray-900">Application Status</h3>
-        <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="space-y-8">
+      <!-- Status Card -->
+      <div v-if="!loading && supplier" class="card p-6 bg-dark-secondary/50">
+        <h3 class="text-xl font-semibold text-dark-text-primary mb-6">Application Overview</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
-            <label class="block text-sm font-medium text-gray-500">Status</label>
+            <label class="block text-xs font-medium text-dark-text-muted uppercase tracking-wider mb-1">Status</label>
             <div class="mt-1">
               <span
-                :class="['inline-flex rounded-full px-2 py-1 text-xs font-medium', getStatusBadge(supplier.kyb_status)]"
+                :class="['inline-flex rounded-lg px-3 py-1 text-sm font-medium border', getStatusBadge(supplier.kyb_status)]"
               >
                 {{ getStatusText(supplier.kyb_status) }}
               </span>
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-500">Company Name</label>
-            <p class="mt-1 text-sm text-gray-900">{{ supplier.company_name || 'Not provided' }}</p>
+            <label class="block text-xs font-medium text-dark-text-muted uppercase tracking-wider mb-1">Company Name</label>
+            <p class="mt-1 text-lg font-medium text-dark-text-primary">{{ supplier.company_name || 'Not provided' }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-500">Submitted Date</label>
-            <p class="mt-1 text-sm text-gray-900">{{ new Date(supplier.updated_at).toLocaleDateString() }}</p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-500">Completion</label>
-            <div class="mt-1">
-              <div class="flex items-center">
-                <div class="flex-1 rounded-full bg-gray-200">
-                  <div
-                    class="h-2 rounded-full bg-indigo-600 transition-all duration-300"
-                    :style="{ width: `${supplier.completion_percentage || 0}%` }"
-                  ></div>
-                </div>
-                <span class="ml-2 text-sm text-gray-600">{{ supplier.completion_percentage || 0 }}%</span>
-              </div>
-            </div>
+            <label class="block text-xs font-medium text-dark-text-muted uppercase tracking-wider mb-1">Submitted On</label>
+            <p class="mt-1 text-sm text-dark-text-secondary">{{ new Date(supplier.updated_at).toLocaleDateString() }}</p>
           </div>
         </div>
       </div>
 
       <!-- Next Steps -->
-      <div class="mt-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-gray-900">What Happens Next?</h3>
-        <div class="mt-4 space-y-4">
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-dark-text-primary">What Happens Next?</h3>
+        
+        <div class="space-y-4">
           <div class="flex items-start">
-            <div class="flex-shrink-0">
-              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                <span class="text-sm font-medium text-blue-600">1</span>
+            <div class="flex-shrink-0 mt-1">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-purple-accent/10 border border-purple-accent/30 text-purple-accent font-bold text-sm">
+                1
               </div>
             </div>
-            <div class="ml-3">
-              <h4 class="text-sm font-medium text-gray-900">Document Review</h4>
-              <p class="mt-1 text-sm text-gray-500">
-                Our compliance team will review your submitted documents and information.
-              </p>
+            <div class="ml-4">
+              <h4 class="text-sm font-semibold text-dark-text-primary">Compliance Review</h4>
+              <p class="text-xs text-dark-text-secondary mt-1">Our team verifies your legal documents and business structure details.</p>
             </div>
           </div>
 
           <div class="flex items-start">
-            <div class="flex-shrink-0">
-              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
-                <span class="text-sm font-medium text-gray-600">2</span>
+            <div class="flex-shrink-0 mt-1">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-dark-tertiary border border-dark-border text-dark-text-muted font-bold text-sm">
+                2
               </div>
             </div>
-            <div class="ml-3">
-              <h4 class="text-sm font-medium text-gray-900">Verification Process</h4>
-              <p class="mt-1 text-sm text-gray-500">
-                We may contact you for additional information or clarification if needed.
-              </p>
+            <div class="ml-4">
+              <h4 class="text-sm font-semibold text-dark-text-primary">Verification Confirmation</h4>
+              <p class="text-xs text-dark-text-secondary mt-1">We may reach out via email if we need any additional documentation or data.</p>
             </div>
           </div>
 
           <div class="flex items-start">
-            <div class="flex-shrink-0">
-              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
-                <span class="text-sm font-medium text-gray-600">3</span>
+            <div class="flex-shrink-0 mt-1">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-dark-tertiary border border-dark-border text-dark-text-muted font-bold text-sm">
+                3
               </div>
             </div>
-            <div class="ml-3">
-              <h4 class="text-sm font-medium text-gray-900">Approval Notification</h4>
-              <p class="mt-1 text-sm text-gray-500">
-                You'll receive an email notification once your application is approved or if additional information is required.
-              </p>
+            <div class="ml-4">
+              <h4 class="text-sm font-semibold text-dark-text-primary">Account Activation</h4>
+              <p class="text-xs text-dark-text-secondary mt-1">Once approved, you'll gain full access to the supplier dashboard and invoicing features.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Contact Information -->
-      <div class="mt-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-gray-900">Need Help?</h3>
-        <p class="mt-2 text-sm text-gray-500">
-          If you have any questions about your application or need to make changes, please contact our support team.
-        </p>
-        <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div class="flex items-center">
-            <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-            </svg>
-            <span class="ml-2 text-sm text-gray-600">support@invoiceapp.com</span>
-          </div>
-          <div class="mt-2 flex items-center sm:mt-0">
-            <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
-            </svg>
-            <span class="ml-2 text-sm text-gray-600">+1 (555) 123-4567</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <!-- Footer Actions -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-dark-border">
         <Link
-          :href="route('dashboard')"
-          class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          :href="route('supplier.dashboard')"
+          class="flex-1"
         >
-          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-          Back to Dashboard
+          <button class="w-full btn-secondary h-12">
+            Go to Dashboard
+          </button>
         </Link>
-
         <Link
           :href="route('onboarding.kyc')"
-          class="mt-3 inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:mt-0"
+          class="flex-1"
         >
-          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-          </svg>
-          Edit Application
+          <GradientButton class="w-full h-12">
+            Update Documents
+          </GradientButton>
         </Link>
       </div>
+
+      <div class="text-center">
+        <p class="text-xs text-dark-text-muted">
+          Need help? Contact us at <a href="mailto:support@invoiceapp.com" class="text-purple-accent hover:underline">support@invoiceapp.com</a>
+        </p>
+      </div>
     </div>
-  </AuthenticatedLayout>
+  </GuestLayout>
 </template>

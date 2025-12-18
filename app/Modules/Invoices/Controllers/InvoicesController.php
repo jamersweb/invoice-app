@@ -10,6 +10,7 @@ use App\Modules\Invoices\Resources\InvoiceResource;
 use App\Modules\Invoices\Services\InvoiceSubmissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class InvoicesController extends Controller
 {
@@ -23,17 +24,17 @@ class InvoicesController extends Controller
 
         // Check if supplier exists
         if (!$supplier) {
-            abort(422, 'Supplier profile not found. Please complete KYC/KYB onboarding first.');
+            throw ValidationException::withMessages(['profile' => 'Supplier profile not found. Please complete KYC/KYB onboarding first.']);
         }
 
         // Check if supplier is KYB approved
         if ($supplier->kyb_status !== 'approved') {
-            abort(422, 'Your supplier profile must be approved before submitting invoices. Current status: ' . $supplier->kyb_status);
+            throw ValidationException::withMessages(['kyb' => 'Your supplier profile must be approved before submitting invoices. Current status: ' . $supplier->kyb_status]);
         }
 
         // Check if supplier is active
         if (!$supplier->is_active) {
-            abort(422, 'Your supplier account is not active. Please contact support.');
+            throw ValidationException::withMessages(['active' => 'Your supplier account is not active. Please contact support.']);
         }
 
         // Check if agreements are signed
@@ -42,7 +43,7 @@ class InvoicesController extends Controller
             ->exists();
 
         if (!$hasAgreement) {
-            abort(422, 'Required agreements must be signed before submitting invoices.');
+            throw ValidationException::withMessages(['agreements' => 'Required agreements must be signed before submitting invoices.']);
         }
 
         // Ensure supplier_id in request matches the logged-in supplier
@@ -69,17 +70,17 @@ class InvoicesController extends Controller
 
         // Check if supplier exists
         if (!$supplier) {
-            abort(422, 'Supplier profile not found. Please complete KYC/KYB onboarding first.');
+            throw ValidationException::withMessages(['profile' => 'Supplier profile not found. Please complete KYC/KYB onboarding first.']);
         }
 
         // Check if supplier is KYB approved
         if ($supplier->kyb_status !== 'approved') {
-            abort(422, 'Your supplier profile must be approved before submitting invoices. Current status: ' . $supplier->kyb_status);
+            throw ValidationException::withMessages(['kyb' => 'Your supplier profile must be approved before submitting invoices. Current status: ' . $supplier->kyb_status]);
         }
 
         // Check if supplier is active
         if (!$supplier->is_active) {
-            abort(422, 'Your supplier account is not active. Please contact support.');
+            throw ValidationException::withMessages(['active' => 'Your supplier account is not active. Please contact support.']);
         }
 
         // Check if agreements are signed
@@ -88,7 +89,7 @@ class InvoicesController extends Controller
             ->exists();
 
         if (!$hasAgreement) {
-            abort(422, 'Required agreements must be signed before submitting invoices.');
+            throw ValidationException::withMessages(['agreements' => 'Required agreements must be signed before submitting invoices.']);
         }
 
         $invoices = [];

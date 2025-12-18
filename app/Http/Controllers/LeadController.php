@@ -25,13 +25,13 @@ class LeadController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): Response
+    public function create(): Response|RedirectResponse
     {
         // Ensure user is not authenticated (guest middleware should handle this, but adding extra safeguard)
         if (auth()->check()) {
             return redirect()->route('dashboard');
         }
-        
+
         return Inertia::render('Apply/Step1');
     }
 
@@ -77,13 +77,19 @@ class LeadController extends Controller
         // Send email verification
         event(new \Illuminate\Auth\Events\Registered($user));
 
+        // Generate OTP
+        $otp = (string) rand(100000, 999999);
+        $user->update([
+            'otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        $user->notify(new \App\Notifications\Auth\EmailVerificationOtpNotification($otp));
+
         // Login user
         \Illuminate\Support\Facades\Auth::login($user);
 
-        return redirect()->route('apply.step2', [
-            'token' => $lead->verify_token,
-            'email' => $user->email,
-        ]);
+        return redirect()->route('verification.otp');
     }
 
     /**
@@ -128,7 +134,7 @@ class LeadController extends Controller
     public function verify(Request $request): RedirectResponse
     {
         $lead = Lead::where('verify_token', $request->query('token'))->firstOrFail();
-        
+
         // Mark lead as verified
         $lead->forceFill([
             'status' => 'verified',
@@ -146,7 +152,7 @@ class LeadController extends Controller
             \Illuminate\Support\Facades\Auth::login($user);
         }
 
-        // After email verification, redirect to KYC/KYB onboarding
+        // After email verification, redirect to onboarding page
         if ($user && $user->hasRole('Supplier')) {
             return redirect()->route('onboarding.kyc')->with('verified', true);
         }

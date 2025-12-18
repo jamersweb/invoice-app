@@ -39,7 +39,7 @@ class HandleInertiaRequests extends Middleware
         $request->headers->set('X-Correlation-ID', $correlationId);
 
         $user = $request->user();
-        
+
         // Load roles relationship if user exists
         if ($user) {
             $user->load('roles');
@@ -49,12 +49,20 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $user,
+                'supplier' => $user && $user->hasRole('Supplier')
+                    ? \App\Models\Supplier::where('contact_email', $user->email)->first()
+                    : null,
             ],
-            'ziggy' => fn () => [
+            'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
             'correlation_id' => $correlationId,
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+            ],
         ];
     }
 }

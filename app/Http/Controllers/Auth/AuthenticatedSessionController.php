@@ -36,26 +36,39 @@ class AuthenticatedSessionController extends Controller
 
         // Check user role and redirect to appropriate dashboard
         $user = Auth::user();
-        
+
         // Admin users go to admin dashboard
         if ($user->hasRole('Admin')) {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
-        
+
+        // Fix for users created without a role - assign Supplier by default if no roles
+        if ($user->roles->isEmpty()) {
+            $user->assignRole('Supplier');
+        }
+
         // Supplier users - check onboarding status
         if ($user->hasRole('Supplier')) {
             // Step 1: Check email verification
             if (!$user->hasVerifiedEmail()) {
-                return redirect()->route('verification.notice');
+                // If no OTP exists or it has expired, generate a new one
+                if (!$user->otp || ($user->otp_expires_at && now()->gt($user->otp_expires_at))) {
+                    $otp = (string) rand(100000, 999999);
+                    $user->update([
+                        'otp' => $otp,
+                        'otp_expires_at' => now()->addMinutes(10),
+                    ]);
+                    $user->notify(new \App\Notifications\Auth\EmailVerificationOtpNotification($otp));
+                }
+                return redirect()->route('verification.otp');
             }
-            
+
             // Step 2: Check KYC/KYB completion
-            $supplier = Supplier::where('contact_email', $user->email)->first();
+            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
             if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
                 return redirect()->route('onboarding.kyc');
             }
-            
-            // All checks passed - redirect to supplier dashboard
+
             return redirect()->intended(route('supplier.dashboard', absolute: false));
         }
 

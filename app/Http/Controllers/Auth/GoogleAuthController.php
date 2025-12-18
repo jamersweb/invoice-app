@@ -57,10 +57,10 @@ class GoogleAuthController extends Controller
             // Use dynamic class resolution to avoid fatal errors if Socialite isn't installed
             $socialiteClass = 'Laravel\Socialite\Facades\Socialite';
             $googleUser = $socialiteClass::driver('google')->user();
-            
+
             // Check if user exists
             $user = User::where('email', $googleUser->getEmail())->first();
-            
+
             if (!$user) {
                 // Create new user from Google account
                 $user = User::create([
@@ -103,18 +103,18 @@ class GoogleAuthController extends Controller
 
             // Check user role and redirect to appropriate dashboard
             if ($user->hasRole('Admin')) {
-                return redirect()->route('admin.dashboard', absolute: false);
+                return redirect()->intended(route('admin.dashboard', false));
             }
-            
+
             // Supplier users
             $supplier = Supplier::where('contact_email', $user->email)->first();
-            
+
             if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
-                // Redirect to KYC/KYB onboarding
+                // Redirect to KYC/KYB onboarding page
                 return redirect()->route('onboarding.kyc');
             }
 
-            return redirect()->route('supplier.dashboard', absolute: false);
+            return redirect()->intended(route('supplier.dashboard', false));
         } catch (\Exception $e) {
             \Log::error('Google OAuth error: ' . $e->getMessage());
             return redirect()->route('apply.step1')

@@ -32,11 +32,11 @@ defineProps<{
             </div>
         </div>
         <div class="relative" bis_skin_checked="1">
-            <div class="mx-auto max-w-2xl px-6 py-10">
-                <h1 class="text-3xl font-bold text-center">Frequently Asked Questions</h1>
+            <div class="mx-auto max-w-4xl px-6 py-10">
+                <slot name="header" />
                 <div class="mt-8 space-y-6">
                     <!-- Form Container -->
-                    <div class="border border-dark-border rounded-xl p-4">
+                    <div class="border border-dark-border rounded-xl p-6 bg-dark-card/50 backdrop-blur-sm">
                         <slot />
                     </div>
                 </div>
