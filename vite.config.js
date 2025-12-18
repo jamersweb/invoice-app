@@ -7,7 +7,9 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css', // 👈 add your main CSS
+                'resources/css/custom.css', // 👈 add your main CSS
                 'resources/js/app.ts',   // your main TS entry
+                'resources/js/custom-js/custom-index.js',
             ],
             ssr: 'resources/js/ssr.ts',
             refresh: true,

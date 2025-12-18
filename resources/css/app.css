@@ -15,23 +15,24 @@
         background-color: #1E1E1E !important;
         color: #FFFFFF !important;
     }
-    
+
     body {
         background-color: #1E1E1E !important;
         color: #FFFFFF;
     }
-    
+
     /* Ensure dark theme classes work */
     .bg-dark-primary {
         background-color: #1E1E1E !important;
     }
-    
+
     .text-dark-text-primary {
         color: #FFFFFF !important;
     }
 }
 
 @layer components {
+
     /* Card Styles */
     .card {
         @apply rounded-card bg-dark-card border border-dark-border p-6;
@@ -119,6 +120,7 @@
 }
 
 @layer utilities {
+
     /* Fix input text color globally - inputs should have dark text by default */
     /* This overrides the body's white text color for form inputs */
     /* Apply to all input types except dark-themed inputs */
@@ -138,7 +140,7 @@
     select:not(.input-dark) {
         color: #111827 !important;
     }
-    
+
     /* Ensure inputs in white/light containers have dark text (higher specificity) */
     .bg-white input:not(.input-dark),
     .bg-white textarea:not(.input-dark),
@@ -150,4 +152,12 @@
     select.bg-white {
         color: #111827 !important;
     }
+}
+
+.how-it-works,
+.faqs {
+    margin-block: auto;
+    min-height: inherit;
+    align-content: center;
+    text-align: center;
 }

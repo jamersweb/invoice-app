@@ -1,5 +1,8 @@
 import '../css/app.css';
 import './bootstrap';
+import '../css/custom.css';
+import '../custom-js/custom-index.js';
+
 
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -36,7 +39,7 @@ createInertiaApp({
             .use(pinia)
             .use(ZiggyVue)
             .mount(el);
-            
+
         // Ensure dark mode after mount
         document.documentElement.classList.add('dark');
         document.body.classList.add('dark');

@@ -13,7 +13,7 @@
 
         <!-- Scripts -->
         @routes
-        @vite(['resources/js/app.ts', 'resources/css/app.css'])
+        @vite(['resources/js/app.ts', 'resources/css/app.css', 'resources/css/custom.css', 'resources/custom-js/custom-index.js'])
         @inertiaHead
     </head>
     <body class="font-sans antialiased bg-dark-primary text-dark-text-primary {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
