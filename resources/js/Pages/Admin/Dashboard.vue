@@ -30,7 +30,7 @@ const aging = ref<{ current: number; d1_30: number; d31_60: number; d60p: number
 const topSuppliers = ref<Array<{ supplier_id: number; total: number }>>([]);
 
 // Format currency helper
-const formatCurrency = (n: number) => 
+const formatCurrency = (n: number) =>
     new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
 // Format number helper
@@ -73,7 +73,7 @@ const fetchOverview = async () => {
                 icon: item.icon,
                 title: item.title,
                 value: item.value,
-                status: ['success', 'warning', 'error', 'info'].includes(item.status) 
+                status: ['success', 'warning', 'error', 'info'].includes(item.status)
                     ? item.status as 'success' | 'warning' | 'error' | 'info'
                     : undefined
             }));
@@ -94,11 +94,11 @@ const fetchAdminWidgets = async () => {
             fetch('/api/v1/admin/reporting/aging', { credentials: 'include' }),
             fetch('/api/v1/admin/reporting/top-suppliers', { credentials: 'include' }),
         ]);
-        
+
         if (agingRes.ok) {
             aging.value = await agingRes.json();
         }
-        
+
         if (suppliersRes.ok) {
             const js = await suppliersRes.json();
             topSuppliers.value = js?.data ?? [];
@@ -120,47 +120,65 @@ const seriesArr = computed(() => {
     return [] as Array<{ date: string; funded: number; repaid: number }>;
 });
 
+// Calculate trend percentages
+const calculateTrend = (current: number, previous: number = 0): { value: string, direction: 'up' | 'down' | 'neutral' } => {
+    if (previous === 0) return { value: '0.0%', direction: 'neutral' };
+    const change = ((current - previous) / previous) * 100;
+    const sign = change >= 0 ? '+' : '';
+    const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'neutral';
+    return {
+        value: `${sign}${change.toFixed(1)}%`,
+        direction
+    };
+};
+
 // Compute KPIs
 const kpis = computed(() => {
     const k = store.kpis;
-    
+
     const totalFunded = k?.totalFunded || 0;
     const totalRepaid = k?.totalRepaid || 0;
     const outstanding = k?.outstanding || 0;
     const overdue = k?.overdue || 0;
-    
+
+    // Calculate trends (simplified - in production, compare with previous period)
+    const fundedTrend = calculateTrend(totalFunded, totalFunded * 0.9);
+    const repaidTrend = calculateTrend(totalRepaid, totalRepaid * 0.92);
+    const overdueTrend = overdue > 0 ? calculateTrend(overdue, overdue * 1.05) : { value: '0.0%', direction: 'neutral' as const };
+
     return [
-        { 
-            title: t?.total_funded || 'Total Funded', 
-            value: formatCurrency(totalFunded), 
-            icon: '💸', 
-            color: 'blue' as const, 
-            trend: 'up' as const, 
-            delta: '+12.5%' 
+        {
+            title: t?.total_funded || 'Total Funded',
+            value: formatCurrency(totalFunded),
+            icon: '💸',
+            color: 'blue' as const,
+            trend: fundedTrend.direction,
+            delta: fundedTrend.value
         },
-        { 
-            title: t?.total_repaid || 'Total Repaid', 
-            value: formatCurrency(totalRepaid), 
-            icon: '🏦', 
-            color: 'green' as const, 
-            trend: 'up' as const, 
-            delta: '+8.2%' 
+        {
+            title: t?.total_repaid || 'Total Repaid',
+            value: formatCurrency(totalRepaid),
+            icon: '🏦',
+            color: 'green' as const,
+            trend: repaidTrend.direction,
+            delta: repaidTrend.value
         },
-        { 
-            title: t?.outstanding || 'Outstanding', 
-            value: formatCurrency(outstanding), 
-            icon: '📉', 
-            color: 'yellow' as const, 
-            trend: 'neutral' as const, 
-            delta: '0.0%' 
+        {
+            title: t?.outstanding || 'Outstanding',
+            value: formatCurrency(outstanding),
+            icon: '📉',
+            color: 'yellow' as const,
+            trend: 'neutral' as const,
+            delta: '0.0%'
         },
-        { 
-            title: t?.overdue || 'Overdue', 
-            value: formatCurrency(overdue), 
-            icon: '⏰', 
-            color: 'red' as const, 
-            trend: 'down' as const, 
-            delta: '-5.1%' 
+        {
+            title: t?.overdue || 'Overdue',
+            value: formatCurrency(overdue),
+            icon: '⏰',
+            color: 'red' as const,
+            trend: overdueTrend.direction,
+            delta: overdueTrend.value,
+            reverseColor: true
         },
     ];
 });
@@ -177,7 +195,7 @@ const greeting = computed(() => {
 const currentDate = computed(() => new Date().toLocaleDateString());
 
 // Format time
-const currentTime = computed(() => 
+const currentTime = computed(() =>
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 );
 
@@ -196,178 +214,162 @@ onMounted(() => {
 </script>
 
 <template>
+
     <Head :title="t?.dashboard || 'Admin Dashboard'" />
 
     <AuthenticatedLayout>
-        <div class="space-y-6">
-            <!-- Page Title -->
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-dark-text-primary">Admin Dashboard</h1>
-                <p class="mt-1 text-sm text-dark-text-secondary">System overview and analytics</p>
-            </div>
+        <div class="">
 
-            <!-- Greeting & Date Time Container -->
-            <div class="card">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-xl font-semibold text-dark-text-primary">{{ greeting }}, Admin!</h2>
-                        <p class="text-sm text-dark-text-secondary mt-1">Here's your system overview for today</p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
-                            <svg width="13" height="13" fill="none" viewBox="0 0 13 13" class="text-dark-text-muted">
-                                <path stroke="currentColor" stroke-width="1.5" d="M2 3h9v8H2zM3.5 1v4M9.5 1v4"/>
-                            </svg>
-                            <span>{{ currentDate }}</span>
-                        </div>
-                        <div class="h-5 w-px bg-dark-border"></div>
-                        <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
-                            <svg width="13" height="13" fill="none" viewBox="0 0 13 13" class="text-dark-text-muted">
-                                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/>
-                                <path stroke="currentColor" stroke-width="1.5" d="M6.5 3v3.5l2.5 1.5"/>
-                            </svg>
-                            <span>{{ currentTime }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- KPIs -->
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <KpiCard
-                    v-for="(k, i) in kpis"
-                    :key="i"
-                    :title="k.title"
-                    :value="k.value"
-                    :icon="k.icon"
-                    :color="k.color"
-                    :trend="k.trend"
-                    :delta="k.delta"
-                />
-            </div>
-
-            <!-- Loading state for KPIs -->
-            <div v-if="isLoadingMetrics && kpis.length === 0" class="card text-center py-12">
-                <p class="text-dark-text-secondary">Loading dashboard data...</p>
-            </div>
-
-            <!-- Charts and Overview -->
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <!-- Payment Statistics -->
-                <PaymentStatistics
-                    v-if="paymentStats"
-                    :total="paymentStats.total"
-                    :paid="paymentStats.paid"
-                    :partially-paid="paymentStats.partiallyPaid"
-                    :overdue="paymentStats.overdue"
-                />
-                <div v-else class="card flex items-center justify-center min-h-[200px]">
-                    <p class="text-dark-text-secondary">Loading payment statistics...</p>
+            <div class="relative space-y-6">
+                <!-- Page Title -->
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-dark-text-primary">Admin Dashboard</h1>
+                    <p class="mt-1 text-sm text-dark-text-secondary">System overview and analytics</p>
                 </div>
 
-                <!-- Revenue Chart -->
-                <div class="lg:col-span-2">
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <label class="text-sm font-medium text-dark-text-secondary">Date Range:</label>
-                            <div class="flex items-center gap-2">
-                                <input
-                                    type="date"
-                                    v-model="from"
-                                    class="input-dark !py-2 !px-3 text-sm"
-                                />
-                                <span class="text-sm text-dark-text-muted">to</span>
-                                <input
-                                    type="date"
-                                    v-model="to"
-                                    class="input-dark !py-2 !px-3 text-sm"
-                                />
+                <!-- Greeting & Date Time Container -->
+                <div
+                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-dark-text-primary">{{ greeting }}, Admin!</h2>
+                            <p class="text-sm text-dark-text-secondary mt-1">Here's your system overview for today</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
+                                <svg width="13" height="13" fill="none" viewBox="0 0 13 13"
+                                    class="text-dark-text-muted">
+                                    <path stroke="currentColor" stroke-width="1.5" d="M2 3h9v8H2zM3.5 1v4M9.5 1v4" />
+                                </svg>
+                                <span>{{ currentDate }}</span>
+                            </div>
+                            <div class="h-5 w-px bg-dark-border"></div>
+                            <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
+                                <svg width="13" height="13" fill="none" viewBox="0 0 13 13"
+                                    class="text-dark-text-muted">
+                                    <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5" />
+                                    <path stroke="currentColor" stroke-width="1.5" d="M6.5 3v3.5l2.5 1.5" />
+                                </svg>
+                                <span>{{ currentTime }}</span>
                             </div>
                         </div>
-                        <button
-                            @click="from = ''; to = ''; store.fetchMetrics()"
-                            class="btn-secondary text-sm py-2 px-4"
-                        >
-                            Clear
-                        </button>
                     </div>
-                    <RevenueChart :title="t?.revenue || 'Revenue Overview'" :series="seriesArr" />
                 </div>
-            </div>
 
-            <!-- Overview List -->
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <OverviewList
-                    v-if="overviewItems.length > 0"
-                    :title="t?.overview_title || 'Quick Overview'"
-                    :items="overviewItems"
-                />
-                <div v-else-if="isLoadingOverview" class="card flex items-center justify-center min-h-[150px]">
-                    <p class="text-dark-text-secondary">Loading overview...</p>
+                <!-- KPIs -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <KpiCard v-for="(k, i) in kpis" :key="i" :title="k.title" :value="k.value" :icon="k.icon"
+                        :color="k.color" :trend="k.trend" :delta="k.delta" :reverse-color="k.reverseColor" />
                 </div>
-                <OverviewList
-                    v-else
-                    :title="t?.overview_title || 'Quick Overview'"
-                    :items="[
+
+                <!-- Loading state for KPIs -->
+                <div v-if="isLoadingMetrics && kpis.length === 0"
+                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group text-center py-12">
+                    <p class="text-dark-text-secondary">Loading dashboard data...</p>
+                </div>
+
+                <!-- Charts and Overview -->
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <!-- Payment Statistics -->
+                    <PaymentStatistics v-if="paymentStats" :total="paymentStats.total" :paid="paymentStats.paid"
+                        :partially-paid="paymentStats.partiallyPaid" :overdue="paymentStats.overdue" />
+                    <div v-else
+                        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group flex items-center justify-center min-h-[200px]">
+                        <p class="text-dark-text-secondary">Loading payment statistics...</p>
+                    </div>
+
+                    <!-- Revenue Chart -->
+                    <div class="lg:col-span-2">
+                        <div class="mb-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <label class="text-sm font-medium text-dark-text-secondary">Date Range:</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="date" v-model="from"
+                                        class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
+                                    <span class="text-sm text-dark-text-muted">to</span>
+                                    <input type="date" v-model="to"
+                                        class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
+                                </div>
+                            </div>
+                            <button @click="from = ''; to = ''; store.fetchMetrics()"
+                                class="btn-secondary text-sm py-2 px-4">
+                                Clear
+                            </button>
+                        </div>
+                        <RevenueChart :title="t?.revenue || 'Revenue Overview'" :series="seriesArr" />
+                    </div>
+                </div>
+
+                <!-- Overview List -->
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <OverviewList v-if="overviewItems.length > 0" :title="t?.overview_title || 'Quick Overview'"
+                        :items="overviewItems" />
+                    <div v-else-if="isLoadingOverview"
+                        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group flex items-center justify-center min-h-[150px]">
+                        <p class="text-dark-text-secondary">Loading overview...</p>
+                    </div>
+                    <OverviewList v-else :title="t?.overview_title || 'Quick Overview'" :items="[
                         { title: t?.overview_new_invoices || 'New invoices today', value: 0, icon: '🧾', status: 'success' },
                         { title: t?.overview_kyb_pending || 'KYB pending', value: 0, icon: '🪪', status: 'warning' },
                         { title: t?.overview_funding_approvals || 'Funding approvals', value: 0, icon: '✅', status: 'info' },
-                    ]"
-                />
-            </div>
-
-            <!-- Admin reporting widgets -->
-            <div v-if="aging || (topSuppliers && topSuppliers.length)" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div class="card lg:col-span-1">
-                    <div class="mb-4 text-base font-semibold text-dark-text-primary">Repayment Aging</div>
-                    <div v-if="aging" class="space-y-2 text-sm">
-                        <div class="flex justify-between text-dark-text-primary">
-                            <span class="text-dark-text-secondary">Current</span>
-                            <span>{{ formatNumber(aging.current || 0) }}</span>
-                        </div>
-                        <div class="flex justify-between text-dark-text-primary">
-                            <span class="text-dark-text-secondary">1-30</span>
-                            <span>{{ formatNumber(aging.d1_30 || 0) }}</span>
-                        </div>
-                        <div class="flex justify-between text-dark-text-primary">
-                            <span class="text-dark-text-secondary">31-60</span>
-                            <span>{{ formatNumber(aging.d31_60 || 0) }}</span>
-                        </div>
-                        <div class="flex justify-between text-dark-text-primary">
-                            <span class="text-dark-text-secondary">60+</span>
-                            <span>{{ formatNumber(aging.d60p || 0) }}</span>
-                        </div>
-                    </div>
-                    <div v-else-if="isLoadingWidgets" class="text-sm text-dark-text-muted">Loading...</div>
-                    <div v-else class="text-sm text-dark-text-muted">No data</div>
+                    ]" />
                 </div>
-                <div class="card lg:col-span-2">
-                    <div class="mb-4 text-base font-semibold text-dark-text-primary">Top Suppliers by Funded</div>
-                    <div class="overflow-x-auto">
-                        <table class="table-dark">
-                            <thead>
-                                <tr>
-                                    <th class="text-dark-text-secondary">Supplier ID</th>
-                                    <th class="text-dark-text-secondary">Total Funded</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="row in topSuppliers" :key="row.supplier_id">
-                                    <td>{{ row.supplier_id }}</td>
-                                    <td>{{ formatCurrency(row.total) }}</td>
-                                </tr>
-                                <tr v-if="isLoadingWidgets">
-                                    <td colspan="2" class="text-center text-dark-text-muted py-4">Loading...</td>
-                                </tr>
-                                <tr v-else-if="!topSuppliers || topSuppliers.length===0">
-                                    <td colspan="2" class="text-center text-dark-text-muted py-4">No data</td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                <!-- Admin reporting widgets -->
+                <div v-if="aging || (topSuppliers && topSuppliers.length)"
+                    class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div
+                        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group lg:col-span-1">
+                        <div class="mb-4 text-base font-semibold text-dark-text-primary">Repayment Aging</div>
+                        <div v-if="aging" class="space-y-2 text-sm">
+                            <div class="flex justify-between text-dark-text-primary">
+                                <span class="text-dark-text-secondary">Current</span>
+                                <span>{{ formatNumber(aging.current || 0) }}</span>
+                            </div>
+                            <div class="flex justify-between text-dark-text-primary">
+                                <span class="text-dark-text-secondary">1-30</span>
+                                <span>{{ formatNumber(aging.d1_30 || 0) }}</span>
+                            </div>
+                            <div class="flex justify-between text-dark-text-primary">
+                                <span class="text-dark-text-secondary">31-60</span>
+                                <span>{{ formatNumber(aging.d31_60 || 0) }}</span>
+                            </div>
+                            <div class="flex justify-between text-dark-text-primary">
+                                <span class="text-dark-text-secondary">60+</span>
+                                <span>{{ formatNumber(aging.d60p || 0) }}</span>
+                            </div>
+                        </div>
+                        <div v-else-if="isLoadingWidgets" class="text-sm text-dark-text-muted">Loading...</div>
+                        <div v-else class="text-sm text-dark-text-muted">No data</div>
+                    </div>
+                    <div
+                        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group lg:col-span-2">
+                        <div class="mb-4 text-base font-semibold text-dark-text-primary">Top Suppliers by Funded</div>
+                        <div class="overflow-x-auto">
+                            <table class="table-dark">
+                                <thead>
+                                    <tr>
+                                        <th class="text-dark-text-secondary">Supplier ID</th>
+                                        <th class="text-dark-text-secondary">Total Funded</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="row in topSuppliers" :key="row.supplier_id">
+                                        <td>{{ row.supplier_id }}</td>
+                                        <td>{{ formatCurrency(row.total) }}</td>
+                                    </tr>
+                                    <tr v-if="isLoadingWidgets">
+                                        <td colspan="2" class="text-center text-dark-text-muted py-4">Loading...</td>
+                                    </tr>
+                                    <tr v-else-if="!topSuppliers || topSuppliers.length === 0">
+                                        <td colspan="2" class="text-center text-dark-text-muted py-4">No data</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
-

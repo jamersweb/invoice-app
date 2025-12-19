@@ -34,13 +34,13 @@ const seriesArr = computed(() => {
 const kpis = computed(() => {
     const k = store.kpis;
     const fmt = (n: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-    
+
     // Use fallback values if store data isn't loaded yet
     const totalFunded = k?.totalFunded || 0;
     const totalRepaid = k?.totalRepaid || 0;
     const outstanding = k?.outstanding || 0;
     const overdue = k?.overdue || 0;
-    
+
     return [
         { title: t?.total_funded || 'Total Funded', value: fmt(totalFunded), icon: '💸', color: 'blue' as const, trend: 'up' as const, delta: '+12.5%' },
         { title: t?.total_repaid || 'Total Repaid', value: fmt(totalRepaid), icon: '🏦', color: 'green' as const, trend: 'up' as const, delta: '+8.2%' },
@@ -59,6 +59,7 @@ const paymentStats = computed(() => ({
 </script>
 
 <template>
+
     <Head :title="t?.dashboard || 'Supplier Dashboard'" />
 
     <AuthenticatedLayout>
@@ -66,11 +67,13 @@ const paymentStats = computed(() => ({
             <!-- Page Title -->
             <div class="mb-6">
                 <h1 class="text-2xl font-bold text-dark-text-primary">Supplier Dashboard</h1>
-                <p class="mt-1 text-sm text-dark-text-secondary">Welcome back! Here's what's happening with your invoices.</p>
+                <p class="mt-1 text-sm text-dark-text-secondary">Welcome back! Here's what's happening with your
+                    invoices.</p>
             </div>
 
             <!-- Greeting & Date Time Container -->
-            <div class="card">
+            <div
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-xl font-semibold text-dark-text-primary">Good morning!</h2>
@@ -79,15 +82,15 @@ const paymentStats = computed(() => ({
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
                             <svg width="13" height="13" fill="none" viewBox="0 0 13 13" class="text-dark-text-muted">
-                                <path stroke="currentColor" stroke-width="1.5" d="M2 3h9v8H2zM3.5 1v4M9.5 1v4"/>
+                                <path stroke="currentColor" stroke-width="1.5" d="M2 3h9v8H2zM3.5 1v4M9.5 1v4" />
                             </svg>
                             <span>{{ new Date().toLocaleDateString() }}</span>
                         </div>
                         <div class="h-5 w-px bg-dark-border"></div>
                         <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
                             <svg width="13" height="13" fill="none" viewBox="0 0 13 13" class="text-dark-text-muted">
-                                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/>
-                                <path stroke="currentColor" stroke-width="1.5" d="M6.5 3v3.5l2.5 1.5"/>
+                                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5" />
+                                <path stroke="currentColor" stroke-width="1.5" d="M6.5 3v3.5l2.5 1.5" />
                             </svg>
                             <span>{{ new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
                         </div>
@@ -97,32 +100,21 @@ const paymentStats = computed(() => ({
 
             <!-- KPIs -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <KpiCard
-                    v-for="(k, i) in kpis"
-                    :key="i"
-                    :title="k.title"
-                    :value="k.value"
-                    :icon="k.icon"
-                    :color="k.color"
-                    :trend="k.trend"
-                    :delta="k.delta"
-                />
+                <KpiCard v-for="(k, i) in kpis" :key="i" :title="k.title" :value="k.value" :icon="k.icon"
+                    :color="k.color" :trend="k.trend" :delta="k.delta" />
             </div>
 
             <!-- Show message if no KPIs available -->
-            <div v-if="kpis.length === 0" class="card text-center py-12">
+            <div v-if="kpis.length === 0"
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group text-center py-12">
                 <p class="text-dark-text-secondary">Loading dashboard data...</p>
             </div>
 
             <!-- Charts and Overview -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <!-- Payment Statistics -->
-                <PaymentStatistics
-                    :total="paymentStats.total"
-                    :paid="paymentStats.paid"
-                    :partially-paid="paymentStats.partiallyPaid"
-                    :overdue="paymentStats.overdue"
-                />
+                <PaymentStatistics :total="paymentStats.total" :paid="paymentStats.paid"
+                    :partially-paid="paymentStats.partiallyPaid" :overdue="paymentStats.overdue" />
 
                 <!-- Revenue Chart -->
                 <div class="lg:col-span-2">
@@ -130,23 +122,15 @@ const paymentStats = computed(() => ({
                         <div class="flex items-center gap-3">
                             <label class="text-sm font-medium text-dark-text-secondary">Date Range:</label>
                             <div class="flex items-center gap-2">
-                                <input
-                                    type="date"
-                                    v-model="from"
-                                    class="input-dark !py-2 !px-3 text-sm"
-                                />
+                                <input type="date" v-model="from"
+                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
                                 <span class="text-sm text-dark-text-muted">to</span>
-                                <input
-                                    type="date"
-                                    v-model="to"
-                                    class="input-dark !py-2 !px-3 text-sm"
-                                />
+                                <input type="date" v-model="to"
+                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
                             </div>
                         </div>
-                        <button
-                            @click="from = ''; to = ''; store.fetchMetrics()"
-                            class="btn-secondary text-sm py-2 px-4"
-                        >
+                        <button @click="from = ''; to = ''; store.fetchMetrics()"
+                            class="btn-secondary text-sm py-2 px-4">
                             Clear
                         </button>
                     </div>
@@ -156,16 +140,12 @@ const paymentStats = computed(() => ({
 
             <!-- Overview List -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <OverviewList
-                    :title="t?.overview_title || 'Quick Overview'"
-                    :items="[
-                        { title: t?.overview_new_invoices || 'New invoices today', value: 12, icon: '🧾', status: 'success' },
-                        { title: t?.overview_kyb_pending || 'KYB pending', value: 7, icon: '🪪', status: 'warning' },
-                        { title: t?.overview_funding_approvals || 'Funding approvals', value: 4, icon: '✅', status: 'info' },
-                    ]"
-                />
+                <OverviewList :title="t?.overview_title || 'Quick Overview'" :items="[
+                    { title: t?.overview_new_invoices || 'New invoices today', value: 12, icon: '🧾', status: 'success' },
+                    { title: t?.overview_kyb_pending || 'KYB pending', value: 7, icon: '🪪', status: 'warning' },
+                    { title: t?.overview_funding_approvals || 'Funding approvals', value: 4, icon: '✅', status: 'info' },
+                ]" />
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
-

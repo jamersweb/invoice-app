@@ -41,6 +41,7 @@ onMounted(async () => {
 </script>
 
 <template>
+
     <Head title="Customers" />
 
     <AuthenticatedLayout>
@@ -49,20 +50,17 @@ onMounted(async () => {
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-dark-text-primary" style="color: #FFFFFF;">Customers</h1>
-                    <p class="mt-1 text-sm text-dark-text-secondary" style="color: #B0B0B0;">Manage your customer relationships</p>
+                    <p class="mt-1 text-sm text-dark-text-secondary" style="color: #B0B0B0;">Manage your customer
+                        relationships</p>
                 </div>
             </div>
-            
+
             <!-- Search and Filters -->
             <div class="card">
                 <div class="flex items-center gap-4">
                     <div class="flex-1">
-                        <DarkInput
-                            v-model="searchQuery"
-                            placeholder="Search customers..."
-                            icon="search"
-                            class="!pr-10"
-                        />
+                        <DarkInput v-model="searchQuery" placeholder="Search customers..." icon="search"
+                            class="!pr-10" />
                     </div>
                 </div>
             </div>
@@ -73,13 +71,27 @@ onMounted(async () => {
                     <table class="table-dark w-full">
                         <thead>
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">ID</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">Name</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">Email</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">Risk Grade</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">Total Invoices</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">Status</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-dark-text-secondary">Actions</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    ID</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    Name</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    Email</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    Risk Grade</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    Total Invoices</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    Status</th>
+                                <th
+                                    class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                                    Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -89,7 +101,8 @@ onMounted(async () => {
                                     <td class="px-4 py-3 text-dark-text-primary">{{ customer.name }}</td>
                                     <td class="px-4 py-3 text-dark-text-secondary">{{ customer.email }}</td>
                                     <td class="px-4 py-3">
-                                        <Badge :variant="customer.risk_grade === 'A' ? 'success' : customer.risk_grade === 'B' ? 'info' : 'warning'">
+                                        <Badge
+                                            :variant="customer.risk_grade === 'A' ? 'success' : customer.risk_grade === 'B' ? 'info' : 'warning'">
                                             {{ customer.risk_grade }}
                                         </Badge>
                                     </td>
@@ -102,13 +115,17 @@ onMounted(async () => {
                                     <td class="px-4 py-3 text-right">
                                         <div class="flex items-center justify-end gap-2">
                                             <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                                <svg width="16" height="16" fill="none" viewBox="0 0 16 16" class="text-dark-text-secondary">
-                                                    <path stroke="currentColor" stroke-width="1.5" d="M11.333 2.667L5 9M11.333 2.667h-4v4h4v-4z"/>
+                                                <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
+                                                    class="text-dark-text-secondary">
+                                                    <path stroke="currentColor" stroke-width="1.5"
+                                                        d="M11.333 2.667L5 9M11.333 2.667h-4v4h4v-4z" />
                                                 </svg>
                                             </button>
                                             <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                                <svg width="16" height="16" fill="none" viewBox="0 0 16 16" class="text-dark-text-secondary">
-                                                    <path stroke="currentColor" stroke-width="1.5" d="M2 4h12M6 8h4M4 12h8"/>
+                                                <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
+                                                    class="text-dark-text-secondary">
+                                                    <path stroke="currentColor" stroke-width="1.5"
+                                                        d="M2 4h12M6 8h4M4 12h8" />
                                                 </svg>
                                             </button>
                                         </div>
@@ -127,4 +144,3 @@ onMounted(async () => {
         </div>
     </AuthenticatedLayout>
 </template>
-

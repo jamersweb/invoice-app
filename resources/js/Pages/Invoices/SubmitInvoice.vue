@@ -48,6 +48,7 @@ function submitInvoice() {
 </script>
 
 <template>
+
     <Head title="Upload Invoice" />
 
     <AuthenticatedLayout>
@@ -60,37 +61,28 @@ function submitInvoice() {
             <!-- Tabs -->
             <div class="card">
                 <div class="flex space-x-1 border-b border-dark-border mb-6">
-                    <button
-                        @click="activeTab = 'supplier'"
-                        :class="[
-                            'px-4 py-2 text-sm font-medium transition-colors',
-                            activeTab === 'supplier'
-                                ? 'text-purple-accent border-b-2 border-purple-accent'
-                                : 'text-dark-text-secondary hover:text-dark-text-primary'
-                        ]"
-                    >
+                    <button @click="activeTab = 'supplier'" :class="[
+                        'px-4 py-2 text-sm font-medium transition-colors',
+                        activeTab === 'supplier'
+                            ? 'text-purple-accent border-b-2 border-purple-accent'
+                            : 'text-dark-text-secondary hover:text-dark-text-primary'
+                    ]">
                         Register Supplier
                     </button>
-                    <button
-                        @click="activeTab = 'upload'"
-                        :class="[
-                            'px-4 py-2 text-sm font-medium transition-colors',
-                            activeTab === 'upload'
-                                ? 'text-purple-accent border-b-2 border-purple-accent'
-                                : 'text-dark-text-secondary hover:text-dark-text-primary'
-                        ]"
-                    >
+                    <button @click="activeTab = 'upload'" :class="[
+                        'px-4 py-2 text-sm font-medium transition-colors',
+                        activeTab === 'upload'
+                            ? 'text-purple-accent border-b-2 border-purple-accent'
+                            : 'text-dark-text-secondary hover:text-dark-text-primary'
+                    ]">
                         Upload Invoice
                     </button>
-                    <button
-                        @click="activeTab = 'funding'"
-                        :class="[
-                            'px-4 py-2 text-sm font-medium transition-colors',
-                            activeTab === 'funding'
-                                ? 'text-purple-accent border-b-2 border-purple-accent'
-                                : 'text-dark-text-secondary hover:text-dark-text-primary'
-                        ]"
-                    >
+                    <button @click="activeTab = 'funding'" :class="[
+                        'px-4 py-2 text-sm font-medium transition-colors',
+                        activeTab === 'funding'
+                            ? 'text-purple-accent border-b-2 border-purple-accent'
+                            : 'text-dark-text-secondary hover:text-dark-text-primary'
+                    ]">
                         Add Manual Funding
                     </button>
                 </div>
@@ -109,7 +101,8 @@ function submitInvoice() {
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-dark-text-secondary mb-2">Phone</label>
-                            <DarkInput v-model="supplierForm.supplier_phone" type="tel" placeholder="Enter phone number" />
+                            <DarkInput v-model="supplierForm.supplier_phone" type="tel"
+                                placeholder="Enter phone number" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-dark-text-secondary mb-2">Address</label>
@@ -124,58 +117,67 @@ function submitInvoice() {
                 <!-- Upload Invoice Tab -->
                 <div v-if="activeTab === 'upload'" class="space-y-6">
                     <h3 class="text-lg font-semibold text-dark-text-primary mb-4">Upload Invoice</h3>
-                    
+
                     <form @submit.prevent="submitInvoice">
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Invoice Number</label>
-                                <DarkInput v-model="invoiceForm.invoice_number" placeholder="Enter invoice number" required />
+                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Invoice
+                                    Number</label>
+                                <DarkInput v-model="invoiceForm.invoice_number" placeholder="Enter invoice number"
+                                    required />
                             </div>
-                            
+
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Supplier ID</label>
-                                    <DarkInput v-model="invoiceForm.supplier_id" type="number" placeholder="Enter supplier ID" />
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Supplier
+                                        ID</label>
+                                    <DarkInput v-model="invoiceForm.supplier_id" type="number"
+                                        placeholder="Enter supplier ID" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Buyer ID</label>
-                                    <DarkInput v-model="invoiceForm.buyer_id" type="number" placeholder="Enter buyer ID" />
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Buyer
+                                        ID</label>
+                                    <DarkInput v-model="invoiceForm.buyer_id" type="number"
+                                        placeholder="Enter buyer ID" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Issue Date</label>
-                                    <DarkInput v-model="invoiceForm.issue_date" type="date" placeholder="Select issue date" />
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Issue
+                                        Date</label>
+                                    <DarkInput v-model="invoiceForm.issue_date" type="date"
+                                        placeholder="Select issue date" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Due Date</label>
-                                    <DarkInput v-model="invoiceForm.due_date" type="date" placeholder="Select due date" required />
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Due
+                                        Date</label>
+                                    <DarkInput v-model="invoiceForm.due_date" type="date" placeholder="Select due date"
+                                        required />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Amount</label>
-                                    <DarkInput v-model.number="invoiceForm.amount" type="number" step="0.01" placeholder="Enter amount" required />
+                                    <label
+                                        class="block text-sm font-medium text-dark-text-secondary mb-2">Amount</label>
+                                    <DarkInput v-model.number="invoiceForm.amount" type="number" step="0.01"
+                                        placeholder="Enter amount" required />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Currency</label>
+                                    <label
+                                        class="block text-sm font-medium text-dark-text-secondary mb-2">Currency</label>
                                     <DarkInput v-model="invoiceForm.currency" placeholder="Currency" maxlength="3" />
                                 </div>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Description</label>
-                                <textarea
-                                    v-model="invoiceForm.description"
-                                    class="input-dark min-h-[100px] resize-none"
-                                    placeholder="Enter invoice description"
-                                ></textarea>
+                                <label
+                                    class="block text-sm font-medium text-dark-text-secondary mb-2">Description</label>
+                                <textarea v-model="invoiceForm.description"
+                                    class="input-dark !py-2 !px-3 text-smmin-h-[100px] resize-none"
+                                    placeholder="Enter invoice description"></textarea>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Upload Invoice File</label>
-                                <input
-                                    @change="onFile"
-                                    type="file"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    class="input-dark file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-accent/20 file:text-purple-accent hover:file:bg-purple-accent/30"
-                                />
+                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Upload Invoice
+                                    File</label>
+                                <input @change="onFile" type="file" accept=".pdf,.jpg,.jpeg,.png"
+                                    class="input-dark !py-2 !px-3 text-smfile:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-accent/20 file:text-purple-accent hover:file:bg-purple-accent/30" />
                             </div>
                         </div>
 
@@ -209,11 +211,13 @@ function submitInvoice() {
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-dark-text-secondary mb-2">Amount</label>
-                            <DarkInput v-model.number="fundingForm.amount" type="number" step="0.01" placeholder="Enter funding amount" />
+                            <DarkInput v-model.number="fundingForm.amount" type="number" step="0.01"
+                                placeholder="Enter funding amount" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-dark-text-secondary mb-2">Funding Date</label>
-                            <DarkInput v-model="fundingForm.funding_date" type="date" placeholder="Select funding date" />
+                            <DarkInput v-model="fundingForm.funding_date" type="date"
+                                placeholder="Select funding date" />
                         </div>
                     </div>
                     <div class="flex justify-end">

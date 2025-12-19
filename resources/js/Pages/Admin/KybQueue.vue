@@ -72,7 +72,7 @@ async function openDrawer(docId: number) {
       drawerDoc.value = j.document;
       drawerHistory.value = j.history;
     }
-  } catch {}
+  } catch { }
 }
 
 async function load() {
@@ -158,6 +158,7 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
 </script>
 
 <template>
+
   <Head title="KYB Queue" />
   <AuthenticatedLayout>
     <div class="space-y-6">
@@ -199,25 +200,20 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
             <DarkInput v-model="age" placeholder="e.g. 24h, 2d" />
           </div>
         </div>
-        
+
         <!-- Quick Filters -->
         <div class="mt-4 flex flex-wrap gap-2">
-          <button 
-            @click="status='pending_review'; vip='1'; page=1; load()" 
-            class="btn-secondary text-sm py-2 px-4"
-          >
+          <button @click="status = 'pending_review'; vip = '1'; page = 1; load()"
+            class="btn-secondary text-sm py-2 px-4">
             VIP Pending
           </button>
-          <button 
-            @click="status='under_review'; assigned_to=String(currentUserId||''); page=1; load()" 
-            class="btn-secondary text-sm py-2 px-4"
-          >
+          <button @click="status = 'under_review'; assigned_to = String(currentUserId || ''); page = 1; load()"
+            class="btn-secondary text-sm py-2 px-4">
             My In-Progress
           </button>
-          <button 
-            @click="status=''; assigned_to=''; vip=''; age='24h'; sort='priority'; dir='desc'; page=1; load()" 
-            class="btn-secondary text-sm py-2 px-4"
-          >
+          <button
+            @click="status = ''; assigned_to = ''; vip = ''; age = '24h'; sort = 'priority'; dir = 'desc'; page = 1; load()"
+            class="btn-secondary text-sm py-2 px-4">
             Older than 24h
           </button>
         </div>
@@ -233,24 +229,32 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
           <div class="text-sm font-medium text-dark-text-primary">Results</div>
           <a :href="exportUrl" class="btn-secondary text-sm py-2 px-4">Export CSV</a>
         </div>
-        
+
         <div class="overflow-x-auto">
           <table class="table-dark">
             <thead>
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">ID</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">TYPE</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">STATUS</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">VIP</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">PRIORITY</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">ASSIGNED TO</th>
-                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-dark-text-secondary">ACTIONS</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">ID
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                  TYPE</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                  STATUS</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                  VIP</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                  PRIORITY</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                  ASSIGNED TO</th>
+                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-dark-text-secondary">
+                  ACTIONS</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="doc in data?.data || []" :key="doc.id" class="hover:bg-dark-secondary">
                 <td class="px-4 py-3">
-                  <button class="text-purple-accent hover:text-purple-hover underline font-medium" @click="openDrawer(doc.id)">
+                  <button class="text-purple-accent hover:text-purple-hover underline font-medium"
+                    @click="openDrawer(doc.id)">
                     {{ doc.id }}
                   </button>
                 </td>
@@ -268,33 +272,21 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
                 <td class="px-4 py-3 text-dark-text-primary">{{ doc.assigned_to ?? '-' }}</td>
                 <td class="px-4 py-3 text-right">
                   <div class="flex items-center justify-end gap-2">
-                    <button 
-                      @click="claim(doc.id)" 
-                      class="btn-primary text-xs py-1.5 px-3"
-                    >
+                    <button @click="claim(doc.id)" class="btn-primary text-xs py-1.5 px-3">
                       Claim
                     </button>
-                    <button 
-                      @click="review(doc.id, 'approve')" 
-                      class="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-3 rounded-lg transition-colors"
-                    >
+                    <button @click="review(doc.id, 'approve')"
+                      class="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-3 rounded-lg transition-colors">
                       Approve
                     </button>
-                    <button 
-                      @click="review(doc.id, 'reject')" 
-                      class="bg-red-500 hover:bg-red-600 text-white text-xs font-medium py-1.5 px-3 rounded-lg transition-colors"
-                    >
+                    <button @click="review(doc.id, 'reject')"
+                      class="bg-red-500 hover:bg-red-600 text-white text-xs font-medium py-1.5 px-3 rounded-lg transition-colors">
                       Reject
                     </button>
-                    <DarkInput 
-                      v-model="reviewNotes[doc.id]" 
-                      placeholder="notes..."
-                      class="!w-32 !py-1.5 !px-2 text-xs"
-                    />
-                    <select 
-                      @change="(e:any)=>reassign(doc.id, e.target.value)" 
-                      class="input-dark !w-32 !py-1.5 !px-2 text-xs"
-                    >
+                    <DarkInput v-model="reviewNotes[doc.id]" placeholder="notes..."
+                      class="!w-32 !py-1.5 !px-2 text-xs" />
+                    <select @change="(e: any) => reassign(doc.id, e.target.value)"
+                      class="input-dark !py-2 !px-3 text-sm!w-32 !py-1.5 !px-2 text-xs">
                       <option value="">Reassign →</option>
                       <option v-for="u in reviewers" :key="u.id" :value="String(u.id)">{{ u.name }}</option>
                     </select>
@@ -317,18 +309,14 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
           Page {{ data?.meta?.current_page || page }} of {{ data?.meta?.last_page || '?' }}
         </div>
         <div class="flex items-center gap-2">
-          <button 
-            :disabled="(data?.meta?.current_page || 1) <= 1" 
-            @click="page = (data?.meta?.current_page || 1) - 1; load()" 
-            class="btn-secondary text-sm py-2 px-4 disabled:opacity-50"
-          >
+          <button :disabled="(data?.meta?.current_page || 1) <= 1"
+            @click="page = (data?.meta?.current_page || 1) - 1; load()"
+            class="btn-secondary text-sm py-2 px-4 disabled:opacity-50">
             Prev
           </button>
-          <button 
-            :disabled="(data?.meta?.current_page || 1) >= (data?.meta?.last_page || 1)" 
-            @click="page = (data?.meta?.current_page || 1) + 1; load()" 
-            class="btn-secondary text-sm py-2 px-4 disabled:opacity-50"
-          >
+          <button :disabled="(data?.meta?.current_page || 1) >= (data?.meta?.last_page || 1)"
+            @click="page = (data?.meta?.current_page || 1) + 1; load()"
+            class="btn-secondary text-sm py-2 px-4 disabled:opacity-50">
             Next
           </button>
         </div>
@@ -338,25 +326,22 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
 
   <!-- Toasts -->
   <div class="fixed bottom-4 right-4 space-y-2 z-50">
-    <div 
-      v-for="t in toasts" 
-      :key="t.id" 
-      :class="[
-        'rounded-lg px-4 py-2 shadow-lg',
-        t.type==='error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
-      ]"
-    >
+    <div v-for="t in toasts" :key="t.id" :class="[
+      'rounded-lg px-4 py-2 shadow-lg',
+      t.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+    ]">
       {{ t.text }}
     </div>
   </div>
 
   <!-- Drawer -->
   <div v-if="showDrawer" class="fixed inset-0 z-50">
-    <div class="absolute inset-0 bg-black/50" @click="showDrawer=false"></div>
-    <div class="absolute right-0 top-0 h-full w-full max-w-xl overflow-auto bg-dark-card border-l border-dark-border shadow-xl">
+    <div class="absolute inset-0 bg-black/50" @click="showDrawer = false"></div>
+    <div
+      class="absolute right-0 top-0 h-full w-full max-w-xl overflow-auto bg-dark-card border-l border-dark-border shadow-xl">
       <div class="flex items-center justify-between border-b border-dark-border p-6">
         <h3 class="text-lg font-semibold text-dark-text-primary">Document #{{ drawerDoc?.id }}</h3>
-        <button class="btn-secondary text-sm py-2 px-4" @click="showDrawer=false">Close</button>
+        <button class="btn-secondary text-sm py-2 px-4" @click="showDrawer = false">Close</button>
       </div>
       <div class="p-6 space-y-6">
         <div class="grid grid-cols-2 gap-4 text-sm">
@@ -387,7 +372,8 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
         </div>
         <div>
           <div class="mb-2 text-sm font-medium text-dark-text-primary">Preview</div>
-          <div v-if="drawerDoc?.file_path" class="aspect-[4/3] w-full overflow-hidden rounded-lg border border-dark-border">
+          <div v-if="drawerDoc?.file_path"
+            class="aspect-[4/3] w-full overflow-hidden rounded-lg border border-dark-border">
             <iframe :src="`/storage/${drawerDoc.file_path}`" class="h-full w-full bg-dark-secondary"></iframe>
           </div>
         </div>
@@ -399,7 +385,7 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
                 <span class="font-medium text-dark-text-primary">{{ h.action }}</span>
                 <span class="text-dark-text-secondary text-xs">{{ h.created_at }}</span>
               </div>
-              <div class="mt-1 text-sm text-dark-text-secondary">By {{ h.actor_name || ('#'+h.actor_id) }}</div>
+              <div class="mt-1 text-sm text-dark-text-secondary">By {{ h.actor_name || ('#' + h.actor_id) }}</div>
             </li>
           </ul>
         </div>

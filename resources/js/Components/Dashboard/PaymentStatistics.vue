@@ -53,48 +53,25 @@ const overdueDashOffset = computed(() => {
 </script>
 
 <template>
-  <div class="card">
+  <div
+    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
     <h3 class="mb-4 text-lg font-semibold text-dark-text-primary">Payment Statistics</h3>
-    
+
     <div class="flex items-center justify-between">
       <!-- Pie Chart Visualization (simplified) -->
       <div class="relative h-32 w-32">
         <svg class="transform -rotate-90" viewBox="0 0 100 100">
           <!-- Paid (green) -->
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            fill="none"
-            stroke="#10B981"
-            stroke-width="20"
-            :stroke-dasharray="paidDashArray"
-            class="transition-all duration-500"
-          />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" stroke-width="20"
+            :stroke-dasharray="paidDashArray" class="transition-all duration-500" />
           <!-- Partially Paid (yellow) -->
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            fill="none"
-            stroke="#F59E0B"
-            stroke-width="20"
-            :stroke-dasharray="partiallyPaidDashArray"
-            :stroke-dashoffset="partiallyPaidDashOffset"
-            class="transition-all duration-500"
-          />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#F59E0B" stroke-width="20"
+            :stroke-dasharray="partiallyPaidDashArray" :stroke-dashoffset="partiallyPaidDashOffset"
+            class="transition-all duration-500" />
           <!-- Overdue (red) -->
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            fill="none"
-            stroke="#EF4444"
-            stroke-width="20"
-            :stroke-dasharray="overdueDashArray"
-            :stroke-dashoffset="overdueDashOffset"
-            class="transition-all duration-500"
-          />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#EF4444" stroke-width="20"
+            :stroke-dasharray="overdueDashArray" :stroke-dashoffset="overdueDashOffset"
+            class="transition-all duration-500" />
         </svg>
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="text-center">

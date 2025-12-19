@@ -41,7 +41,7 @@ onMounted(() => {
   if (chartRef.value && props.series && props.series.length > 0) {
     setTimeout(() => drawChart(), 100);
   }
-  
+
   // Watch for container resize
   if (chartRef.value && window.ResizeObserver) {
     resizeObserver = new ResizeObserver(() => {
@@ -51,7 +51,7 @@ onMounted(() => {
     });
     resizeObserver.observe(chartRef.value.parentElement || chartRef.value);
   }
-  
+
   // Fallback: window resize listener
   window.addEventListener('resize', handleResize);
 });
@@ -84,11 +84,11 @@ function drawChart() {
   const displayWidth = rect.width;
   const displayHeight = rect.height;
   const dpr = window.devicePixelRatio || 1;
-  
+
   canvas.width = displayWidth * dpr;
   canvas.height = displayHeight * dpr;
   ctx.scale(dpr, dpr);
-  
+
   // Clear canvas
   ctx.clearRect(0, 0, displayWidth, displayHeight);
 
@@ -150,7 +150,8 @@ function drawChart() {
 </script>
 
 <template>
-  <div class="card">
+  <div
+    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
     <div class="mb-6 flex items-center justify-between">
       <h3 class="text-lg font-semibold text-dark-text-primary">{{ title || 'Revenue Overview' }}</h3>
       <div class="flex items-center gap-4 text-sm">
@@ -166,11 +167,7 @@ function drawChart() {
     </div>
 
     <div class="h-64 w-full">
-      <canvas
-        ref="chartRef"
-        class="h-full w-full"
-        style="width: 100%; height: 100%;"
-      ></canvas>
+      <canvas ref="chartRef" class="h-full w-full" style="width: 100%; height: 100%;"></canvas>
     </div>
 
     <!-- Fallback for no data -->

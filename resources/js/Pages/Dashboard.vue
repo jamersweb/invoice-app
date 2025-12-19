@@ -109,50 +109,55 @@ async function fetchAdminWidgets() {
             const js = await s.json();
             topSuppliers.value = js?.data ?? [];
         }
-    } catch {}
+    } catch { }
 }
 
 onMounted(fetchAdminWidgets);
 
 // Calculate trend percentages (mock for now, can be enhanced with historical data)
-const calculateTrend = (current: number, previous: number = 0): string => {
-    if (previous === 0) return '0.0%';
+// Calculate trend percentages
+const calculateTrend = (current: number, previous: number = 0): { value: string, direction: 'up' | 'down' | 'neutral' } => {
+    if (previous === 0) return { value: '0.0%', direction: 'neutral' };
     const change = ((current - previous) / previous) * 100;
     const sign = change >= 0 ? '+' : '';
-    return `${sign}${change.toFixed(1)}%`;
+    const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'neutral';
+    return {
+        value: `${sign}${change.toFixed(1)}%`,
+        direction
+    };
 };
 
 const kpis = computed(() => {
     const k = store.kpis;
     const fmt = (n: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-    
+
     // Use fallback values if store data isn't loaded yet
     const totalFunded = k?.totalFunded || 0;
     const totalRepaid = k?.totalRepaid || 0;
     const outstanding = k?.outstanding || 0;
     const overdue = k?.overdue || 0;
-    
+
     // Calculate trends (simplified - in production, compare with previous period)
     const fundedTrend = calculateTrend(totalFunded, totalFunded * 0.9);
     const repaidTrend = calculateTrend(totalRepaid, totalRepaid * 0.92);
-    const overdueTrend = overdue > 0 ? calculateTrend(overdue, overdue * 1.05) : '0.0%';
-    
+    const overdueTrend = overdue > 0 ? calculateTrend(overdue, overdue * 1.05) : { value: '0.0%', direction: 'neutral' as const };
+
     return [
         {
             title: t?.total_funded || 'Total Funded',
             value: fmt(totalFunded),
             icon: '💸',
             color: 'blue' as const,
-            trend: 'up' as const,
-            delta: fundedTrend,
+            trend: fundedTrend.direction,
+            delta: fundedTrend.value,
         },
         {
             title: t?.total_repaid || 'Total Repaid',
             value: fmt(totalRepaid),
             icon: '🏦',
             color: 'green' as const,
-            trend: 'up' as const,
-            delta: repaidTrend,
+            trend: repaidTrend.direction,
+            delta: repaidTrend.value,
         },
         {
             title: t?.outstanding || 'Outstanding',
@@ -167,8 +172,9 @@ const kpis = computed(() => {
             value: fmt(overdue),
             icon: '⏰',
             color: 'red' as const,
-            trend: overdue > 0 ? 'down' as const : 'neutral' as const,
-            delta: overdueTrend,
+            trend: overdueTrend.direction,
+            delta: overdueTrend.value,
+            reverseColor: true,
         },
     ];
 });
@@ -199,6 +205,7 @@ async function handleRefresh() {
 </script>
 
 <template>
+
     <Head :title="t?.dashboard || 'Dashboard'" />
 
     <AuthenticatedLayout>
@@ -207,31 +214,28 @@ async function handleRefresh() {
             <div class="mb-6 flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-dark-text-primary">Dashboard</h1>
-                    <p class="mt-1 text-sm text-dark-text-secondary">Welcome back! Here's what's happening with your invoices.</p>
+                    <p class="mt-1 text-sm text-dark-text-secondary">Welcome back! Here's what's happening with your
+                        invoices.</p>
                 </div>
-                <button
-                    @click="handleRefresh"
-                    :disabled="store.loading"
-                    class="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <svg
-                        class="h-4 w-4"
-                        :class="{ 'animate-spin': store.loading }"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <button @click="handleRefresh" :disabled="store.loading"
+                    class="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="h-4 w-4" :class="{ 'animate-spin': store.loading }" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Refresh
                 </button>
             </div>
 
             <!-- Error State -->
-            <div v-if="store.error" class="card border-red-500/50 bg-red-500/10">
+            <div v-if="store.error"
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group border-red-500/50 bg-red-500/10">
                 <div class="flex items-center gap-3">
                     <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
                     </svg>
                     <div>
                         <p class="font-medium text-red-400">Error loading dashboard</p>
@@ -241,24 +245,26 @@ async function handleRefresh() {
             </div>
 
             <!-- Greeting & Date Time Container -->
-            <div class="card">
+            <div
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 class="text-xl font-semibold text-dark-text-primary">{{ greeting }}!</h2>
-                        <p class="text-sm text-dark-text-secondary mt-1">Here's your overview for {{ formattedDate }}</p>
+                        <p class="text-sm text-dark-text-secondary mt-1">Here's your overview for {{ formattedDate }}
+                        </p>
                     </div>
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
                             <svg width="13" height="13" fill="none" viewBox="0 0 13 13" class="text-dark-text-muted">
-                                <path stroke="currentColor" stroke-width="1.5" d="M2 3h9v8H2zM3.5 1v4M9.5 1v4"/>
+                                <path stroke="currentColor" stroke-width="1.5" d="M2 3h9v8H2zM3.5 1v4M9.5 1v4" />
                             </svg>
                             <span>{{ currentTime.toLocaleDateString() }}</span>
                         </div>
                         <div class="h-5 w-px bg-dark-border"></div>
                         <div class="flex items-center gap-2 text-sm text-dark-text-secondary">
                             <svg width="13" height="13" fill="none" viewBox="0 0 13 13" class="text-dark-text-muted">
-                                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/>
-                                <path stroke="currentColor" stroke-width="1.5" d="M6.5 3v3.5l2.5 1.5"/>
+                                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5" />
+                                <path stroke="currentColor" stroke-width="1.5" d="M6.5 3v3.5l2.5 1.5" />
                             </svg>
                             <span>{{ formattedTime }}</span>
                         </div>
@@ -268,33 +274,24 @@ async function handleRefresh() {
 
             <!-- KPIs -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <KpiCard
-                    v-for="(k, i) in kpis"
-                    :key="i"
-                    :title="k.title"
-                    :value="k.value"
-                    :icon="k.icon"
-                    :color="k.color"
-                    :trend="k.trend"
-                    :delta="k.delta"
-                />
+                <KpiCard v-for="(k, i) in kpis" :key="i" :title="k.title" :value="k.value" :icon="k.icon"
+                    :color="k.color" :trend="k.trend" :delta="k.delta" :reverse-color="k.reverseColor" />
             </div>
 
             <!-- Loading State -->
-            <div v-if="store.loading && !store.kpis" class="card text-center py-12">
-                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-purple-accent border-r-transparent"></div>
+            <div v-if="store.loading && !store.kpis"
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group text-center py-12">
+                <div
+                    class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-purple-accent border-r-transparent">
+                </div>
                 <p class="mt-4 text-dark-text-secondary">Loading dashboard data...</p>
             </div>
 
             <!-- Charts and Overview -->
             <div v-if="!store.loading || store.kpis" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <!-- Payment Statistics -->
-                <PaymentStatistics
-                    :total="paymentStats.total"
-                    :paid="paymentStats.paid"
-                    :partially-paid="paymentStats.partiallyPaid"
-                    :overdue="paymentStats.overdue"
-                />
+                <PaymentStatistics :total="paymentStats.total" :paid="paymentStats.paid"
+                    :partially-paid="paymentStats.partiallyPaid" :overdue="paymentStats.overdue" />
 
                 <!-- Revenue Chart -->
                 <div class="lg:col-span-2">
@@ -302,23 +299,15 @@ async function handleRefresh() {
                         <div class="flex items-center gap-3">
                             <label class="text-sm font-medium text-dark-text-secondary">Date Range:</label>
                             <div class="flex items-center gap-2">
-                                <input
-                                    type="date"
-                                    v-model="from"
-                                    class="input-dark !py-2 !px-3 text-sm"
-                                />
+                                <input type="date" v-model="from"
+                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
                                 <span class="text-sm text-dark-text-muted">to</span>
-                                <input
-                                    type="date"
-                                    v-model="to"
-                                    class="input-dark !py-2 !px-3 text-sm"
-                                />
+                                <input type="date" v-model="to"
+                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
                             </div>
                         </div>
-                        <button
-                            @click="from = ''; to = ''; store.fetchMetrics()"
-                            class="btn-secondary text-sm py-2 px-4"
-                        >
+                        <button @click="from = ''; to = ''; store.fetchMetrics()"
+                            class="btn-secondary text-sm py-2 px-4">
                             Clear
                         </button>
                     </div>
@@ -328,24 +317,18 @@ async function handleRefresh() {
 
             <!-- Overview List -->
             <div v-if="overviewItems.length > 0" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <OverviewList
-                    :title="t?.overview_title || 'Quick Overview'"
-                    :items="overviewItems"
-                />
+                <OverviewList :title="t?.overview_title || 'Quick Overview'" :items="overviewItems" />
             </div>
 
             <!-- Recent Activity -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <RecentActivity
-                    :items="recentActivity"
-                    :loading="loadingActivity"
-                    @refresh="fetchRecentActivity"
-                />
+                <RecentActivity :items="recentActivity" :loading="loadingActivity" @refresh="fetchRecentActivity" />
             </div>
 
             <!-- Admin reporting widgets -->
             <div v-if="aging || (topSuppliers && topSuppliers.length)" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div class="card lg:col-span-1">
+                <div
+                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group lg:col-span-1">
                     <div class="mb-4 text-base font-semibold text-dark-text-primary">Repayment Aging</div>
                     <div v-if="aging" class="space-y-2 text-sm">
                         <div class="flex justify-between text-dark-text-primary">
@@ -367,7 +350,8 @@ async function handleRefresh() {
                     </div>
                     <div v-else class="text-sm text-dark-text-muted">No data</div>
                 </div>
-                <div class="card lg:col-span-2">
+                <div
+                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group lg:col-span-2">
                     <div class="mb-4 text-base font-semibold text-dark-text-primary">Top Suppliers by Funded</div>
                     <div class="overflow-x-auto">
                         <table class="table-dark">

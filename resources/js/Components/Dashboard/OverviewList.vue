@@ -13,7 +13,8 @@ const statusColors = {
 </script>
 
 <template>
-  <div class="card">
+  <div
+    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
     <div v-if="title" class="mb-4">
       <h3 class="text-lg font-semibold text-dark-text-primary">{{ title }}</h3>
     </div>
@@ -28,7 +29,8 @@ const statusColors = {
           <div>
             <span class="text-sm font-medium text-dark-text-primary">{{ item.title }}</span>
             <div v-if="item.status" class="mt-1">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border" :class="statusColors[item.status]">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border"
+                :class="statusColors[item.status]">
                 {{ item.status.charAt(0).toUpperCase() + item.status.slice(1) }}
               </span>
             </div>

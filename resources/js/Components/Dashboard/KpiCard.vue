@@ -1,11 +1,12 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title: string;
   value: string | number;
   delta?: string;
   icon?: string;
   trend?: 'up' | 'down' | 'neutral';
   color?: 'blue' | 'green' | 'yellow' | 'red' | 'purple';
+  reverseColor?: boolean;
 }>();
 
 const colorClasses = {
@@ -23,10 +24,22 @@ const iconBgClasses = {
   red: 'bg-red-500/20 text-red-400',
   purple: 'bg-purple-accent/20 text-purple-accent'
 };
+
+const getTrendColor = (trend?: 'up' | 'down' | 'neutral') => {
+  if (!trend || trend === 'neutral') return 'text-dark-text-muted';
+
+  const isUp = trend === 'up';
+  // If reverseColor is true, up is bad (red), down is good (green)
+  // If reverseColor is false, up is good (green), down is bad (red)
+  const isGood = props.reverseColor ? !isUp : isUp;
+
+  return isGood ? 'text-green-400' : 'text-red-400';
+};
 </script>
 
 <template>
-  <div class="relative overflow-hidden rounded-card card">
+  <div
+    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
     <div class="relative">
       <div class="flex items-center justify-between">
         <div class="flex-1">
@@ -35,35 +48,22 @@ const iconBgClasses = {
 
           <!-- Trend indicator -->
           <div v-if="delta" class="mt-3 flex items-center gap-1.5 text-sm">
-            <svg
-              v-if="trend === 'up'"
-              class="h-4 w-4 text-green-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            <svg v-if="trend === 'up'" class="h-4 w-4" :class="getTrendColor('up')" fill="currentColor"
+              viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
+                clip-rule="evenodd" />
             </svg>
-            <svg
-              v-else-if="trend === 'down'"
-              class="h-4 w-4 text-red-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            <svg v-else-if="trend === 'down'" class="h-4 w-4" :class="getTrendColor('down')" fill="currentColor"
+              viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z"
+                clip-rule="evenodd" />
             </svg>
-            <svg
-              v-else
-              class="h-4 w-4 text-dark-text-muted"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+            <svg v-else class="h-4 w-4 text-dark-text-muted" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
             </svg>
-            <span :class="{
-              'text-green-400': trend === 'up',
-              'text-red-400': trend === 'down',
-              'text-dark-text-muted': trend === 'neutral' || !trend
-            }">{{ delta }}</span>
+            <span :class="getTrendColor(trend)">{{ delta }}</span>
           </div>
         </div>
 
