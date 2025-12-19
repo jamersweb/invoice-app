@@ -1,4 +1,5 @@
 <template>
+
   <Head title="Profit Allocations" />
   <AuthenticatedLayout>
     <div class="p-6">
@@ -9,7 +10,8 @@
             <div class="flex items-center gap-3">
               <div class="p-3 bg-purple-600/20 rounded-xl">
                 <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-5m-3 5h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 7h6m0 10v-5m-3 5h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
               <div>
@@ -18,28 +20,16 @@
               </div>
             </div>
             <div class="flex gap-3">
-              <button
-                @click="recalculateAllocations"
-                :disabled="isRecalculating"
-                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50"
-              >
-                <svg
-                  v-if="isRecalculating"
-                  class="w-4 h-4 animate-spin"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <button @click="recalculateAllocations" :disabled="isRecalculating"
+                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50">
+                <svg v-if="isRecalculating" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                <svg
-                  v-else
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-5m-3 5h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 7h6m0 10v-5m-3 5h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
                 {{ isRecalculating ? 'Calculating...' : 'Calculate Allocations' }}
               </button>
@@ -49,15 +39,13 @@
 
         <!-- Investor Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div
-            v-for="(summary, investor) in investorSummary"
-            :key="investor"
-            class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-4 cursor-pointer hover:border-blue-500/50 transition-colors"
-          >
+          <div v-for="(summary, investor) in investorSummary" :key="investor"
+            class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-4 cursor-pointer hover:border-blue-500/50 transition-colors">
             <div class="flex items-center justify-between mb-2">
               <p class="text-slate-300 font-semibold text-sm">{{ investor }}</p>
               <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
             <p class="text-white text-xl font-bold">{{ formatCurrency(summary.totalProfit) }}</p>
@@ -85,19 +73,13 @@
 
         <!-- Filters -->
         <div class="mb-6 flex flex-wrap gap-4">
-          <select
-            v-model="filters.investor"
-            class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white"
-          >
+          <select v-model="filters.investor" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
             <option value="all">All Investors</option>
             <option v-for="investor in uniqueInvestors" :key="investor" :value="investor">
               {{ investor }}
             </option>
           </select>
-          <select
-            v-model="filters.status"
-            class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white"
-          >
+          <select v-model="filters.status" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
             <option value="all">All Status</option>
             <option value="Ongoing">Ongoing</option>
             <option value="Ended">Ended</option>
@@ -105,16 +87,18 @@
         </div>
 
         <!-- Allocations Table -->
-        <div v-if="filteredAllocations.length === 0" class="bg-slate-800/30 border border-slate-700 rounded-lg p-12 text-center">
+        <div v-if="filteredAllocations.length === 0"
+          class="bg-slate-800/30 border border-slate-700 rounded-lg p-12 text-center">
           <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-5m-3 5h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 7h6m0 10v-5m-3 5h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
           </svg>
           <p class="text-slate-400 text-lg mb-2">No allocations calculated yet</p>
           <p class="text-slate-500 text-sm mb-6">Click "Calculate Allocations" to generate profit distributions</p>
         </div>
 
         <div v-else class="bg-slate-800/30 border border-slate-700 rounded-lg overflow-hidden">
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full">
               <thead class="bg-slate-800/50 border-b border-slate-700">
                 <tr>
@@ -128,11 +112,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="allocation in filteredAllocations"
-                  :key="allocation.id"
-                  class="border-b border-slate-700/50 hover:bg-slate-800/30"
-                >
+                <tr v-for="allocation in filteredAllocations" :key="allocation.id"
+                  class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-white font-medium text-xs p-3">
                     {{ allocation.transaction?.transaction_number || 'N/A' }}
                   </td>
@@ -148,15 +129,12 @@
                     {{ formatCurrency(allocation.individual_profit) }}
                   </td>
                   <td class="text-center p-3">
-                    <span
-                      :class="`px-2 py-1 rounded text-xs ${
-                        allocation.deal_status === 'Ended'
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                          : allocation.deal_status === 'Ongoing'
+                    <span :class="`px-2 py-1 rounded text-xs ${allocation.deal_status === 'Ended'
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                        : allocation.deal_status === 'Ongoing'
                           ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
                           : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
-                      }`"
-                    >
+                      }`">
                       {{ allocation.deal_status }}
                     </span>
                   </td>
@@ -169,17 +147,11 @@
         <!-- Pagination -->
         <div v-if="allocations.links && allocations.links.length > 3" class="mt-6 flex justify-center">
           <div class="flex gap-2">
-            <Link
-              v-for="link in allocations.links"
-              :key="link.label"
-              :href="link.url || '#'"
-              v-html="link.label"
-              :class="`px-3 py-2 rounded-lg ${
-                link.active
+            <Link v-for="link in allocations.links" :key="link.label" :href="link.url || '#'" v-html="link.label"
+              :class="`px-3 py-2 rounded-lg ${link.active
                   ? 'bg-purple-600 text-white'
                   : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
-              } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`"
-            />
+                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>
       </div>

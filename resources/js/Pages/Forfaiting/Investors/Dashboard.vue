@@ -1,4 +1,5 @@
 <template>
+
   <Head :title="`${investor.name} - Dashboard`" />
   <AuthenticatedLayout>
     <div class="p-6">
@@ -6,17 +7,15 @@
         <!-- Header -->
         <div class="mb-8">
           <div class="flex items-center gap-3 mb-2">
-            <Link
-              :href="route('forfaiting.investors.index')"
-              class="text-slate-400 hover:text-white"
-            >
+            <Link :href="route('forfaiting.investors.index')" class="text-slate-400 hover:text-white">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </Link>
             <div class="p-3 bg-purple-600/20 rounded-xl">
               <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
             <div>
@@ -51,7 +50,7 @@
           <div class="p-6 border-b border-slate-700">
             <h3 class="text-white text-lg font-semibold">Investments</h3>
           </div>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full">
               <thead class="bg-slate-800/50 border-b border-slate-700">
                 <tr>
@@ -61,11 +60,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="investment in investments"
-                  :key="investment.id"
-                  class="border-b border-slate-700/50 hover:bg-slate-800/30"
-                >
+                <tr v-for="investment in investments" :key="investment.id"
+                  class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-blue-400 font-mono text-xs p-3">{{ formatCurrency(investment.amount) }}</td>
                   <td class="text-right text-slate-300 text-xs p-3">{{ investment.currency }}</td>
                   <td class="text-right text-slate-300 text-xs p-3">{{ formatDate(investment.date) }}</td>
@@ -83,7 +79,7 @@
           <div class="p-6 border-b border-slate-700">
             <h3 class="text-white text-lg font-semibold">Profit Allocations</h3>
           </div>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full">
               <thead class="bg-slate-800/50 border-b border-slate-700">
                 <tr>
@@ -95,11 +91,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="allocation in allocations"
-                  :key="allocation.id"
-                  class="border-b border-slate-700/50 hover:bg-slate-800/30"
-                >
+                <tr v-for="allocation in allocations" :key="allocation.id"
+                  class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-white font-medium text-xs p-3">
                     {{ allocation.transaction?.transaction_number || 'N/A' }}
                   </td>
@@ -111,13 +104,10 @@
                   </td>
                   <td class="text-right text-slate-300 text-xs p-3">{{ formatDate(allocation.allocation_date) }}</td>
                   <td class="text-center p-3">
-                    <span
-                      :class="`px-2 py-1 rounded text-xs ${
-                        allocation.deal_status === 'Ended'
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                          : 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                      }`"
-                    >
+                    <span :class="`px-2 py-1 rounded text-xs ${allocation.deal_status === 'Ended'
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                        : 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                      }`">
                       {{ allocation.deal_status }}
                     </span>
                   </td>

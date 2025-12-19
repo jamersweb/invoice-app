@@ -67,7 +67,7 @@ onMounted(async () => {
 
             <!-- Customers Table -->
             <div class="card overflow-hidden p-0">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto custom-scrollbar">
                     <table class="table-dark w-full">
                         <thead>
                             <tr>

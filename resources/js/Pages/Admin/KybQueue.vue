@@ -230,8 +230,8 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
           <a :href="exportUrl" class="btn-secondary text-sm py-2 px-4">Export CSV</a>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="table-dark">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="table-dark bg-none">
             <thead>
               <tr>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dark-text-secondary">ID
@@ -338,7 +338,7 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
   <div v-if="showDrawer" class="fixed inset-0 z-50">
     <div class="absolute inset-0 bg-black/50" @click="showDrawer = false"></div>
     <div
-      class="absolute right-0 top-0 h-full w-full max-w-xl overflow-auto bg-dark-card border-l border-dark-border shadow-xl">
+      class="absolute right-0 top-0 h-full w-full max-w-xl overflow-auto custom-scrollbar bg-dark-card border-l border-dark-border shadow-xl">
       <div class="flex items-center justify-between border-b border-dark-border p-6">
         <h3 class="text-lg font-semibold text-dark-text-primary">Document #{{ drawerDoc?.id }}</h3>
         <button class="btn-secondary text-sm py-2 px-4" @click="showDrawer = false">Close</button>

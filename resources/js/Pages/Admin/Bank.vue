@@ -1,22 +1,26 @@
 <template>
   <AuthenticatedLayout>
+
     <Head title="Admin - Banking Details" />
     <div class="space-y-6">
       <div>
         <h1 class="text-3xl font-bold text-gray-900">Banking Details</h1>
-        <p class="mt-2 text-sm text-gray-600">View and manage all supplier banking information. Full details visible.</p>
+        <p class="mt-2 text-sm text-gray-600">View and manage all supplier banking information. Full details visible.
+        </p>
       </div>
 
       <div v-if="$page.props.flash?.success" class="rounded-lg bg-green-50 p-4 text-green-700">
         {{ $page.props.flash.success }}
       </div>
 
-      <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
+      <div
+        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Supplier</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Account Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Account Name
+              </th>
               <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">IBAN</th>
               <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">SWIFT</th>
               <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Bank</th>
@@ -53,31 +57,40 @@
           <form @submit.prevent="submitEdit" class="px-6 py-4 space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Account Name *</label>
-              <input v-model="editForm.account_name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required />
+              <input v-model="editForm.account_name" type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">IBAN *</label>
-              <input v-model="editForm.iban" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono" required />
+              <input v-model="editForm.iban" type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono" required />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">SWIFT</label>
-              <input v-model="editForm.swift" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono" />
+              <input v-model="editForm.swift" type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Bank Name</label>
-              <input v-model="editForm.bank_name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+              <input v-model="editForm.bank_name" type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Branch</label>
-              <input v-model="editForm.branch" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+              <input v-model="editForm.branch" type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Correction Note *</label>
-              <textarea v-model="editForm.correction_note" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="Explain why this change is needed..." required></textarea>
+              <textarea v-model="editForm.correction_note" rows="3"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="Explain why this change is needed..." required></textarea>
             </div>
             <div class="flex justify-end space-x-3 pt-4">
-              <button type="button" @click="closeModal" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-              <button type="submit" :disabled="editForm.processing" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">
+              <button type="button" @click="closeModal"
+                class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button type="submit" :disabled="editForm.processing"
+                class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">
                 {{ editForm.processing ? 'Saving...' : 'Save Changes' }}
               </button>
             </div>
@@ -129,15 +142,3 @@ function submitEdit() {
   })
 }
 </script>
-
-
-
-
-
-
-
-
-
-
-
-

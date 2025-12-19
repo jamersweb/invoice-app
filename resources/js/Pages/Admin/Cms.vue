@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 
-type Cms = { id:number, key:string, locale:string, title?:string, body?:string, cta_text?:string, cta_href?:string, image_url?:string, is_active:boolean };
+type Cms = { id: number, key: string, locale: string, title?: string, body?: string, cta_text?: string, cta_href?: string, image_url?: string, is_active: boolean };
 const items = ref<Cms[]>([]);
 const loading = ref(true);
 const form = ref<Cms>({ id: 0, key: '', locale: 'en', title: '', body: '', cta_text: '', cta_href: '', image_url: '', is_active: true });
@@ -35,6 +35,7 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
 </script>
 
 <template>
+
   <Head title="CMS" />
   <AuthenticatedLayout>
     <template #header>
@@ -45,7 +46,7 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
 
     <div class="mx-auto max-w-7xl py-8 px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="rounded-xl border border-gray-200 bg-white p-6 lg:col-span-2">
+        <div class="rounded-xl border border-gray-200  p-6 lg:col-span-2">
           <div class="mb-4 text-base font-semibold text-gray-900">Blocks</div>
           <div v-if="loading" class="py-10 text-center text-sm text-gray-500">Loading…</div>
           <div v-else class="overflow-x-auto">
@@ -70,18 +71,21 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
                     <button class="text-red-600 hover:underline" @click="remove(row.id)">Delete</button>
                   </td>
                 </tr>
-                <tr v-if="items.length===0"><td colspan="5" class="py-6 text-center text-gray-500">No blocks</td></tr>
+                <tr v-if="items.length === 0">
+                  <td colspan="5" class="py-6 text-center text-gray-500">No blocks</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-6">
+        <div class="rounded-xl border border-gray-200  p-6">
           <div class="mb-4 text-base font-semibold text-gray-900">{{ form.id ? 'Edit' : 'Create' }} Block</div>
           <div class="space-y-3">
             <div>
               <label class="block text-sm font-medium text-gray-700">Key</label>
-              <input v-model="form.key" class="mt-1 w-full rounded-lg border border-gray-300 p-2" :disabled="!!form.id" />
+              <input v-model="form.key" class="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                :disabled="!!form.id" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Locale</label>
@@ -114,7 +118,8 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
               <label for="is_active" class="text-sm text-gray-700">Active</label>
             </div>
             <div class="pt-2">
-              <button @click="save" class="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">Save</button>
+              <button @click="save"
+                class="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">Save</button>
             </div>
           </div>
         </div>
@@ -122,5 +127,3 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
     </div>
   </AuthenticatedLayout>
 </template>
-
-

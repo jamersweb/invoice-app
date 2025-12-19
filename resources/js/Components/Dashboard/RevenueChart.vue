@@ -151,7 +151,7 @@ function drawChart() {
 
 <template>
   <div
-    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
+    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
     <div class="mb-6 flex items-center justify-between">
       <h3 class="text-lg font-semibold text-dark-text-primary">{{ title || 'Revenue Overview' }}</h3>
       <div class="flex items-center gap-4 text-sm">

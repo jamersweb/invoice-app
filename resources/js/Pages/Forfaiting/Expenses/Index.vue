@@ -1,4 +1,5 @@
 <template>
+
   <Head title="Expenses & Payables" />
   <AuthenticatedLayout>
     <div class="p-6">
@@ -8,7 +9,8 @@
           <div class="flex items-center gap-3 mb-2">
             <div class="p-3 bg-red-600/20 rounded-xl">
               <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0zm5 0a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0zm5 0a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0z" />
               </svg>
             </div>
             <div>
@@ -40,10 +42,8 @@
 
         <!-- Action Buttons -->
         <div v-if="!isFormOpen" class="mb-6 flex justify-end gap-3">
-          <button
-            @click="isFormOpen = true"
-            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
+          <button @click="isFormOpen = true"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -67,50 +67,31 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Category</label>
-                <input
-                  v-model="form.category"
-                  type="text"
-                  required
+                <input v-model="form.category" type="text" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., Office Supplies"
-                />
+                  placeholder="e.g., Office Supplies" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Description</label>
-                <input
-                  v-model="form.description"
-                  type="text"
-                  required
+                <input v-model="form.description" type="text" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="Expense description"
-                />
+                  placeholder="Expense description" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Amount (AED)</label>
-                <input
-                  v-model.number="form.amount"
-                  type="number"
-                  step="0.01"
-                  required
+                <input v-model.number="form.amount" type="number" step="0.01" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., 500"
-                />
+                  placeholder="e.g., 500" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Date</label>
-                <input
-                  v-model="form.expense_date"
-                  type="date"
-                  required
-                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                />
+                <input v-model="form.expense_date" type="date" required
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Status</label>
-                <select
-                  v-model="form.status"
-                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                >
+                <select v-model="form.status"
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white">
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Rejected">Rejected</option>
@@ -119,26 +100,17 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-300 mb-1">Notes</label>
-              <textarea
-                v-model="form.notes"
-                class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                rows="3"
-                placeholder="Optional notes..."
-              ></textarea>
+              <textarea v-model="form.notes"
+                class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" rows="3"
+                placeholder="Optional notes..."></textarea>
             </div>
             <div class="flex justify-end gap-3">
-              <button
-                type="button"
-                @click="cancelForm"
-                class="px-4 py-2 rounded-lg border border-slate-600 text-white hover:bg-slate-700"
-              >
+              <button type="button" @click="cancelForm"
+                class="px-4 py-2 rounded-lg border border-slate-600 text-white hover:bg-slate-700">
                 Cancel
               </button>
-              <button
-                type="submit"
-                :disabled="form.processing"
-                class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
-              >
+              <button type="submit" :disabled="form.processing"
+                class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white disabled:opacity-50">
                 {{ form.processing ? 'Saving...' : (editingExpense ? 'Update' : 'Create') }}
               </button>
             </div>
@@ -148,26 +120,16 @@
         <!-- Filters -->
         <div class="mb-6 flex flex-wrap gap-4">
           <div class="flex-1 min-w-[200px]">
-            <input
-              v-model="filters.search"
-              type="text"
-              placeholder="Search expenses..."
-              class="w-full rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white placeholder-slate-400"
-            />
+            <input v-model="filters.search" type="text" placeholder="Search expenses..."
+              class="w-full rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white placeholder-slate-400" />
           </div>
-          <select
-            v-model="filters.status"
-            class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white"
-          >
+          <select v-model="filters.status" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
             <option value="all">All Status</option>
             <option value="Pending">Pending</option>
             <option value="Approved">Approved</option>
             <option value="Rejected">Rejected</option>
           </select>
-          <select
-            v-model="filters.category"
-            class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white"
-          >
+          <select v-model="filters.category" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
             <option value="all">All Categories</option>
             <option v-for="category in uniqueCategories" :key="category" :value="category">
               {{ category }}
@@ -177,7 +139,7 @@
 
         <!-- Expense Table -->
         <div class="bg-slate-800/30 border border-slate-700 rounded-lg overflow-hidden">
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full">
               <thead class="bg-slate-800/50 border-b border-slate-700">
                 <tr>
@@ -190,11 +152,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="expense in filteredExpenses"
-                  :key="expense.id"
-                  class="border-b border-slate-700/50 hover:bg-slate-800/30"
-                >
+                <tr v-for="expense in filteredExpenses" :key="expense.id"
+                  class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-white text-xs p-3">{{ expense.category }}</td>
                   <td class="text-white text-xs p-3">{{ expense.description }}</td>
                   <td class="text-right text-red-400 font-mono text-xs p-3">
@@ -204,46 +163,34 @@
                     {{ formatDate(expense.expense_date) }}
                   </td>
                   <td class="text-center p-3">
-                    <span
-                      :class="`px-2 py-1 rounded text-xs ${
-                        expense.status === 'Approved'
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                          : expense.status === 'Pending'
+                    <span :class="`px-2 py-1 rounded text-xs ${expense.status === 'Approved'
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                        : expense.status === 'Pending'
                           ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                           : 'bg-red-500/20 text-red-400 border border-red-500/50'
-                      }`"
-                    >
+                      }`">
                       {{ expense.status }}
                     </span>
                   </td>
                   <td class="text-right p-3">
                     <div class="flex justify-end gap-2">
-                      <button
-                        v-if="expense.status === 'Pending'"
-                        @click="updateStatus(expense.id, 'Approved')"
-                        class="text-green-400 hover:text-green-300"
-                        title="Approve"
-                      >
+                      <button v-if="expense.status === 'Pending'" @click="updateStatus(expense.id, 'Approved')"
+                        class="text-green-400 hover:text-green-300" title="Approve">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                       </button>
-                      <button
-                        v-if="expense.status === 'Pending'"
-                        @click="updateStatus(expense.id, 'Rejected')"
-                        class="text-red-400 hover:text-red-300"
-                        title="Reject"
-                      >
+                      <button v-if="expense.status === 'Pending'" @click="updateStatus(expense.id, 'Rejected')"
+                        class="text-red-400 hover:text-red-300" title="Reject">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
-                      <button
-                        @click="deleteExpense(expense.id)"
-                        class="text-red-400 hover:text-red-300"
-                      >
+                      <button @click="deleteExpense(expense.id)" class="text-red-400 hover:text-red-300">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
@@ -260,17 +207,10 @@
         <!-- Pagination -->
         <div v-if="expenses.links && expenses.links.length > 3" class="mt-6 flex justify-center">
           <div class="flex gap-2">
-            <Link
-              v-for="link in expenses.links"
-              :key="link.label"
-              :href="link.url || '#'"
-              v-html="link.label"
-              :class="`px-3 py-2 rounded-lg ${
-                link.active
-                  ? 'bg-red-600 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
-              } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`"
-            />
+            <Link v-for="link in expenses.links" :key="link.label" :href="link.url || '#'" v-html="link.label" :class="`px-3 py-2 rounded-lg ${link.active
+                ? 'bg-red-600 text-white'
+                : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+              } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>
       </div>

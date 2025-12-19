@@ -50,6 +50,7 @@ function formatCurrency(amount: number) {
 </script>
 
 <template>
+
     <Head title="Invoices" />
 
     <AuthenticatedLayout>
@@ -61,12 +62,7 @@ function formatCurrency(amount: number) {
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="relative w-[199px]">
-                        <DarkInput
-                            v-model="dateRange"
-                            placeholder="Date Range"
-                            icon="calendar"
-                            class="!pr-10"
-                        />
+                        <DarkInput v-model="dateRange" placeholder="Date Range" icon="calendar" class="!pr-10" />
                     </div>
                     <Link :href="route('invoices.submit')">
                         <GradientButton size="md">New Invoice</GradientButton>
@@ -78,24 +74,21 @@ function formatCurrency(amount: number) {
             <div class="card">
                 <div class="flex items-center gap-4">
                     <div class="flex-1">
-                        <DarkInput
-                            v-model="searchQuery"
-                            placeholder="Search invoices..."
-                            icon="search"
-                            class="!pr-10"
-                        />
+                        <DarkInput v-model="searchQuery" placeholder="Search invoices..." icon="search"
+                            class="!pr-10" />
                     </div>
                 </div>
             </div>
 
             <!-- Invoices Table -->
             <div class="card overflow-hidden p-0">
-                <div class="overflow-x-auto">
-                    <table class="table-dark">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="table-dark bg-none">
                         <thead>
                             <tr>
                                 <th class="w-12">
-                                    <input type="checkbox" class="rounded border-dark-border bg-dark-secondary text-purple-accent focus:ring-purple-accent" />
+                                    <input type="checkbox"
+                                        class="rounded border-dark-border bg-dark-secondary text-purple-accent focus:ring-purple-accent" />
                                 </th>
                                 <th class="w-24">ID</th>
                                 <th>Customer</th>
@@ -111,12 +104,14 @@ function formatCurrency(amount: number) {
                         <tbody>
                             <tr v-for="invoice in invoices" :key="invoice.id">
                                 <td>
-                                    <input type="checkbox" class="rounded border-dark-border bg-dark-secondary text-purple-accent focus:ring-purple-accent" />
+                                    <input type="checkbox"
+                                        class="rounded border-dark-border bg-dark-secondary text-purple-accent focus:ring-purple-accent" />
                                 </td>
                                 <td class="font-medium">{{ invoice.invoice_number }}</td>
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <div class="h-6 w-6 rounded-full bg-purple-accent flex items-center justify-center">
+                                        <div
+                                            class="h-6 w-6 rounded-full bg-purple-accent flex items-center justify-center">
                                             <span class="text-xs text-white font-medium">
                                                 {{ invoice.customer_name?.charAt(0) || 'U' }}
                                             </span>
@@ -124,7 +119,8 @@ function formatCurrency(amount: number) {
                                         <span>{{ invoice.customer_name || 'Unknown' }}</span>
                                     </div>
                                 </td>
-                                <td class="text-dark-text-secondary">{{ new Date(invoice.created_at).toLocaleDateString() }}</td>
+                                <td class="text-dark-text-secondary">{{ new
+                                    Date(invoice.created_at).toLocaleDateString() }}</td>
                                 <td>{{ formatCurrency(invoice.amount) }}</td>
                                 <td>{{ formatCurrency(invoice.paid) }}</td>
                                 <td>
@@ -133,22 +129,29 @@ function formatCurrency(amount: number) {
                                     </Badge>
                                 </td>
                                 <td class="text-dark-text-secondary">{{ invoice.payment_mode || 'N/A' }}</td>
-                                <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString() }}</td>
+                                <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString()
+                                    }}</td>
                                 <td>
                                     <div class="flex items-center gap-2">
                                         <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16" class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5" d="M8 1.333v13.334M1.333 8h13.334"/>
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
+                                                class="text-dark-text-secondary">
+                                                <path stroke="currentColor" stroke-width="1.5"
+                                                    d="M8 1.333v13.334M1.333 8h13.334" />
                                             </svg>
                                         </button>
                                         <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16" class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5" d="M11.333 2.667L5 9M11.333 2.667h-4v4h4v-4z"/>
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
+                                                class="text-dark-text-secondary">
+                                                <path stroke="currentColor" stroke-width="1.5"
+                                                    d="M11.333 2.667L5 9M11.333 2.667h-4v4h4v-4z" />
                                             </svg>
                                         </button>
                                         <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16" class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5" d="M2 4h12M6 8h4M4 12h8"/>
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
+                                                class="text-dark-text-secondary">
+                                                <path stroke="currentColor" stroke-width="1.5"
+                                                    d="M2 4h12M6 8h4M4 12h8" />
                                             </svg>
                                         </button>
                                     </div>
@@ -164,16 +167,19 @@ function formatCurrency(amount: number) {
                         Showing 1 to 10 of 50 results
                     </div>
                     <div class="flex items-center gap-2">
-                        <button class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
+                        <button
+                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
                             Previous
                         </button>
                         <button class="px-3 py-1.5 rounded-lg bg-purple-accent text-white text-sm">
                             1
                         </button>
-                        <button class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
+                        <button
+                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
                             2
                         </button>
-                        <button class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
+                        <button
+                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
                             Next
                         </button>
                     </div>
@@ -182,4 +188,3 @@ function formatCurrency(amount: number) {
         </div>
     </AuthenticatedLayout>
 </template>
-

@@ -83,6 +83,7 @@ function numberToWords(num: number): string {
 </script>
 
 <template>
+
     <Head :title="`Invoice ${invoice?.invoice_number || ''}`" />
 
     <AuthenticatedLayout>
@@ -103,7 +104,8 @@ function numberToWords(num: number): string {
                 <!-- Invoice Header -->
                 <div class="flex items-start justify-between border-b border-dark-border pb-6">
                     <div>
-                        <h2 class="text-xl font-bold text-dark-text-primary mb-2">Invoice #{{ invoice?.invoice_number }}</h2>
+                        <h2 class="text-xl font-bold text-dark-text-primary mb-2">Invoice #{{ invoice?.invoice_number }}
+                        </h2>
                         <div class="flex items-center gap-4 text-sm text-dark-text-secondary">
                             <div>
                                 <span class="text-dark-text-muted">Date: </span>
@@ -115,7 +117,8 @@ function numberToWords(num: number): string {
                             </div>
                         </div>
                     </div>
-                    <Badge :variant="invoice?.status === 'paid' ? 'success' : invoice?.status === 'overdue' ? 'danger' : 'warning'">
+                    <Badge
+                        :variant="invoice?.status === 'paid' ? 'success' : invoice?.status === 'overdue' ? 'danger' : 'warning'">
                         {{ invoice?.status?.toUpperCase() }}
                     </Badge>
                 </div>
@@ -158,7 +161,7 @@ function numberToWords(num: number): string {
 
                 <!-- Items Table -->
                 <div class="border-b border-dark-border pb-6">
-                    <table class="table-dark">
+                    <table class="table-dark bg-none">
                         <thead>
                             <tr>
                                 <th class="w-12">#</th>
@@ -195,7 +198,8 @@ function numberToWords(num: number): string {
                         </div>
                         <div class="border-t border-dark-border pt-3 flex justify-between">
                             <span class="font-semibold text-dark-text-primary">Total</span>
-                            <span class="text-xl font-bold text-dark-text-primary">{{ formatCurrency(invoice?.total || 0) }}</span>
+                            <span class="text-xl font-bold text-dark-text-primary">{{ formatCurrency(invoice?.total ||
+                                0) }}</span>
                         </div>
                         <div class="text-sm text-dark-text-secondary pt-2">
                             <p>Total Amount in Words:</p>
@@ -209,15 +213,20 @@ function numberToWords(num: number): string {
                     <div>
                         <h3 class="text-sm font-semibold text-dark-text-primary mb-3">Bank Details</h3>
                         <div class="text-sm text-dark-text-secondary space-y-2">
-                            <p><span class="font-medium text-dark-text-primary">Bank Name:</span> {{ invoice?.bank_details?.bank_name }}</p>
-                            <p><span class="font-medium text-dark-text-primary">Account Number:</span> {{ invoice?.bank_details?.account_number }}</p>
-                            <p><span class="font-medium text-dark-text-primary">IFSC Code:</span> {{ invoice?.bank_details?.ifsc_code }}</p>
-                            <p><span class="font-medium text-dark-text-primary">Branch:</span> {{ invoice?.bank_details?.branch }}</p>
+                            <p><span class="font-medium text-dark-text-primary">Bank Name:</span> {{
+                                invoice?.bank_details?.bank_name }}</p>
+                            <p><span class="font-medium text-dark-text-primary">Account Number:</span> {{
+                                invoice?.bank_details?.account_number }}</p>
+                            <p><span class="font-medium text-dark-text-primary">IFSC Code:</span> {{
+                                invoice?.bank_details?.ifsc_code }}</p>
+                            <p><span class="font-medium text-dark-text-primary">Branch:</span> {{
+                                invoice?.bank_details?.branch }}</p>
                         </div>
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-dark-text-primary mb-3 text-center">Signature</h3>
-                        <div class="h-20 border-2 border-dashed border-dark-border rounded-lg flex items-center justify-center">
+                        <div
+                            class="h-20 border-2 border-dashed border-dark-border rounded-lg flex items-center justify-center">
                             <span class="text-dark-text-muted text-sm">Signature</span>
                         </div>
                     </div>
@@ -240,4 +249,3 @@ function numberToWords(num: number): string {
         </div>
     </AuthenticatedLayout>
 </template>
-

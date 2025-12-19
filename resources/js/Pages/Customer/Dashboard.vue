@@ -5,9 +5,9 @@ import { ref, onMounted, computed } from 'vue';
 
 const loading = ref(true);
 const kpis = ref({ invoices: 0, funded: 0, outstanding: 0 });
-const recentInvoices = ref<Array<{ id:number, invoice_number?:string, amount:number, status:string }>>([]);
+const recentInvoices = ref<Array<{ id: number, invoice_number?: string, amount: number, status: string }>>([]);
 const activeOffers = ref<Array<any>>([]);
-const repaymentSchedule = ref<Array<{ id:number, invoice_id:number, amount:number, due_date:string, status:string }>>([]);
+const repaymentSchedule = ref<Array<{ id: number, invoice_id: number, amount: number, due_date: string, status: string }>>([]);
 const supplier = ref<{ kyb_status?: string } | null>(null);
 const fundingBlocked = computed(() => (supplier.value?.kyb_status ?? 'pending') !== 'approved');
 
@@ -53,6 +53,7 @@ onMounted(async () => {
 </script>
 
 <template>
+
   <Head title="Customer Dashboard" />
   <AuthenticatedLayout>
     <template #header>
@@ -71,19 +72,20 @@ onMounted(async () => {
       <div v-else class="space-y-8">
         <!-- Funding blocked banner -->
         <div v-if="fundingBlocked" class="rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-800">
-          Funding actions are blocked until your KYB is approved. Complete onboarding in <a href="/onboarding/kyc" class="underline">KYC/KYB</a>.
+          Funding actions are blocked until your KYB is approved. Complete onboarding in <a href="/onboarding/kyc"
+            class="underline">KYC/KYB</a>.
         </div>
         <!-- KPIs -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div class="rounded-xl border border-gray-200 bg-white p-6">
+          <div class="rounded-xl border border-gray-200  p-6">
             <div class="text-sm text-gray-500">Invoices</div>
             <div class="mt-2 text-2xl font-semibold text-gray-900">{{ kpis.invoices }}</div>
           </div>
-          <div class="rounded-xl border border-gray-200 bg-white p-6">
+          <div class="rounded-xl border border-gray-200  p-6">
             <div class="text-sm text-gray-500">Total Funded</div>
             <div class="mt-2 text-2xl font-semibold text-gray-900">{{ kpis.funded.toLocaleString() }}</div>
           </div>
-          <div class="rounded-xl border border-gray-200 bg-white p-6">
+          <div class="rounded-xl border border-gray-200  p-6">
             <div class="text-sm text-gray-500">Outstanding</div>
             <div class="mt-2 text-2xl font-semibold text-gray-900">{{ kpis.outstanding.toLocaleString() }}</div>
           </div>
@@ -91,7 +93,7 @@ onMounted(async () => {
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <!-- Recent Invoices -->
-          <div class="rounded-xl border border-gray-200 bg-white p-6 lg:col-span-1">
+          <div class="rounded-xl border border-gray-200  p-6 lg:col-span-1">
             <div class="mb-4 flex items-center justify-between">
               <h3 class="text-base font-semibold text-gray-900">Recent Invoices</h3>
             </div>
@@ -108,7 +110,7 @@ onMounted(async () => {
           </div>
 
           <!-- Active Offers -->
-          <div class="rounded-xl border border-gray-200 bg-white p-6 lg:col-span-1">
+          <div class="rounded-xl border border-gray-200  p-6 lg:col-span-1">
             <div class="mb-4 flex items-center justify-between">
               <h3 class="text-base font-semibold text-gray-900">Active Offers</h3>
             </div>
@@ -120,12 +122,13 @@ onMounted(async () => {
                 </div>
                 <div class="text-sm text-gray-900">{{ Number(off.net_amount ?? off.amount).toLocaleString() }}</div>
               </div>
-              <div v-if="activeOffers.length === 0" class="py-6 text-center text-sm text-gray-500">No active offers</div>
+              <div v-if="activeOffers.length === 0" class="py-6 text-center text-sm text-gray-500">No active offers
+              </div>
             </div>
           </div>
 
           <!-- Repayment Schedule -->
-          <div class="rounded-xl border border-gray-200 bg-white p-6 lg:col-span-1">
+          <div class="rounded-xl border border-gray-200  p-6 lg:col-span-1">
             <div class="mb-4 flex items-center justify-between">
               <h3 class="text-base font-semibold text-gray-900">Repayment Schedule</h3>
             </div>
@@ -133,17 +136,18 @@ onMounted(async () => {
               <div v-for="er in repaymentSchedule" :key="er.id" class="flex items-center justify-between py-3">
                 <div>
                   <div class="text-sm font-medium text-gray-900">Invoice #{{ er.invoice_id }}</div>
-                  <div class="text-xs text-gray-500">Due {{ new Date(er.due_date).toLocaleDateString() }} — {{ er.status }}</div>
+                  <div class="text-xs text-gray-500">Due {{ new Date(er.due_date).toLocaleDateString() }} — {{ er.status
+                    }}
+                  </div>
                 </div>
                 <div class="text-sm text-gray-900">{{ Number(er.amount).toLocaleString() }}</div>
               </div>
-              <div v-if="repaymentSchedule.length === 0" class="py-6 text-center text-sm text-gray-500">No upcoming repayments</div>
+              <div v-if="repaymentSchedule.length === 0" class="py-6 text-center text-sm text-gray-500">No upcoming
+                repayments</div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </AuthenticatedLayout>
-  </template>
-
-
+</template>

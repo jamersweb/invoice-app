@@ -31,6 +31,8 @@
     }
 }
 
+
+
 @layer components {
 
     /* Card Styles */
@@ -58,7 +60,7 @@
 
     /* Input Styles */
     .input-dark {
-        @apply w-full px-4 py-3 bg-dark-secondary border border-dark-border rounded-lg text-dark-text-primary placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-purple-accent focus:border-transparent transition-all;
+        @apply w-full px-4 py-3 bg-slate-900/50 border-b border-slate-700/50 backdrop-blur-sm border border-dark-border rounded-lg text-dark-text-primary placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-purple-accent focus:border-transparent transition-all;
     }
 
     .input-light {
@@ -125,7 +127,7 @@
     /* Fix input text color globally - inputs should have dark text by default */
     /* This overrides the body's white text color for form inputs */
     /* Apply to all input types except dark-themed inputs */
-    input[type="text"]:not(.input-dark),
+    /* input[type="text"]:not(.input-dark),
     input[type="email"]:not(.input-dark),
     input[type="password"]:not(.input-dark),
     input[type="tel"]:not(.input-dark),
@@ -140,7 +142,7 @@
     textarea:not(.input-dark),
     select:not(.input-dark) {
         color: #111827 !important;
-    }
+    } */
 
     /* Ensure inputs in white/light containers have dark text (higher specificity) */
     .bg-white input:not(.input-dark),
@@ -161,4 +163,26 @@
     min-height: inherit;
     align-content: center;
     text-align: center;
+}
+
+
+/*
+ *  STYLE 2
+ */
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    background-color: #0F172A;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #161F31;
 }

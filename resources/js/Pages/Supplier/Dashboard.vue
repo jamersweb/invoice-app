@@ -73,7 +73,7 @@ const paymentStats = computed(() => ({
 
             <!-- Greeting & Date Time Container -->
             <div
-                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-xl font-semibold text-dark-text-primary">Good morning!</h2>
@@ -106,7 +106,7 @@ const paymentStats = computed(() => ({
 
             <!-- Show message if no KPIs available -->
             <div v-if="kpis.length === 0"
-                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group text-center py-12">
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all text-center py-12">
                 <p class="text-dark-text-secondary">Loading dashboard data...</p>
             </div>
 
@@ -118,19 +118,19 @@ const paymentStats = computed(() => ({
 
                 <!-- Revenue Chart -->
                 <div class="lg:col-span-2">
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
+                    <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
                             <label class="text-sm font-medium text-dark-text-secondary">Date Range:</label>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="date" v-model="from"
-                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
+                                    class="input-dark !py-2 !px-3 text-sm flex-1 sm:flex-none" />
                                 <span class="text-sm text-dark-text-muted">to</span>
                                 <input type="date" v-model="to"
-                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
+                                    class="input-dark !py-2 !px-3 text-sm flex-1 sm:flex-none" />
                             </div>
                         </div>
                         <button @click="from = ''; to = ''; store.fetchMetrics()"
-                            class="btn-secondary text-sm py-2 px-4">
+                            class="btn-secondary text-sm py-2 px-4 w-full sm:w-auto">
                             Clear
                         </button>
                     </div>

@@ -54,7 +54,7 @@ const overdueDashOffset = computed(() => {
 
 <template>
   <div
-    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
+    class="relative overflow-hidden rounded-card rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
     <h3 class="mb-4 text-lg font-semibold text-dark-text-primary">Payment Statistics</h3>
 
     <div class="flex items-center justify-between">

@@ -1,4 +1,5 @@
 <template>
+
   <Head title="Master Transactions" />
   <AuthenticatedLayout>
     <div class="p-6">
@@ -8,7 +9,8 @@
           <div class="flex items-center gap-3 mb-2">
             <div class="p-3 bg-emerald-600/20 rounded-xl">
               <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
@@ -40,10 +42,8 @@
 
         <!-- Action Buttons -->
         <div v-if="!isFormOpen" class="mb-6 flex justify-end gap-3">
-          <button
-            @click="isFormOpen = true"
-            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
+          <button @click="isFormOpen = true"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -67,81 +67,49 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Transaction #</label>
-                <input
-                  v-model="form.transaction_number"
-                  type="number"
-                  required
+                <input v-model="form.transaction_number" type="number" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., 1"
-                />
+                  placeholder="e.g., 1" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Transaction Date</label>
-                <input
-                  v-model="form.date_of_transaction"
-                  type="date"
-                  required
-                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                />
+                <input v-model="form.date_of_transaction" type="date" required
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Customer</label>
-                <input
-                  v-model="form.customer"
-                  type="text"
-                  required
+                <input v-model="form.customer" type="text" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="Customer name"
-                />
+                  placeholder="Customer name" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Net Amount (AED)</label>
-                <input
-                  v-model.number="form.net_amount"
-                  type="number"
-                  step="0.01"
-                  required
+                <input v-model.number="form.net_amount" type="number" step="0.01" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., 60000"
-                />
+                  placeholder="e.g., 60000" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Profit Margin (%)</label>
-                <input
-                  v-model.number="form.profit_margin"
-                  type="number"
-                  step="0.01"
-                  required
+                <input v-model.number="form.profit_margin" type="number" step="0.01" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., 5.0"
-                />
+                  placeholder="e.g., 5.0" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Sales Cycle (days)</label>
-                <input
-                  v-model.number="form.sales_cycle"
-                  type="number"
-                  required
+                <input v-model.number="form.sales_cycle" type="number" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., 45"
-                />
+                  placeholder="e.g., 45" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Disbursement Charges (AED)</label>
-                <input
-                  v-model.number="form.disbursement_charges"
-                  type="number"
-                  step="0.01"
+                <input v-model.number="form.disbursement_charges" type="number" step="0.01"
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="e.g., 0"
-                />
+                  placeholder="e.g., 0" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Status</label>
-                <select
-                  v-model="form.status"
-                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                >
+                <select v-model="form.status"
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white">
                   <option value="Not Disbursed">Not Disbursed</option>
                   <option value="Ongoing">Ongoing</option>
                   <option value="Ended">Ended</option>
@@ -150,26 +118,17 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-300 mb-1">Notes</label>
-              <textarea
-                v-model="form.notes"
-                class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                rows="3"
-                placeholder="Optional notes..."
-              ></textarea>
+              <textarea v-model="form.notes"
+                class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" rows="3"
+                placeholder="Optional notes..."></textarea>
             </div>
             <div class="flex justify-end gap-3">
-              <button
-                type="button"
-                @click="cancelForm"
-                class="px-4 py-2 rounded-lg border border-slate-600 text-white hover:bg-slate-700"
-              >
+              <button type="button" @click="cancelForm"
+                class="px-4 py-2 rounded-lg border border-slate-600 text-white hover:bg-slate-700">
                 Cancel
               </button>
-              <button
-                type="submit"
-                :disabled="form.processing"
-                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
-              >
+              <button type="submit" :disabled="form.processing"
+                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50">
                 {{ form.processing ? 'Saving...' : (editingTransaction ? 'Update' : 'Create') }}
               </button>
             </div>
@@ -179,26 +138,16 @@
         <!-- Filters -->
         <div class="mb-6 flex flex-wrap gap-4">
           <div class="flex-1 min-w-[200px]">
-            <input
-              v-model="filters.search"
-              type="text"
-              placeholder="Search transactions..."
-              class="w-full rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white placeholder-slate-400"
-            />
+            <input v-model="filters.search" type="text" placeholder="Search transactions..."
+              class="w-full rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white placeholder-slate-400" />
           </div>
-          <select
-            v-model="filters.status"
-            class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white"
-          >
+          <select v-model="filters.status" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
             <option value="all">All Status</option>
             <option value="Ongoing">Ongoing</option>
             <option value="Ended">Ended</option>
             <option value="Not Disbursed">Not Disbursed</option>
           </select>
-          <select
-            v-model="filters.customer"
-            class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white"
-          >
+          <select v-model="filters.customer" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
             <option value="all">All Customers</option>
             <option v-for="customer in uniqueCustomers" :key="customer" :value="customer">
               {{ customer }}
@@ -208,7 +157,7 @@
 
         <!-- Transaction Table -->
         <div class="bg-slate-800/30 border border-slate-700 rounded-lg overflow-hidden">
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full">
               <thead class="bg-slate-800/50 border-b border-slate-700">
                 <tr>
@@ -223,11 +172,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="transaction in filteredTransactions"
-                  :key="transaction.id"
-                  class="border-b border-slate-700/50 hover:bg-slate-800/30"
-                >
+                <tr v-for="transaction in filteredTransactions" :key="transaction.id"
+                  class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-white font-medium text-xs p-3">{{ transaction.transaction_number }}</td>
                   <td class="text-white text-xs p-3">{{ transaction.customer }}</td>
                   <td class="text-right text-purple-400 font-mono text-xs p-3">
@@ -239,34 +185,27 @@
                     {{ formatDate(transaction.date_of_transaction) }}
                   </td>
                   <td class="text-center p-3">
-                    <span
-                      :class="`px-2 py-1 rounded text-xs ${
-                        transaction.status === 'Ongoing'
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                          : transaction.status === 'Ended'
+                    <span :class="`px-2 py-1 rounded text-xs ${transaction.status === 'Ongoing'
+                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                        : transaction.status === 'Ended'
                           ? 'bg-green-500/20 text-green-400 border border-green-500/50'
                           : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
-                      }`"
-                    >
+                      }`">
                       {{ transaction.status }}
                     </span>
                   </td>
                   <td class="text-right p-3">
                     <div class="flex justify-end gap-2">
-                      <button
-                        @click="editTransaction(transaction)"
-                        class="text-blue-400 hover:text-blue-300"
-                      >
+                      <button @click="editTransaction(transaction)" class="text-blue-400 hover:text-blue-300">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
-                      <button
-                        @click="deleteTransaction(transaction.id)"
-                        class="text-red-400 hover:text-red-300"
-                      >
+                      <button @click="deleteTransaction(transaction.id)" class="text-red-400 hover:text-red-300">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
@@ -283,17 +222,11 @@
         <!-- Pagination -->
         <div v-if="transactions.links && transactions.links.length > 3" class="mt-6 flex justify-center">
           <div class="flex gap-2">
-            <Link
-              v-for="link in transactions.links"
-              :key="link.label"
-              :href="link.url || '#'"
-              v-html="link.label"
-              :class="`px-3 py-2 rounded-lg ${
-                link.active
+            <Link v-for="link in transactions.links" :key="link.label" :href="link.url || '#'" v-html="link.label"
+              :class="`px-3 py-2 rounded-lg ${link.active
                   ? 'bg-emerald-600 text-white'
                   : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
-              } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`"
-            />
+                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>
       </div>

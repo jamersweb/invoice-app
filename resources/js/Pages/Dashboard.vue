@@ -230,7 +230,7 @@ async function handleRefresh() {
 
             <!-- Error State -->
             <div v-if="store.error"
-                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group border-red-500/50 bg-red-500/10">
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all border-red-500/50 bg-red-500/10">
                 <div class="flex items-center gap-3">
                     <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -246,7 +246,7 @@ async function handleRefresh() {
 
             <!-- Greeting & Date Time Container -->
             <div
-                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group">
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 class="text-xl font-semibold text-dark-text-primary">{{ greeting }}!</h2>
@@ -280,7 +280,7 @@ async function handleRefresh() {
 
             <!-- Loading State -->
             <div v-if="store.loading && !store.kpis"
-                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group text-center py-12">
+                class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all text-center py-12">
                 <div
                     class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-purple-accent border-r-transparent">
                 </div>
@@ -295,19 +295,19 @@ async function handleRefresh() {
 
                 <!-- Revenue Chart -->
                 <div class="lg:col-span-2">
-                    <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex items-center gap-3">
+                    <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
                             <label class="text-sm font-medium text-dark-text-secondary">Date Range:</label>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="date" v-model="from"
-                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
+                                    class="input-dark !py-2 !px-3 text-sm flex-1 sm:flex-none" />
                                 <span class="text-sm text-dark-text-muted">to</span>
                                 <input type="date" v-model="to"
-                                    class="input-dark !py-2 !px-3 text-sm!py-2 !px-3 text-sm" />
+                                    class="input-dark !py-2 !px-3 text-sm flex-1 sm:flex-none" />
                             </div>
                         </div>
                         <button @click="from = ''; to = ''; store.fetchMetrics()"
-                            class="btn-secondary text-sm py-2 px-4">
+                            class="btn-secondary text-sm py-2 px-4 w-full sm:w-auto">
                             Clear
                         </button>
                     </div>
@@ -328,7 +328,7 @@ async function handleRefresh() {
             <!-- Admin reporting widgets -->
             <div v-if="aging || (topSuppliers && topSuppliers.length)" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div
-                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group lg:col-span-1">
+                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all lg:col-span-1">
                     <div class="mb-4 text-base font-semibold text-dark-text-primary">Repayment Aging</div>
                     <div v-if="aging" class="space-y-2 text-sm">
                         <div class="flex justify-between text-dark-text-primary">
@@ -351,10 +351,10 @@ async function handleRefresh() {
                     <div v-else class="text-sm text-dark-text-muted">No data</div>
                 </div>
                 <div
-                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 backdrop-blur-sm border-slate-700/50 p-8 group lg:col-span-2">
+                    class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all lg:col-span-2">
                     <div class="mb-4 text-base font-semibold text-dark-text-primary">Top Suppliers by Funded</div>
-                    <div class="overflow-x-auto">
-                        <table class="table-dark">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="table-dark bg-none">
                             <thead>
                                 <tr>
                                     <th class="text-dark-text-secondary">Supplier ID</th>

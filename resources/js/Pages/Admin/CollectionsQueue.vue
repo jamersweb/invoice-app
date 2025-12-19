@@ -3,10 +3,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 
-type Row = { id:number; invoice_number:string; amount:number; supplier_id:number; buyer_id:number; due_date:string; assigned_to:number|null; priority:number|null };
+type Row = { id: number; invoice_number: string; amount: number; supplier_id: number; buyer_id: number; due_date: string; assigned_to: number | null; priority: number | null };
 
 const loading = ref(false);
-const error = ref<string|null>(null);
+const error = ref<string | null>(null);
 const rows = ref<Row[]>([]);
 const meta = ref<any>(null);
 
@@ -14,7 +14,7 @@ const assigned_to = ref('');
 const min_amount = ref('');
 const age = ref('');
 const page = ref(1);
-const reviewers = ref<Array<{ id:number; name:string }>>([]);
+const reviewers = ref<Array<{ id: number; name: string }>>([]);
 
 async function load() {
   loading.value = true;
@@ -29,7 +29,7 @@ async function load() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const j = await res.json();
     rows.value = j.data; meta.value = j.meta;
-  } catch (e:any) { error.value = e?.message || 'Failed'; } finally { loading.value = false; }
+  } catch (e: any) { error.value = e?.message || 'Failed'; } finally { loading.value = false; }
 }
 
 async function fetchReviewers() {
@@ -39,21 +39,22 @@ async function fetchReviewers() {
 
 onMounted(() => { fetchReviewers(); load(); });
 
-async function claim(id:number) {
-  await fetch(`/api/v1/admin/collections/${id}/claim`, { method:'POST', headers: { 'X-CSRF-TOKEN': (document.querySelector('meta[name=csrf-token]') as HTMLMetaElement)?.content } });
+async function claim(id: number) {
+  await fetch(`/api/v1/admin/collections/${id}/claim`, { method: 'POST', headers: { 'X-CSRF-TOKEN': (document.querySelector('meta[name=csrf-token]') as HTMLMetaElement)?.content } });
   await load();
 }
-async function reassign(id:number, uid:string) {
+async function reassign(id: number, uid: string) {
   if (!uid) return;
-  await fetch(`/api/v1/admin/collections/${id}/reassign`, { method:'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name=csrf-token]') as HTMLMetaElement)?.content }, body: JSON.stringify({ assigned_to: Number(uid) }) });
+  await fetch(`/api/v1/admin/collections/${id}/reassign`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name=csrf-token]') as HTMLMetaElement)?.content }, body: JSON.stringify({ assigned_to: Number(uid) }) });
   await load();
 }
-async function remind(id:number) {
-  await fetch(`/api/v1/admin/collections/${id}/remind`, { method:'POST', headers: { 'X-CSRF-TOKEN': (document.querySelector('meta[name=csrf-token]') as HTMLMetaElement)?.content } });
+async function remind(id: number) {
+  await fetch(`/api/v1/admin/collections/${id}/remind`, { method: 'POST', headers: { 'X-CSRF-TOKEN': (document.querySelector('meta[name=csrf-token]') as HTMLMetaElement)?.content } });
 }
 </script>
 
 <template>
+
   <Head title="Collections" />
   <AuthenticatedLayout>
     <template #header>
@@ -71,7 +72,7 @@ async function remind(id:number) {
       </div>
       <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Invoice</th>
               <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
@@ -83,12 +84,16 @@ async function remind(id:number) {
           <tbody class="divide-y divide-gray-100">
             <tr v-for="r in rows" :key="r.id">
               <td class="px-4 py-3">{{ r.invoice_number }}</td>
-              <td class="px-4 py-3">{{ new Intl.NumberFormat(undefined, { style:'currency', currency:'USD'}).format(r.amount) }}</td>
+              <td class="px-4 py-3">{{ new Intl.NumberFormat(undefined, {
+                style: 'currency',
+                currency: 'USD'
+              }).format(r.amount) }}</td>
               <td class="px-4 py-3">{{ r.due_date }}</td>
               <td class="px-4 py-3">{{ r.assigned_to ?? '-' }}</td>
               <td class="px-4 py-3 text-right">
-                <button @click="claim(r.id)" class="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white">Claim</button>
-                <select @change="(e:any)=>reassign(r.id, e.target.value)" class="ml-2 rounded border p-1 text-xs">
+                <button @click="claim(r.id)"
+                  class="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white">Claim</button>
+                <select @change="(e: any) => reassign(r.id, e.target.value)" class="ml-2 rounded border p-1 text-xs">
                   <option value="">Reassign →</option>
                   <option v-for="u in reviewers" :key="u.id" :value="String(u.id)">{{ u.name }}</option>
                 </select>
@@ -101,12 +106,13 @@ async function remind(id:number) {
       <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
         <div>Page {{ meta?.current_page || page }} of {{ meta?.last_page || '?' }}</div>
         <div class="space-x-2">
-          <button :disabled="(meta?.current_page || 1) <= 1" @click="page = (meta?.current_page || 1) - 1; load();" class="rounded border px-3 py-1 disabled:opacity-50">Prev</button>
-          <button :disabled="(meta?.current_page || 1) >= (meta?.last_page || 1)" @click="page = (meta?.current_page || 1) + 1; load();" class="rounded border px-3 py-1 disabled:opacity-50">Next</button>
+          <button :disabled="(meta?.current_page || 1) <= 1" @click="page = (meta?.current_page || 1) - 1; load();"
+            class="rounded border px-3 py-1 disabled:opacity-50">Prev</button>
+          <button :disabled="(meta?.current_page || 1) >= (meta?.last_page || 1)"
+            @click="page = (meta?.current_page || 1) + 1; load();"
+            class="rounded border px-3 py-1 disabled:opacity-50">Next</button>
         </div>
       </div>
     </div>
   </AuthenticatedLayout>
 </template>
-
-
