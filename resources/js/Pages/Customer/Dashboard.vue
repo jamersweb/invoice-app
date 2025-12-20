@@ -100,7 +100,7 @@ onMounted(async () => {
             <div class="divide-y divide-gray-100">
               <div v-for="inv in recentInvoices" :key="inv.id" class="flex items-center justify-between py-3">
                 <div>
-                  <div class="text-sm font-medium text-gray-900">{{ inv.invoice_number || ('INV-' + inv.id) }}</div>
+                  <div class="text-sm font-medium">{{ inv.invoice_number || ('INV-' + inv.id) }}</div>
                   <div class="text-xs text-gray-500">{{ inv.status }}</div>
                 </div>
                 <div class="text-sm text-gray-900">{{ Number(inv.amount).toLocaleString() }}</div>
@@ -117,7 +117,7 @@ onMounted(async () => {
             <div class="divide-y divide-gray-100">
               <div v-for="off in activeOffers" :key="off.id" class="flex items-center justify-between py-3">
                 <div>
-                  <div class="text-sm font-medium text-gray-900">Offer #{{ off.id }}</div>
+                  <div class="text-sm font-medium">Offer #{{ off.id }}</div>
                   <div class="text-xs text-gray-500">Expires {{ new Date(off.expires_at).toLocaleString() }}</div>
                 </div>
                 <div class="text-sm text-gray-900">{{ Number(off.net_amount ?? off.amount).toLocaleString() }}</div>
@@ -135,9 +135,9 @@ onMounted(async () => {
             <div class="divide-y divide-gray-100">
               <div v-for="er in repaymentSchedule" :key="er.id" class="flex items-center justify-between py-3">
                 <div>
-                  <div class="text-sm font-medium text-gray-900">Invoice #{{ er.invoice_id }}</div>
+                  <div class="text-sm font-medium">Invoice #{{ er.invoice_id }}</div>
                   <div class="text-xs text-gray-500">Due {{ new Date(er.due_date).toLocaleDateString() }} — {{ er.status
-                    }}
+                  }}
                   </div>
                 </div>
                 <div class="text-sm text-gray-900">{{ Number(er.amount).toLocaleString() }}</div>

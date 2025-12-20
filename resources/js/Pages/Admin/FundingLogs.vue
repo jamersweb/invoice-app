@@ -74,12 +74,12 @@
             <tr v-for="log in logs.data" :key="log.id">
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ log.transfer_date }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ log.supplier_name }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium text-gray-900">{{ log.amount }} {{
+              <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">{{ log.amount }} {{
                 log.currency }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-500">{{ log.bank_reference || '—' }}
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-500">{{ log.internal_reference || '—'
-              }}</td>
+                }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ log.recorded_by }}</td>
               <td class="px-6 py-4 text-sm text-gray-500">{{ log.notes || '—' }}</td>
             </tr>

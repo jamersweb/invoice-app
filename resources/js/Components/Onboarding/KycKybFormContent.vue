@@ -100,7 +100,7 @@ const validateStep = (step: number): boolean => {
       if (!form.contact_phone) validationErrors.value.contact_phone = 'Contact phone is required';
       break;
     case 4:
-      const missingRequired = documentTypes.value.filter(dt => 
+      const missingRequired = documentTypes.value.filter(dt =>
         dt.required && (!uploadedDocuments.value[dt.id] || uploadedDocuments.value[dt.id].length === 0)
       );
       if (missingRequired.length > 0) {
@@ -197,7 +197,7 @@ onMounted(() => {
         Object.assign(form, data.supplier);
       }
     })
-    .catch(() => {});
+    .catch(() => { });
 
   // Load KYB checklist
   fetch('/api/v1/me/kyb/checklist')
@@ -213,17 +213,18 @@ onMounted(() => {
         return { ...dt, required: rule.is_required, description: (dt.description || '') + exp };
       });
     })
-    .catch(() => {});
+    .catch(() => { });
 });
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between sticky top-0 bg-dark-primary z-10 pb-4 border-b border-dark-border">
+    <div class="flex items-center justify-between sticky top-0  z-10 pb-4 border-b border-dark-border">
       <div>
         <h1 class="text-2xl font-bold text-dark-text-primary">Registration & KYB</h1>
-        <p class="mt-1 text-sm text-dark-text-secondary">Please provide the required information to complete your KYC/KYB verification</p>
+        <p class="mt-1 text-sm text-dark-text-secondary">Please provide the required information to complete your
+          KYC/KYB verification</p>
       </div>
       <div class="text-right">
         <div class="text-sm text-dark-text-secondary">Progress</div>
@@ -236,15 +237,12 @@ onMounted(() => {
       <div class="flex items-center justify-between">
         <div v-for="(step, index) in steps" :key="step.id" class="flex items-center flex-1">
           <div class="flex items-center">
-            <button
-              @click="goToStep(step.id)"
-              :class="[
-                'flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium transition-colors',
-                currentStep >= step.id
-                  ? 'border-purple-accent bg-purple-accent text-white'
-                  : 'border-dark-border bg-dark-secondary text-dark-text-secondary hover:border-dark-border/70'
-              ]"
-            >
+            <button @click="goToStep(step.id)" :class="[
+              'flex progress-steps items-center justify-center rounded-full text-xs font-medium transition-colors',
+              currentStep >= step.id
+                ? 'border-purple-accent bg-purple-accent text-white'
+                : 'border-dark-border bg-dark-secondary text-dark-text-secondary hover:border-dark-border/70'
+            ]">
               {{ step.id }}
             </button>
             <div class="ml-3 hidden md:block">
@@ -258,7 +256,8 @@ onMounted(() => {
 
     <!-- Form Content -->
     <div class="grid grid-cols-1 gap-6">
-      <div class="card p-6">
+      <div
+        class="rounded-xl border text-card-foreground shadow bg-slate-800/30 backdrop-blur-sm border-slate-700/50 p-6">
         <!-- Step 1: Company Information -->
         <div v-if="currentStep === 1" class="space-y-6">
           <div>
@@ -268,45 +267,30 @@ onMounted(() => {
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
               <InputLabel for="company_name" value="Company Name *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="company_name"
-                v-model="form.company_name"
-                placeholder="Enter your company name"
-                :class="{ 'border-red-500': validationErrors.company_name }"
-              />
+              <DarkInput id="company_name" v-model="form.company_name" placeholder="Enter your company name"
+                :class="{ 'border-red-500': validationErrors.company_name }" />
               <InputError :message="validationErrors.company_name" />
             </div>
 
             <div>
               <InputLabel for="legal_name" value="Legal Name *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="legal_name"
-                v-model="form.legal_name"
-                placeholder="Enter legal company name"
-                :class="{ 'border-red-500': validationErrors.legal_name }"
-              />
+              <DarkInput id="legal_name" v-model="form.legal_name" placeholder="Enter legal company name"
+                :class="{ 'border-red-500': validationErrors.legal_name }" />
               <InputError :message="validationErrors.legal_name" />
             </div>
 
             <div>
-              <InputLabel for="tax_registration_number" value="Tax Registration Number *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="tax_registration_number"
-                v-model="form.tax_registration_number"
+              <InputLabel for="tax_registration_number" value="Tax Registration Number *"
+                class="text-dark-text-secondary mb-2" />
+              <DarkInput id="tax_registration_number" v-model="form.tax_registration_number"
                 placeholder="Enter tax registration number"
-                :class="{ 'border-red-500': validationErrors.tax_registration_number }"
-              />
+                :class="{ 'border-red-500': validationErrors.tax_registration_number }" />
               <InputError :message="validationErrors.tax_registration_number" />
             </div>
 
             <div>
               <InputLabel for="website" value="Website" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="website"
-                v-model="form.website"
-                type="url"
-                placeholder="https://yourcompany.com"
-              />
+              <DarkInput id="website" v-model="form.website" type="url" placeholder="https://yourcompany.com" />
             </div>
           </div>
         </div>
@@ -320,12 +304,9 @@ onMounted(() => {
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
               <InputLabel for="business_type" value="Business Type *" class="text-dark-text-secondary mb-2" />
-              <select
-                id="business_type"
-                v-model="form.business_type"
-                class="input-dark w-full bg-dark-secondary border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
-                :class="{ 'border-red-500': validationErrors.business_type }"
-              >
+              <select id="business_type" v-model="form.business_type"
+                class="input-dark w-full border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
+                :class="{ 'border-red-500': validationErrors.business_type }">
                 <option value="">Select business type</option>
                 <option v-for="type in businessTypes" :key="type" :value="type">{{ type }}</option>
               </select>
@@ -334,12 +315,9 @@ onMounted(() => {
 
             <div>
               <InputLabel for="industry" value="Industry *" class="text-dark-text-secondary mb-2" />
-              <select
-                id="industry"
-                v-model="form.industry"
-                class="input-dark w-full bg-dark-secondary border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
-                :class="{ 'border-red-500': validationErrors.industry }"
-              >
+              <select id="industry" v-model="form.industry"
+                class="input-dark w-full  border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
+                :class="{ 'border-red-500': validationErrors.industry }">
                 <option value="">Select industry</option>
                 <option v-for="ind in industries" :key="ind" :value="ind">{{ ind }}</option>
               </select>
@@ -348,12 +326,8 @@ onMounted(() => {
 
             <div class="sm:col-span-2">
               <InputLabel for="incorporation_date" value="Incorporation Date *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="incorporation_date"
-                v-model="form.incorporation_date"
-                type="date"
-                :class="{ 'border-red-500': validationErrors.incorporation_date }"
-              />
+              <DarkInput id="incorporation_date" v-model="form.incorporation_date" type="date"
+                :class="{ 'border-red-500': validationErrors.incorporation_date }" />
               <InputError :message="validationErrors.incorporation_date" />
             </div>
           </div>
@@ -368,12 +342,9 @@ onMounted(() => {
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
               <InputLabel for="country" value="Country *" class="text-dark-text-secondary mb-2" />
-              <select
-                id="country"
-                v-model="form.country"
+              <select id="country" v-model="form.country"
                 class="input-dark w-full bg-dark-secondary border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
-                :class="{ 'border-red-500': validationErrors.country }"
-              >
+                :class="{ 'border-red-500': validationErrors.country }">
                 <option value="">Select country</option>
                 <option value="US">United States</option>
                 <option value="CA">Canada</option>
@@ -387,36 +358,22 @@ onMounted(() => {
 
             <div>
               <InputLabel for="city" value="City *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="city"
-                v-model="form.city"
-                placeholder="Enter city"
-                :class="{ 'border-red-500': validationErrors.city }"
-              />
+              <DarkInput id="city" v-model="form.city" placeholder="Enter city"
+                :class="{ 'border-red-500': validationErrors.city }" />
               <InputError :message="validationErrors.city" />
             </div>
 
             <div class="sm:col-span-2">
               <InputLabel for="contact_email" value="Contact Email *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="contact_email"
-                v-model="form.contact_email"
-                type="email"
-                placeholder="contact@yourcompany.com"
-                :class="{ 'border-red-500': validationErrors.contact_email }"
-              />
+              <DarkInput id="contact_email" v-model="form.contact_email" type="email"
+                placeholder="contact@yourcompany.com" :class="{ 'border-red-500': validationErrors.contact_email }" />
               <InputError :message="validationErrors.contact_email" />
             </div>
 
             <div class="sm:col-span-2">
               <InputLabel for="contact_phone" value="Contact Phone *" class="text-dark-text-secondary mb-2" />
-              <DarkInput
-                id="contact_phone"
-                v-model="form.contact_phone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-                :class="{ 'border-red-500': validationErrors.contact_phone }"
-              />
+              <DarkInput id="contact_phone" v-model="form.contact_phone" type="tel" placeholder="+1 (555) 123-4567"
+                :class="{ 'border-red-500': validationErrors.contact_phone }" />
               <InputError :message="validationErrors.contact_phone" />
             </div>
           </div>
@@ -429,17 +386,12 @@ onMounted(() => {
           </div>
 
           <div class="space-y-6">
-            <DocumentUpload
-              v-for="docType in documentTypes"
-              :key="docType.id"
-              :document-type="docType"
-              :uploaded-files="uploadedDocuments[docType.id] || []"
-              :max-files="3"
+            <DocumentUpload v-for="docType in documentTypes" :key="docType.id" :document-type="docType"
+              :uploaded-files="uploadedDocuments[docType.id] || []" :max-files="3"
               :accepted-types="['.pdf', '.jpg', '.jpeg', '.png']"
               @files-uploaded="(files) => handleDocumentUpload(docType.id, files)"
               @file-removed="(index) => removeDocument(docType.id, index)"
-              @version-note="(note) => (documentNotes[docType.id] = note)"
-            />
+              @version-note="(note) => (documentNotes[docType.id] = note)" />
           </div>
 
           <div v-if="validationErrors.documents" class="rounded-lg bg-red-500/20 border border-red-500/30 p-4">
@@ -449,31 +401,17 @@ onMounted(() => {
 
         <!-- Navigation Buttons -->
         <div class="mt-8 flex items-center justify-between border-t border-dark-border pt-6">
-          <button
-            v-if="currentStep > 1"
-            @click="prevStep"
-            type="button"
-            class="btn-secondary"
-          >
+          <button v-if="currentStep > 1" @click="prevStep" type="button" class="btn-secondary">
             Previous
           </button>
           <div v-else></div>
 
           <div class="flex items-center space-x-3">
-            <GradientButton
-              v-if="currentStep < totalSteps"
-              @click="nextStep"
-              type="button"
-            >
+            <GradientButton v-if="currentStep < totalSteps" @click="nextStep" type="button">
               Next
             </GradientButton>
-            <GradientButton
-              v-else
-              @click="submitForm"
-              type="button"
-              :disabled="form.processing"
-              class="disabled:opacity-50"
-            >
+            <GradientButton v-else @click="submitForm" type="button" :disabled="form.processing"
+              class="disabled:opacity-50">
               {{ form.processing ? 'Submitting...' : 'Submit Application' }}
             </GradientButton>
           </div>
@@ -487,13 +425,16 @@ onMounted(() => {
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #3f3f46;
   border-radius: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #52525b;
 }

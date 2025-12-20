@@ -280,7 +280,7 @@ const exportData = async (format: 'excel' | 'csv') => {
           <div class="mt-4 rounded-lg bg-gray-50 p-4">
             <p class="text-sm text-gray-700">{{ getStatusInfo(supplier.kyb_status).description }}</p>
             <div v-if="supplier.kyb_notes" class="mt-2">
-              <p class="text-sm font-medium text-gray-900">Additional Notes:</p>
+              <p class="text-sm font-medium">Additional Notes:</p>
               <p class="text-sm text-gray-600">{{ supplier.kyb_notes }}</p>
             </div>
           </div>
@@ -313,7 +313,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900">Application Submitted</p>
+                <p class="text-sm font-medium">Application Submitted</p>
                 <p class="text-sm text-gray-500">{{ formatDate(supplier.created_at) }}</p>
               </div>
             </div>
@@ -331,7 +331,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900">Under Review</p>
+                <p class="text-sm font-medium">Under Review</p>
                 <p class="text-sm text-gray-500">
                   {{ supplier.kyb_status === 'under_review' ? 'Currently being reviewed' : 'Pending review' }}
                 </p>
@@ -348,7 +348,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900">Application Approved</p>
+                <p class="text-sm font-medium">Application Approved</p>
                 <p class="text-sm text-gray-500">{{ formatDate(supplier.kyb_approved_at!) }}</p>
               </div>
             </div>
@@ -367,7 +367,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                 </path>
               </svg>
             </div>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No documents uploaded</h3>
+            <h3 class="mt-2 text-sm font-medium">No documents uploaded</h3>
             <p class="mt-1 text-sm text-gray-500">Upload your required documents to complete your application.</p>
           </div>
 
@@ -379,7 +379,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                   <span class="text-lg">📄</span>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900">
+                  <p class="text-sm font-medium">
                     {{ documentTypes[document.document_type_id as keyof typeof documentTypes] || 'Document' }}
                   </p>
                   <p class="text-sm text-gray-500">Uploaded {{ formatDate(document.created_at) }}</p>
@@ -409,7 +409,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                 <span class="text-xs font-medium text-blue-600">1</span>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900">Complete your profile</p>
+                <p class="text-sm font-medium">Complete your profile</p>
                 <p class="text-sm text-gray-500">Ensure all required information is filled out completely.</p>
               </div>
             </div>
@@ -419,7 +419,7 @@ const exportData = async (format: 'excel' | 'csv') => {
                 <span class="text-xs font-medium text-blue-600">2</span>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900">Upload required documents</p>
+                <p class="text-sm font-medium">Upload required documents</p>
                 <p class="text-sm text-gray-500">Submit all necessary verification documents.</p>
               </div>
             </div>
@@ -427,10 +427,10 @@ const exportData = async (format: 'excel' | 'csv') => {
             <div class="flex items-start space-x-3">
               <div class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
                 <span class="text-xs font-medium text-blue-600">{{ supplier.kyb_status === 'pending' ? '3' : '1'
-                  }}</span>
+                }}</span>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900">Wait for review</p>
+                <p class="text-sm font-medium">Wait for review</p>
                 <p class="text-sm text-gray-500">Our compliance team will review your application within 2-3 business
                   days.
                 </p>

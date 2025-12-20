@@ -160,11 +160,12 @@ function submitInvoice() {
                                     <label class="block text-sm font-medium text-dark-text-secondary mb-2">Supplier
                                         ID</label>
                                     <DarkInput v-model="invoiceForm.supplier_id" type="number"
-                                        placeholder="Enter supplier ID" readonly class="opacity-70 cursor-not-allowed" />
+                                        placeholder="Enter supplier ID" readonly
+                                        class="opacity-70 cursor-not-allowed" />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-dark-text-secondary mb-2">Buyer</label>
-                                    <select v-model="invoiceForm.buyer_id" 
+                                    <select v-model="invoiceForm.buyer_id"
                                         class="input-dark w-full bg-dark-secondary border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
                                         required>
                                         <option value="">Select Buyer</option>
@@ -229,7 +230,8 @@ function submitInvoice() {
                     <div class="card bg-dark-secondary/50">
                         <div v-if="hasSignedAgreement" class="flex items-center gap-3 text-green-500">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="font-medium">Agreement Signed Successfully</span>
                         </div>
