@@ -64,7 +64,7 @@ const getStatusBadge = (status: string) => {
 
     <AuthenticatedLayout>
         <div class="space-y-6">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-dark-text-primary">Suppliers</h1>
                     <p class="mt-1 text-sm text-dark-text-secondary">Manage and verify supplier onboarding applications
@@ -120,7 +120,8 @@ const getStatusBadge = (status: string) => {
                             <tr v-for="supplier in suppliers.data" :key="supplier.id"
                                 class="hover:bg-dark-tertiary/30 transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-dark-text-primary">{{ supplier.company_name }}
+                                    <div class="text-sm font-medium text-dark-text-primary truncate max-w-[200px]">{{
+                                        supplier.company_name }}
                                     </div>
                                     <div class="text-xs text-dark-text-secondary">{{ supplier.legal_name }}</div>
                                 </td>

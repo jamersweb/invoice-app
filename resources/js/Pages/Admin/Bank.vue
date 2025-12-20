@@ -14,7 +14,7 @@
       </div>
 
       <div
-        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
+        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all overflow-x-auto custom-scrollbar">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="">
             <tr>
@@ -30,12 +30,16 @@
           </thead>
           <tbody class="divide-y divide-gray-200 bg-white">
             <tr v-for="account in accounts" :key="account.id">
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ account.supplier_name }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ account.account_name }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 truncate max-w-[150px]">{{
+                account.supplier_name }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 truncate max-w-[150px]">{{
+                account.account_name }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-900">{{ account.iban }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-900">{{ account.swift || '—' }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ account.bank_name || '—' }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ account.branch || '—' }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 truncate max-w-[150px]">{{ account.bank_name
+                || '—' }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 truncate max-w-[150px]">{{ account.branch ||
+                '—' }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm">
                 <button @click="openEditModal(account)" class="text-indigo-600 hover:text-indigo-900">Edit</button>
               </td>

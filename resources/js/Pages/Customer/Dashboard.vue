@@ -57,7 +57,7 @@ onMounted(async () => {
   <Head title="Customer Dashboard" />
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-2xl font-bold text-gray-900">Customer Dashboard</h2>
           <p class="mt-1 text-sm text-gray-500">Overview of your activity and invoices</p>
@@ -137,7 +137,7 @@ onMounted(async () => {
                 <div>
                   <div class="text-sm font-medium">Invoice #{{ er.invoice_id }}</div>
                   <div class="text-xs text-gray-500">Due {{ new Date(er.due_date).toLocaleDateString() }} — {{ er.status
-                  }}
+                    }}
                   </div>
                 </div>
                 <div class="text-sm text-gray-900">{{ Number(er.amount).toLocaleString() }}</div>

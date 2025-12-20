@@ -3,7 +3,7 @@
 
     <Head title="Admin - Audit Log" />
     <div class="space-y-6">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 class="text-3xl font-bold text-gray-900">Audit Log</h1>
           <p class="mt-2 text-sm text-gray-600">Complete audit trail of all system actions with correlation IDs for
@@ -88,9 +88,10 @@
           <tbody class="divide-y divide-gray-200 bg-white">
             <tr v-for="log in logs.data" :key="log.id" class="hover:bg-gray-50">
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ log.created_at }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ log.actor }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900 font-mono text-xs">{{ log.action }}</td>
-              <td class="px-6 py-4 text-sm text-gray-500">{{ log.entity_type }} #{{ log.entity_id }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900 truncate max-w-[150px]">{{ log.actor }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900 font-mono text-xs truncate max-w-[150px]">{{ log.action }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500 truncate max-w-[150px]">{{ log.entity_type }} #{{ log.entity_id
+              }}</td>
               <td class="px-6 py-4 text-sm font-mono text-xs text-gray-500">
                 <button @click="copyCorrelationId(log.correlation_id)" class="hover:text-indigo-600"
                   :title="log.correlation_id">
@@ -98,7 +99,8 @@
                 </button>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">{{ log.ip || '—' }}</td>
-              <td class="px-6 py-4 text-sm text-gray-500">{{ log.diff_summary || '—' }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500 truncate max-w-[200px]" :title="log.diff_summary">{{
+                log.diff_summary || '—' }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-sm">
                 <button @click="viewDetails(log.id)" class="text-indigo-600 hover:text-indigo-900">View</button>
               </td>

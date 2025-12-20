@@ -28,7 +28,7 @@
                             <p class="text-white text-xl sm:text-3xl font-bold">{{ formatPercent(metrics.idlePercent) }}
                             </p>
                             <p :class="`text-[9px] sm:text-xs mt-1 ${metrics.idlePercent >= 5 && metrics.idlePercent <= 10 ? 'text-green-300' :
-                                    metrics.idlePercent > 10 ? 'text-amber-300' : 'text-red-300'
+                                metrics.idlePercent > 10 ? 'text-amber-300' : 'text-red-300'
                                 }`">
                                 Target: 5-10%
                             </p>
@@ -69,7 +69,7 @@
                             <p class="text-white text-xl sm:text-3xl font-bold">{{
                                 Math.round(portfolioHealthScore.overall) }}</p>
                             <p :class="`text-[9px] sm:text-xs mt-1 ${portfolioHealthScore.overall >= 70 ? 'text-green-300' :
-                                    portfolioHealthScore.overall >= 50 ? 'text-amber-300' : 'text-red-300'
+                                portfolioHealthScore.overall >= 50 ? 'text-amber-300' : 'text-red-300'
                                 }`">
                                 {{ portfolioHealthScore.overall >= 70 ? 'Excellent' : portfolioHealthScore.overall >= 50
                                     ? 'Good' : 'Needs Attention' }}
@@ -91,12 +91,12 @@
                     </div>
                     <div class="space-y-3">
                         <div v-for="(alert, idx) in alerts" :key="idx" :class="`p-3 rounded-lg border ${alert.severity === 'critical' ? 'bg-red-900/30 border-red-700/50' :
-                                alert.severity === 'warning' ? 'bg-amber-900/30 border-amber-700/50' :
-                                    'bg-blue-900/30 border-blue-700/50'
+                            alert.severity === 'warning' ? 'bg-amber-900/30 border-amber-700/50' :
+                                'bg-blue-900/30 border-blue-700/50'
                             }`">
                             <p :class="`font-semibold mb-1 ${alert.severity === 'critical' ? 'text-red-400' :
-                                    alert.severity === 'warning' ? 'text-amber-400' :
-                                        'text-blue-400'
+                                alert.severity === 'warning' ? 'text-amber-400' :
+                                    'text-blue-400'
                                 }`">{{ alert.title }}</p>
                             <p class="text-white text-sm">{{ alert.message }}</p>
                         </div>
@@ -180,7 +180,7 @@
                     <div>
                         <h4 class="text-white text-sm font-semibold mb-3">Customer Quality Scores (Min 3 Deals)</h4>
                         <div
-                            class="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden max-h-80 overflow-y-auto custom-scrollbar">
+                            class="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden max-h-80 overflow-y-auto overflow-x-auto custom-scrollbar">
                             <table class="w-full">
                                 <thead>
                                     <tr class="border-b border-slate-700 bg-slate-800/50">
@@ -201,8 +201,8 @@
                                         <td class="text-center text-slate-300 text-xs p-3">{{ customer.dealCount }}</td>
                                         <td class="text-right p-3">
                                             <span :class="`px-2 py-1 rounded text-xs ${customer.qualityScore >= 75 ? 'bg-green-500/20 text-green-400 border border-green-500/50' :
-                                                    customer.qualityScore >= 50 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
-                                                        'bg-red-500/20 text-red-400 border border-red-500/50'
+                                                customer.qualityScore >= 50 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
+                                                    'bg-red-500/20 text-red-400 border border-red-500/50'
                                                 }`">
                                                 {{ formatNumber(customer.qualityScore) }}
                                             </span>
@@ -232,7 +232,7 @@
                     </div>
 
                     <div
-                        class="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden mb-4 max-h-96 overflow-y-auto custom-scrollbar">
+                        class="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden mb-4 max-h-96 overflow-y-auto overflow-x-auto custom-scrollbar">
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-slate-700 bg-slate-800/50">
@@ -256,16 +256,16 @@
                                             formatCurrency(investor.deployedCapital) }}</span>
                                         <span class="text-slate-500"> / </span>
                                         <span class="text-cyan-400 font-mono">{{ formatCurrency(investor.totalCapital)
-                                            }}</span>
+                                        }}</span>
                                         <span class="text-slate-500 ml-1">({{ formatPercent(investor.deploymentRate)
-                                            }})</span>
+                                        }})</span>
                                     </td>
                                     <td class="text-right text-slate-400 text-xs p-3 hidden md:table-cell">{{
                                         investor.daysSinceLastInvestment }}d</td>
                                     <td class="text-center p-3">
                                         <span :class="`px-2 py-1 rounded text-xs ${investor.redemptionRisk
-                                                ? 'bg-red-500/20 text-red-400 border border-red-500/50'
-                                                : 'bg-green-500/20 text-green-400 border border-green-500/50'
+                                            ? 'bg-red-500/20 text-red-400 border border-red-500/50'
+                                            : 'bg-green-500/20 text-green-400 border border-green-500/50'
                                             }`">
                                             {{ investor.redemptionRisk ? '⚠️ High' : '✅ Low' }}
                                         </span>
@@ -279,14 +279,14 @@
                         <div class="bg-purple-800/50 border-purple-700 rounded-lg p-3">
                             <p class="text-purple-200 text-xs mb-1">At Redemption Risk</p>
                             <p class="text-white text-xl font-bold">{{investorIntelligence.filter((i: any) =>
-                                i.redemptionRisk).length }}</p>
+                                i.redemptionRisk).length}}</p>
                             <p class="text-purple-300 text-xs mt-1">No profit in 90d + returns &lt;3%</p>
                         </div>
                         <div class="bg-pink-800/50 border-pink-700 rounded-lg p-3">
                             <p class="text-pink-200 text-xs mb-1">Avg Deployment Rate</p>
                             <p class="text-white text-xl font-bold">
                                 {{formatPercent(investorIntelligence.reduce((sum: number, i: any) => sum +
-                                    i.deploymentRate, 0) / investorIntelligence.length) }}
+                                    i.deploymentRate, 0) / investorIntelligence.length)}}
                             </p>
                             <p class="text-pink-300 text-xs mt-1">Capital utilization</p>
                         </div>
@@ -294,7 +294,7 @@
                             <p class="text-indigo-200 text-xs mb-1">Total Investor Capital</p>
                             <p class="text-white text-xl font-bold">
                                 {{formatCurrency(investorIntelligence.reduce((sum: number, i: any) => sum +
-                                i.totalCapital, 0)) }}
+                                    i.totalCapital, 0))}}
                             </p>
                             <p class="text-indigo-300 text-xs mt-1">AED</p>
                         </div>
@@ -311,7 +311,8 @@
                         </svg>
                         <h3 class="text-white text-base sm:text-lg font-semibold">Next 10 Deals Ending</h3>
                     </div>
-                    <div class="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+                    <div
+                        class="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden overflow-x-auto custom-scrollbar">
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-slate-700 bg-slate-800/50">
@@ -336,8 +337,8 @@
                                     </td>
                                     <td class="text-center p-3">
                                         <span :class="`px-2 py-1 rounded text-xs ${deal.daysUntilEnd < 7 ? 'bg-red-500/20 text-red-400 border border-red-500/50' :
-                                                deal.daysUntilEnd < 14 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50' :
-                                                    'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                                            deal.daysUntilEnd < 14 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50' :
+                                                'bg-blue-500/20 text-blue-400 border border-blue-500/50'
                                             }`">
                                             {{ deal.daysUntilEnd }}d
                                         </span>

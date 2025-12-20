@@ -134,7 +134,7 @@
               <tbody>
                 <tr v-for="investment in filteredInvestments" :key="investment.id"
                   class="border-b border-slate-700/50 hover:bg-slate-800/30">
-                  <td class="text-white font-medium text-xs p-3">{{ investment.name }}</td>
+                  <td class="text-white font-medium text-xs p-3 truncate max-w-[150px]">{{ investment.name }}</td>
                   <td class="text-right text-blue-400 font-mono text-xs p-3">
                     {{ formatCurrency(investment.amount) }}
                   </td>
@@ -164,8 +164,8 @@
           <div class="flex gap-2">
             <Link v-for="link in investments.links" :key="link.label" :href="link.url || '#'" v-html="link.label"
               :class="`px-3 py-2 rounded-lg ${link.active
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
                 } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>

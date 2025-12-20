@@ -70,7 +70,7 @@ async function remind(id: number) {
         <input v-model="age" class="rounded border p-2" placeholder="age (e.g. 7d)" />
         <button @click="load" class="rounded border px-3 py-2">Apply</button>
       </div>
-      <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-gray-200 bg-white overflow-x-auto custom-scrollbar">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="">
             <tr>
@@ -89,7 +89,7 @@ async function remind(id: number) {
                 currency: 'USD'
               }).format(r.amount) }}</td>
               <td class="px-4 py-3">{{ r.due_date }}</td>
-              <td class="px-4 py-3">{{ r.assigned_to ?? '-' }}</td>
+              <td class="px-4 py-3 truncate max-w-[150px]">{{ r.assigned_to ?? '-' }}</td>
               <td class="px-4 py-3 text-right">
                 <button @click="claim(r.id)"
                   class="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white">Claim</button>

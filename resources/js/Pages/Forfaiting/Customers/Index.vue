@@ -6,7 +6,7 @@
       <div class="max-w-[1800px] mx-auto">
         <!-- Header -->
         <div class="mb-8">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@
               </div>
             </div>
             <button v-if="!isFormOpen" @click="isFormOpen = true"
-              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+              class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
@@ -168,8 +168,8 @@
         <div v-if="customers.links && customers.links.length > 3" class="mt-6 flex justify-center">
           <div class="flex gap-2">
             <Link v-for="link in customers.links" :key="link.label" :href="link.url || '#'" v-html="link.label" :class="`px-3 py-2 rounded-lg ${link.active
-                ? 'bg-indigo-600 text-white'
-                : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+              ? 'bg-indigo-600 text-white'
+              : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
               } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>

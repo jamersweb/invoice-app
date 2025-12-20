@@ -74,7 +74,7 @@ const paymentStats = computed(() => ({
             <!-- Greeting & Date Time Container -->
             <div
                 class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-xl font-semibold text-dark-text-primary">Good morning!</h2>
                         <p class="text-sm text-dark-text-secondary mt-1">Here's your overview for today</p>

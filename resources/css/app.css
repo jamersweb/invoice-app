@@ -19,6 +19,7 @@
     body {
         background-color: #1E1E1E !important;
         color: #FFFFFF;
+        overflow-x: hidden;
     }
 
     /* Ensure dark theme classes work */
@@ -28,6 +29,10 @@
 
     .text-dark-text-primary {
         color: #FFFFFF !important;
+    }
+
+    th {
+        white-space: nowrap;
     }
 }
 
@@ -177,7 +182,7 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
     background-color: #0F172A;
 }
 

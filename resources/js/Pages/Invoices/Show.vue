@@ -89,7 +89,7 @@ function numberToWords(num: number): string {
     <AuthenticatedLayout>
         <div class="space-y-6">
             <!-- Header Actions -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-dark-text-primary">Invoice Details</h1>
                 </div>

@@ -18,7 +18,7 @@ const form = useForm({
     notes: props.supplier.kyb_notes || '',
 });
 
-const submitReview = (status: 'approved' | 'rejected') => {
+const submitReview = (status: 'approved' | 'rejected' | 'under_review') => {
     form.status = status;
     form.post(route('admin.suppliers.status.update', props.supplier.id), {
         onSuccess: () => {
@@ -40,7 +40,7 @@ const formatDate = (date: string) => {
     <AuthenticatedLayout>
         <div class="space-y-6">
             <!-- Header -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-3">
                         <Link :href="route('admin.suppliers.index')"
@@ -72,11 +72,11 @@ const formatDate = (date: string) => {
                             { id: 'location', name: 'Location & Contact' },
                             { id: 'documents', name: 'Documents' }
                         ]" :key="tab.id" @click="activeTab = tab.id" :class="[
-                                'px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2',
-                                activeTab === tab.id
-                                    ? 'border-purple-accent text-purple-accent'
-                                    : 'border-transparent text-dark-text-secondary hover:text-white hover:border-dark-border'
-                            ]">
+                            'px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2',
+                            activeTab === tab.id
+                                ? 'border-purple-accent text-purple-accent'
+                                : 'border-transparent text-dark-text-secondary hover:text-white hover:border-dark-border'
+                        ]">
                             {{ tab.name }}
                         </button>
                     </div>

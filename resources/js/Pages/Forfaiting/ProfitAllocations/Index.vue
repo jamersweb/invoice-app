@@ -6,7 +6,7 @@
       <div class="max-w-[1800px] mx-auto">
         <!-- Header -->
         <div class="mb-8">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="p-3 bg-purple-600/20 rounded-xl">
                 <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,10 +130,10 @@
                   </td>
                   <td class="text-center p-3">
                     <span :class="`px-2 py-1 rounded text-xs ${allocation.deal_status === 'Ended'
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                        : allocation.deal_status === 'Ongoing'
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                          : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                      : allocation.deal_status === 'Ongoing'
+                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
                       }`">
                       {{ allocation.deal_status }}
                     </span>
@@ -149,8 +149,8 @@
           <div class="flex gap-2">
             <Link v-for="link in allocations.links" :key="link.label" :href="link.url || '#'" v-html="link.label"
               :class="`px-3 py-2 rounded-lg ${link.active
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+                ? 'bg-purple-600 text-white'
+                : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
                 } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>

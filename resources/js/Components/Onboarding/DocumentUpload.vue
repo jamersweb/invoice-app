@@ -217,7 +217,7 @@ const updateNote = () => emit('version-note', versionNote.value);
         <div class="flex items-center">
           <span class="mr-2 text-lg">{{ getFileIcon(file.name) }}</span>
           <div>
-            <p class="text-sm font-medium">{{ file.name }}</p>
+            <p class="text-sm font-medium truncate max-w-[200px] sm:max-w-xs">{{ file.name }}</p>
             <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
           </div>
         </div>

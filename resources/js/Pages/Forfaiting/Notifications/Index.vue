@@ -6,7 +6,7 @@
       <div class="max-w-[1800px] mx-auto">
         <!-- Header -->
         <div class="mb-8">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="p-3 bg-yellow-600/20 rounded-xl">
                 <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@
               </div>
             </div>
             <button v-if="!isFormOpen" @click="isFormOpen = true"
-              class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+              class="w-full sm:w-auto bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
@@ -110,17 +110,17 @@
                 <tr v-for="notification in filteredNotifications" :key="notification.id"
                   class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-white text-xs p-3">{{ notification.type }}</td>
-                  <td class="text-white font-medium text-xs p-3">{{ notification.title }}</td>
+                  <td class="text-white font-medium text-xs p-3 truncate max-w-[200px]">{{ notification.title }}</td>
                   <td class="text-slate-300 text-xs p-3 max-w-xs truncate">{{ notification.message }}</td>
                   <td class="text-right text-slate-300 text-xs p-3">
                     {{ notification.scheduled_at ? formatDate(notification.scheduled_at) : '-' }}
                   </td>
                   <td class="text-center p-3">
                     <span :class="`px-2 py-1 rounded text-xs ${notification.status === 'sent'
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                        : notification.status === 'pending'
-                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
-                          : 'bg-red-500/20 text-red-400 border border-red-500/50'
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                      : notification.status === 'pending'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/50'
                       }`">
                       {{ notification.status }}
                     </span>
@@ -148,8 +148,8 @@
           <div class="flex gap-2">
             <Link v-for="link in notifications.links" :key="link.label" :href="link.url || '#'" v-html="link.label"
               :class="`px-3 py-2 rounded-lg ${link.active
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+                ? 'bg-yellow-600 text-white'
+                : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
                 } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>

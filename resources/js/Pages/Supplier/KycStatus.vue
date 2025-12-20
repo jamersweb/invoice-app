@@ -163,7 +163,7 @@ const exportData = async (format: 'excel' | 'csv') => {
 
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-2xl font-bold text-gray-900">KYC/KYB Status</h2>
           <p class="mt-1 text-sm text-gray-500">Track your application progress and document status</p>

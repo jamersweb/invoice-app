@@ -67,7 +67,7 @@ async function resolveReq(id: number) { await fetch('/admin/api/doc-requests/' +
                 <tr v-for="r in items" :key="r.id" class="border-t">
                   <td class="py-2">{{ r.supplier_id }}</td>
                   <td class="py-2">{{ r.document_type_id }}</td>
-                  <td class="py-2">{{ r.note || '-' }}</td>
+                  <td class="py-2 truncate max-w-[200px]" :title="r.note">{{ r.note || '-' }}</td>
                   <td class="py-2">{{ r.requested_at || '-' }}</td>
                   <td class="py-2">{{ r.resolved_at || '-' }}</td>
                   <td class="py-2 text-right">

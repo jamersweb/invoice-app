@@ -3,7 +3,7 @@
 
     <Head title="Admin - Funding Logs" />
     <div class="space-y-6">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 class="text-3xl font-bold text-gray-900">Funding Logs</h1>
           <p class="mt-2 text-sm text-gray-600">Record and track all bank transfers to suppliers. Append-only log.</p>
@@ -55,7 +55,7 @@
 
       <!-- Table -->
       <div
-        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all">
+        class="rounded-xl border text-card-foreground shadow bg-slate-800/40 border-slate-700/50 p-4 hover:bg-slate-800/60 transition-all overflow-x-auto custom-scrollbar">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="">
             <tr>
@@ -76,12 +76,16 @@
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ log.supplier_name }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">{{ log.amount }} {{
                 log.currency }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-500">{{ log.bank_reference || '—' }}
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-500 truncate max-w-[150px]">{{
+                log.bank_reference || '—' }}
               </td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-500">{{ log.internal_reference || '—'
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-500 truncate max-w-[150px]">{{
+                log.internal_reference || '—'
+              }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 truncate max-w-[150px]">{{ log.recorded_by }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 truncate max-w-[200px]" :title="log.notes">{{ log.notes || '—'
                 }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ log.recorded_by }}</td>
-              <td class="px-6 py-4 text-sm text-gray-500">{{ log.notes || '—' }}</td>
             </tr>
           </tbody>
         </table>

@@ -56,7 +56,7 @@ function formatCurrency(amount: number) {
     <AuthenticatedLayout>
         <div class="space-y-6">
             <!-- Header -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-dark-text-primary">Invoices</h1>
                 </div>
@@ -116,7 +116,8 @@ function formatCurrency(amount: number) {
                                                 {{ invoice.customer_name?.charAt(0) || 'U' }}
                                             </span>
                                         </div>
-                                        <span>{{ invoice.customer_name || 'Unknown' }}</span>
+                                        <span class="truncate max-w-[150px] sm:max-w-[200px]">{{ invoice.customer_name
+                                            || 'Unknown' }}</span>
                                     </div>
                                 </td>
                                 <td class="text-dark-text-secondary">{{ new
@@ -130,7 +131,7 @@ function formatCurrency(amount: number) {
                                 </td>
                                 <td class="text-dark-text-secondary">{{ invoice.payment_mode || 'N/A' }}</td>
                                 <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString()
-                                    }}</td>
+                                }}</td>
                                 <td>
                                     <div class="flex items-center gap-2">
                                         <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">

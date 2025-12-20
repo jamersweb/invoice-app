@@ -45,7 +45,7 @@ async function remove(id: number) { await fetch('/admin/api/agreements/templates
               </thead>
               <tbody>
                 <tr v-for="t in items" :key="t.id" class="border-t">
-                  <td class="py-2">{{ t.name }}</td>
+                  <td class="py-2 truncate max-w-[200px]">{{ t.name }}</td>
                   <td class="py-2">{{ t.version }}</td>
                   <td class="py-2">{{ (t.effective_from || '-') }} → {{ (t.effective_to || '-') }}</td>
                   <td class="py-2 text-right">
