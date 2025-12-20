@@ -37,6 +37,7 @@ class Invoice extends Model
     }
 
     protected $fillable = [
+        'user_id',
         'supplier_id',
         'buyer_id',
         'invoice_number',
@@ -80,6 +81,7 @@ class Invoice extends Model
         'priority' => 'integer',
         'repayment_parts' => 'integer',
         'repayment_interval_days' => 'integer',
+        'user_id' => 'integer',
     ];
 }
 

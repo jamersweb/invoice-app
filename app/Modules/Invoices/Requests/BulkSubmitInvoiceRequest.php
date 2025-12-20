@@ -15,8 +15,8 @@ class BulkSubmitInvoiceRequest extends FormRequest
     {
         return [
             'invoices' => ['required', 'array', 'min:1', 'max:50'], // Max 50 invoices per bulk submission
-            'invoices.*.supplier_id' => ['required', 'integer'],
-            'invoices.*.buyer_id' => ['required', 'integer'],
+            'invoices.*.supplier_id' => ['nullable', 'integer'],
+            'invoices.*.buyer_id' => ['nullable', 'integer'],
             'invoices.*.invoice_number' => ['required', 'string', 'max:191'],
             'invoices.*.amount' => ['required', 'numeric', 'min:0.01'],
             'invoices.*.currency' => ['required', 'string', 'size:3'],

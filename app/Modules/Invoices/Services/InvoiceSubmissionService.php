@@ -20,13 +20,16 @@ class InvoiceSubmissionService
                 $path = Storage::disk(config('filesystems.default'))->putFile('invoices', $data['file']);
             }
 
-            $toleranceLow = (float)$data['amount'] * 0.95;
-            $toleranceHigh = (float)$data['amount'] * 1.05;
-            $isDuplicate = Invoice::query()
-                ->where('buyer_id', $data['buyer_id'])
-                ->where('invoice_number', $data['invoice_number'])
-                ->whereBetween('amount', [$toleranceLow, $toleranceHigh])
-                ->exists();
+            $toleranceLow = (float) $data['amount'] * 0.95;
+            $toleranceHigh = (float) $data['amount'] * 1.05;
+            $isDuplicate = false;
+            if (isset($data['buyer_id'])) {
+                $isDuplicate = Invoice::query()
+                    ->where('buyer_id', $data['buyer_id'])
+                    ->where('invoice_number', $data['invoice_number'])
+                    ->whereBetween('amount', [$toleranceLow, $toleranceHigh])
+                    ->exists();
+            }
 
             $payload = $data;
             $payload['file_path'] = $path;

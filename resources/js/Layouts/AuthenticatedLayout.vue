@@ -44,17 +44,13 @@ const navigation: NavItem[] = [
     // Main navigation - Dashboard link will be set dynamically based on role
     { name: 'Dashboard', href: '', icon: '📊', section: 'main' },
     { name: 'Invoices', href: 'invoices.index', icon: '🧾', section: 'main' },
-    { name: 'Customers', href: 'customers.index', icon: '👥', section: 'main' },
-    { name: 'Reports', href: 'reports.index', icon: '📈', section: 'main' },
 
-    // Other navigation (bottom)
-    { name: 'Settings', href: 'profile.edit', icon: '⚙️', section: 'bottom' },
-    { name: 'Help', href: '#', icon: '❓', section: 'bottom' },
 
     // Admin routes - organized as shown in images
     { name: 'Customer Dashboard', href: 'admin.buyers', icon: '👔', section: 'admin' },
     { name: 'Suppliers', href: 'admin.suppliers.index', icon: '🏪', section: 'admin' },
     { name: 'KYB Queue', href: 'admin.kyb.queue', icon: '🪪', section: 'admin', dot: true },
+    { name: 'Invoice Review', href: 'admin.invoice-review', icon: '🔍', section: 'admin', dot: true },
     { name: 'Collections', href: 'admin.collections', icon: '💰', section: 'admin', dot: true },
     { name: 'CMS', href: 'admin.cms', icon: '⭐', section: 'admin' },
     { name: 'KYB Checklist', href: 'admin.kyb.checklist', icon: '✅', section: 'admin' },
@@ -192,33 +188,7 @@ function currentRoute(routeName: string) {
                         </div>
                     </div>
 
-                    <div class="border-t border-dark-border"></div>
 
-                    <!-- Reports & Settings -->
-                    <div>
-                        <div class="mb-4">
-                            <h3 class="text-xs font-semibold text-dark-text-muted uppercase tracking-wider">Other</h3>
-                        </div>
-                        <div class="space-y-1">
-                            <Link v-for="item in bottomNav" :key="item.name"
-                                :href="item.isUrl ? item.href : (route().has(item.href) ? route(item.href) : '#')"
-                                :class="[
-                                    currentRoute(item.href)
-                                        ? 'bg-purple-accent/20 text-purple-accent border-l-2 border-purple-accent'
-                                        : 'text-dark-text-secondary hover:bg-dark-tertiary hover:text-dark-text-primary',
-                                    'group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200'
-                                ]">
-                                <div class="flex items-center">
-                                    <span class="mr-3 text-base">{{ item.icon }}</span>
-                                    {{ item.name }}
-                                </div>
-                                <span v-if="item.badge"
-                                    class="ml-2 rounded-full bg-purple-accent px-2 py-0.5 text-xs font-semibold text-white">{{
-                                        item.badge }}</span>
-                                <span v-else-if="item.dot" class="ml-2 h-2 w-2 rounded-full bg-purple-accent"></span>
-                            </Link>
-                        </div>
-                    </div>
 
                     <!-- Admin Menu (if admin) -->
                     <div v-if="adminNav.length > 0">
@@ -281,24 +251,7 @@ function currentRoute(routeName: string) {
                     </div>
                 </nav>
 
-                <!-- Sidebar Icons Container -->
-                <div class="border-t border-dark-border p-4">
-                    <div class="flex flex-col space-y-4">
-                        <button
-                            class="p-2 text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-tertiary rounded-lg transition-colors">
-                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
-                                <path stroke="currentColor" stroke-width="1.5"
-                                    d="M8 1.333v2M8 12.667v2M2.667 8h-2M15.333 8h-2M4.673 4.673L3.333 3.333M12.327 12.327l1.34 1.34M4.673 11.327L3.333 12.667M12.327 3.673l1.34-1.34" />
-                            </svg>
-                        </button>
-                        <button
-                            class="p-2 text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-tertiary rounded-lg transition-colors">
-                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
-                                <path stroke="currentColor" stroke-width="1.5" d="M8 2.667v10.666M2.667 8h10.666" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+
             </div>
         </div>
 
@@ -331,35 +284,7 @@ function currentRoute(routeName: string) {
 
                     <!-- Actions Container -->
                     <div class="flex items-center gap-x-2 sm:gap-x-4">
-                        <!-- Search -->
-                        <div class="relative hidden sm:block w-[216px]">
-                            <DarkInput v-model="searchQuery" placeholder="Search..." icon="search" class="!pr-10" />
-                        </div>
 
-                        <!-- Icons Container -->
-                        <div class="flex items-center gap-x-2">
-                            <!-- Flag/Language -->
-                            <button class="p-2 rounded-lg hover:bg-dark-tertiary transition-colors">
-                                <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
-                                    class="text-dark-text-secondary">
-                                    <path stroke="currentColor" stroke-width="1.5"
-                                        d="M8 1.333L10 4l-2 2-2-2 2-2.667zM8 14.667L6 12l2-2 2 2-2 2.667z" />
-                                </svg>
-                            </button>
-
-                            <!-- Notifications -->
-                            <button class="relative p-2 rounded-lg hover:bg-dark-tertiary transition-colors">
-                                <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
-                                    class="text-dark-text-secondary">
-                                    <path stroke="currentColor" stroke-width="1.5"
-                                        d="M8 2.667A4 4 0 004 6.667v2.666a2.667 2.667 0 01-.533 1.6L2.4 12.8h11.2l-1.067-1.867A2.667 2.667 0 0112 9.333V6.667a4 4 0 00-4-4zM6 12.8v.8a2 2 0 104 0v-.8" />
-                                </svg>
-                                <span class="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-                            </button>
-
-                            <!-- Theme Toggle -->
-                            <ThemeToggle />
-                        </div>
 
                         <!-- Avatar -->
                         <div class="relative">

@@ -14,8 +14,8 @@ class SubmitInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'supplier_id' => ['required', 'integer'],
-            'buyer_id' => ['required', 'integer'],
+            'supplier_id' => ['nullable', 'integer'],
+            'buyer_id' => ['nullable', 'integer'],
             'invoice_number' => ['required', 'string', 'max:191'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'currency' => ['required', 'string', 'size:3'],

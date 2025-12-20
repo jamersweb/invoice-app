@@ -12,9 +12,14 @@ class InvoicePolicy
         return $user->can('submit_invoices') || $user->hasRole('Admin');
     }
 
+    public function view(User $user, Invoice $invoice): bool
+    {
+        return ($invoice->user_id && $user->id == $invoice->user_id) || $user->hasRole(['Admin', 'Analyst']);
+    }
+
     public function update(User $user, Invoice $invoice): bool
     {
-        return $user->can('issue_offers') || $user->hasRole(['Admin','Analyst']);
+        return ($invoice->user_id && $user->id == $invoice->user_id) || $user->hasRole(['Admin', 'Analyst']);
     }
 }
 

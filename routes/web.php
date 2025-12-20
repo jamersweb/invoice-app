@@ -86,7 +86,7 @@ Route::middleware(['auth', 'permission:review_documents'])->prefix('api/v1')->gr
         if ($assigned = $request->query('assigned_to')) {
             $query->where('assigned_to', $assigned);
         }
-        if ($vip = $request->boolean('vip', null)) {
+        if ($vip = $request->boolean('vip', false)) {
             $query->where('vip', $vip);
         }
         if ($age = $request->query('age')) {
@@ -1022,7 +1022,30 @@ Route::middleware('auth')->group(function () {
     Route::get('/bank', [\App\Http\Controllers\BankAccountController::class, 'index'])->name('bank.index');
     Route::post('/bank', [\App\Http\Controllers\BankAccountController::class, 'store'])->name('bank.store');
     Route::get('/invoices', function () {
-        return Inertia::render('Invoices/Index');
+        $user = auth()->user();
+        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $invoices = [];
+        if ($supplier) {
+            $invoices = \App\Modules\Invoices\Models\Invoice::where('user_id', $user->id)
+                ->with(['buyer'])
+                ->orderByDesc('created_at')
+                ->get()
+                ->map(function ($invoice) {
+                    return [
+                        'id' => $invoice->id,
+                        'invoice_number' => $invoice->invoice_number,
+                        'customer_name' => $invoice->buyer?->name ?? 'Unknown',
+                        'amount' => (float) $invoice->amount,
+                        'paid' => (float) ($invoice->paid_amount ?? 0),
+                        'status' => $invoice->status,
+                        'due_date' => $invoice->due_date?->toDateString(),
+                        'created_at' => $invoice->created_at->toISOString(),
+                    ];
+                });
+        }
+        return Inertia::render('Invoices/Index', [
+            'invoices' => $invoices
+        ]);
     })->name('invoices.index');
     Route::get('/invoices/submit', function () {
         $supplier = \App\Models\Supplier::where('contact_email', auth()->user()->email)->first();
@@ -1035,6 +1058,11 @@ Route::middleware('auth')->group(function () {
             'buyers' => \App\Models\Buyer::all(['id', 'name']),
         ]);
     })->name('invoices.submit');
+
+    Route::post('/invoices', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'store'])->name('invoices.store');
+    Route::get('/invoices/{id}', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{id}/edit', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'edit'])->name('invoices.edit');
+    Route::put('/invoices/{id}', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'update'])->name('invoices.update');
     Route::get('/customers', function () {
         return Inertia::render('Customers/Index');
     })->name('customers.index');
@@ -1164,7 +1192,7 @@ Route::middleware('auth')->group(function () {
                 $q->whereIn('status', ['pending', 'pending_review', 'under_review']);
             if ($assigned = $request->query('assigned_to'))
                 $q->where('assigned_to', $assigned);
-            if (($vip = $request->boolean('vip', null)) !== null)
+            if (($vip = $request->boolean('vip', false)) !== null)
                 $q->where('vip', $vip);
             if ($age = $request->query('age')) {
                 if (preg_match('/^(\d+)([hd])$/', $age, $m)) {

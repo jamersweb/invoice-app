@@ -37,24 +37,21 @@ class InvoicesController extends Controller
             throw ValidationException::withMessages(['active' => 'Your supplier account is not active. Please contact support.']);
         }
 
-        // Check if agreements are signed
-        $hasAgreement = \App\Models\Agreement::where('status', 'signed')
-            ->where('signer_id', $user->id)
-            ->exists();
+        // Agreement check removed as per request
 
-        if (!$hasAgreement) {
-            throw ValidationException::withMessages(['agreements' => 'Required agreements must be signed before submitting invoices.']);
-        }
+        // Restrictive supplier_id check removed to fix 403 error
 
-        // Ensure supplier_id in request matches the logged-in supplier
-        if ($request->input('supplier_id') != $supplier->id) {
-            abort(403, 'You can only submit invoices for your own supplier account.');
-        }
+        $invoice = $service->submit(array_merge(
+            $request->validated(),
+            [
+                'file' => $request->file('file'),
+                'supplier_id' => $supplier->id, // Force current user's supplier ID
+                'user_id' => $user->id // Link to specific user
+            ]
+        ));
 
-        $invoice = $service->submit($request->validated() + ['file' => $request->file('file')]);
-        return (new InvoiceResource($invoice))
-            ->response()
-            ->setStatusCode(201);
+        return redirect()->route('invoices.index')
+            ->with('success', 'Invoice submitted successfully.');
     }
 
     /**
@@ -83,35 +80,27 @@ class InvoicesController extends Controller
             throw ValidationException::withMessages(['active' => 'Your supplier account is not active. Please contact support.']);
         }
 
-        // Check if agreements are signed
-        $hasAgreement = \App\Models\Agreement::where('status', 'signed')
-            ->where('signer_id', $user->id)
-            ->exists();
-
-        if (!$hasAgreement) {
-            throw ValidationException::withMessages(['agreements' => 'Required agreements must be signed before submitting invoices.']);
-        }
+        // Agreement check removed as per request
 
         $invoices = [];
         $errors = [];
 
         foreach ($request->input('invoices') as $index => $invoiceData) {
             try {
-                // Ensure supplier_id matches the logged-in supplier
-                if ($invoiceData['supplier_id'] != $supplier->id) {
-                    $errors[] = [
-                        'index' => $index,
-                        'invoice_number' => $invoiceData['invoice_number'] ?? 'N/A',
-                        'error' => 'You can only submit invoices for your own supplier account.'
-                    ];
-                    continue;
-                }
+                // Restrictive supplier_id check removed to fix 403 error
 
                 // Get file from request
                 $fileKey = "invoices.{$index}.file";
                 $file = $request->file($fileKey);
 
-                $invoice = $service->submit($invoiceData + ['file' => $file]);
+                $invoice = $service->submit(array_merge(
+                    $invoiceData,
+                    [
+                        'file' => $file,
+                        'supplier_id' => $supplier->id, // Force current user's supplier ID
+                        'user_id' => $user->id // Link to specific user
+                    ]
+                ));
                 $invoices[] = $invoice;
             } catch (\Exception $e) {
                 $errors[] = [
@@ -134,6 +123,66 @@ class InvoicesController extends Controller
             'invoices' => InvoiceResource::collection($invoices),
             'errors' => $errors,
         ], 201);
+    }
+
+    public function show($id)
+    {
+        $invoice = \App\Modules\Invoices\Models\Invoice::with(['buyer'])->findOrFail($id);
+
+        if ($invoice->user_id !== auth()->id()) {
+            abort(403, "User ID " . auth()->id() . " does not match Invoice User ID " . $invoice->user_id);
+        }
+
+        $this->authorize('view', $invoice);
+
+        return inertia('Invoices/Show', [
+            'invoice' => new InvoiceResource($invoice)
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $invoice = \App\Modules\Invoices\Models\Invoice::findOrFail($id);
+        $this->authorize('update', $invoice);
+
+        if ($invoice->status !== 'draft' && $invoice->status !== 'under_review') {
+            return redirect()->route('invoices.index')
+                ->with('error', 'Only draft or under review invoices can be edited.');
+        }
+
+        return inertia('Invoices/Edit', [
+            'invoice' => new InvoiceResource($invoice)
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $invoice = \App\Modules\Invoices\Models\Invoice::findOrFail($id);
+        $this->authorize('update', $invoice);
+
+        if ($invoice->status !== 'draft' && $invoice->status !== 'under_review') {
+            return redirect()->route('invoices.index')
+                ->with('error', 'Only draft or under review invoices can be updated.');
+        }
+
+        $validated = $request->validate([
+            'invoice_number' => ['required', 'string', 'max:191'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            'currency' => ['nullable', 'string', 'max:3'],
+            'due_date' => ['required', 'date'],
+            'issue_date' => ['nullable', 'date'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        if ($request->hasFile('file')) {
+            $path = \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->putFile('invoices', $request->file('file'));
+            $validated['file_path'] = $path;
+        }
+
+        $invoice->update($validated);
+
+        return redirect()->route('invoices.index')
+            ->with('success', 'Invoice updated successfully.');
     }
 }
 
