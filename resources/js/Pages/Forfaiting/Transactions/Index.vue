@@ -175,7 +175,7 @@
                 <tr v-for="transaction in filteredTransactions" :key="transaction.id"
                   class="border-b border-slate-700/50 hover:bg-slate-800/30">
                   <td class="text-white font-medium text-xs p-3">{{ transaction.transaction_number }}</td>
-                  <td class="text-white text-xs p-3">{{ transaction.customer }}</td>
+                  <td class="text-white text-xs p-3 truncate max-w-[150px]">{{ transaction.customer }}</td>
                   <td class="text-right text-purple-400 font-mono text-xs p-3">
                     {{ formatCurrency(transaction.net_amount) }}
                   </td>
@@ -186,10 +186,10 @@
                   </td>
                   <td class="text-center p-3">
                     <span :class="`px-2 py-1 rounded text-xs ${transaction.status === 'Ongoing'
-                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                        : transaction.status === 'Ended'
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                          : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
+                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                      : transaction.status === 'Ended'
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/50'
                       }`">
                       {{ transaction.status }}
                     </span>
@@ -224,8 +224,8 @@
           <div class="flex gap-2">
             <Link v-for="link in transactions.links" :key="link.label" :href="link.url || '#'" v-html="link.label"
               :class="`px-3 py-2 rounded-lg ${link.active
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
                 } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`" />
           </div>
         </div>

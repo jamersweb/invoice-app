@@ -68,7 +68,7 @@ async function remove(id: number) { await fetch('/admin/api/kyb-checklist/' + id
               <tbody>
                 <tr v-for="r in rows" :key="r.id" class="border-t">
                   <td class="py-2">{{ r.customer_type }}</td>
-                  <td class="py-2">{{ r.document_type?.name || r.document_type_id }}</td>
+                  <td class="py-2 truncate max-w-[200px]">{{ r.document_type?.name || r.document_type_id }}</td>
                   <td class="py-2"><button class="text-indigo-600 hover:underline" @click="toggle(r, 'is_required')">{{
                     r.is_required ? 'Yes' : 'No' }}</button></td>
                   <td class="py-2"><button class="text-indigo-600 hover:underline" @click="toggle(r, 'is_active')">{{

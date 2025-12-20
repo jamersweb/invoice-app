@@ -34,7 +34,12 @@ function formatCurrency(amount: any, currency = 'AED') {
 
     <AuthenticatedLayout>
         <div class="space-y-6">
+<<<<<<< HEAD
             <div class="flex items-center justify-between">
+=======
+            <!-- Header Actions -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+>>>>>>> f7fcee6785bbb3d0cb36068d84f4317b2a212f60
                 <div>
                     <h1 class="text-2xl font-bold text-dark-text-primary">Invoice Details</h1>
                 </div>

@@ -98,8 +98,10 @@ onMounted(async () => {
                             <template v-if="customers && customers.length > 0">
                                 <tr v-for="customer in customers" :key="customer.id" class="hover:bg-dark-secondary">
                                     <td class="px-4 py-3 font-medium text-dark-text-primary">{{ customer.id }}</td>
-                                    <td class="px-4 py-3 text-dark-text-primary">{{ customer.name }}</td>
-                                    <td class="px-4 py-3 text-dark-text-secondary">{{ customer.email }}</td>
+                                    <td class="px-4 py-3 text-dark-text-primary truncate max-w-[150px]">{{ customer.name
+                                        }}</td>
+                                    <td class="px-4 py-3 text-dark-text-secondary truncate max-w-[200px]">{{
+                                        customer.email }}</td>
                                     <td class="px-4 py-3">
                                         <Badge
                                             :variant="customer.risk_grade === 'A' ? 'success' : customer.risk_grade === 'B' ? 'info' : 'warning'">

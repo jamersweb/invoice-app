@@ -22,7 +22,7 @@ onMounted(load);
   <Head title="Leads" />
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 class="text-2xl font-bold text-gray-900">Leads</h2>
         <div class="flex items-center gap-3">
           <input v-model="search" @keyup.enter="load" placeholder="Search..."
@@ -48,10 +48,10 @@ onMounted(load);
             </thead>
             <tbody>
               <tr v-for="row in items" :key="row.id" class="border-t">
-                <td class="py-2">{{ row.name }}</td>
-                <td class="py-2">{{ row.email }}</td>
+                <td class="py-2 truncate max-w-[150px]">{{ row.name }}</td>
+                <td class="py-2 truncate max-w-[200px]">{{ row.email }}</td>
                 <td class="py-2">{{ row.phone || '-' }}</td>
-                <td class="py-2">{{ row.company || '-' }}</td>
+                <td class="py-2 truncate max-w-[150px]">{{ row.company || '-' }}</td>
                 <td class="py-2">{{ new Date(row.created_at).toLocaleString() }}</td>
               </tr>
               <tr v-if="items.length === 0">

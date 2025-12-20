@@ -39,7 +39,7 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
   <Head title="CMS" />
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 class="text-2xl font-bold text-gray-900">CMS Blocks</h2>
       </div>
     </template>
@@ -64,7 +64,7 @@ async function remove(id: number) { await fetch('/admin/api/cms/' + id, { method
                 <tr v-for="row in items" :key="row.id" class="border-t">
                   <td class="py-2">{{ row.key }}</td>
                   <td class="py-2">{{ row.locale }}</td>
-                  <td class="py-2">{{ row.title }}</td>
+                  <td class="py-2 truncate max-w-xs">{{ row.title }}</td>
                   <td class="py-2">{{ row.is_active ? 'Yes' : 'No' }}</td>
                   <td class="py-2 text-right">
                     <button class="text-indigo-600 hover:underline mr-3" @click="edit(row)">Edit</button>

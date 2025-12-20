@@ -269,7 +269,7 @@ function getStatusBadge(status: string): 'warning' | 'success' | 'danger' | 'inf
                   <span v-else class="text-dark-text-muted">-</span>
                 </td>
                 <td class="px-4 py-3 text-dark-text-primary">{{ doc.priority ?? '-' }}</td>
-                <td class="px-4 py-3 text-dark-text-primary">{{ doc.assigned_to ?? '-' }}</td>
+                <td class="px-4 py-3 text-dark-text-primary truncate max-w-[150px]">{{ doc.assigned_to ?? '-' }}</td>
                 <td class="px-4 py-3 text-right">
                   <div class="flex items-center justify-end gap-2">
                     <button @click="claim(doc.id)" class="btn-primary text-xs py-1.5 px-3">
