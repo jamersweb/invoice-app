@@ -142,11 +142,11 @@ const getStatusText = (status: string) => {
       <!-- Footer Actions -->
       <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-dark-border">
         <Link
-          :href="route('supplier.dashboard')"
+          href="/"
           class="flex-1"
         >
           <button class="w-full btn-secondary h-12">
-            Go to Dashboard
+            Back to Home
           </button>
         </Link>
         <Link

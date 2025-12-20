@@ -11,6 +11,8 @@ use App\Modules\Funding\Models\Funding;
 use App\Modules\Repayments\Models\ReceivedRepayment;
 use App\Modules\Invoices\Models\Invoice;
 use App\Models\User;
+use App\Models\Agreement;
+use App\Models\AgreementTemplate;
 
 Route::get('/', function () {
     $locale = app()->getLocale();
@@ -47,7 +49,8 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         \Illuminate\Support\Facades\Mail::raw(
             "Contact form from {$data['name']} ({$data['email']}):\n\n{$data['message']}",
             function ($m) {
-                $m->to(config('mail.from.address'))->subject('Contact Form'); }
+                $m->to(config('mail.from.address'))->subject('Contact Form');
+            }
         );
     } catch (\Throwable $e) {
         // ignore mail failures in minimal setup
@@ -1022,7 +1025,15 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Invoices/Index');
     })->name('invoices.index');
     Route::get('/invoices/submit', function () {
-        return Inertia::render('Invoices/SubmitInvoice');
+        $supplier = \App\Models\Supplier::where('contact_email', auth()->user()->email)->first();
+        return Inertia::render('Invoices/SubmitInvoice', [
+            'templates' => AgreementTemplate::all(['id', 'name', 'version']),
+            'hasSignedAgreement' => Agreement::where('status', 'signed')
+                ->where('signer_id', auth()->id())
+                ->exists(),
+            'supplier_id' => $supplier?->id,
+            'buyers' => \App\Models\Buyer::all(['id', 'name']),
+        ]);
     })->name('invoices.submit');
     Route::get('/customers', function () {
         return Inertia::render('Customers/Index');
@@ -1615,7 +1626,8 @@ Route::middleware(['auth'])->group(function () {
 
         // Document Requests per supplier
         Route::get('/doc-requests', function () {
-            return Inertia::render('Admin/DocRequests'); })->name('admin.doc_requests');
+            return Inertia::render('Admin/DocRequests');
+        })->name('admin.doc_requests');
         Route::get('/api/doc-requests', function (Request $request) {
             $q = \App\Models\RequestedDocument::query();
             if ($sid = $request->query('supplier_id'))

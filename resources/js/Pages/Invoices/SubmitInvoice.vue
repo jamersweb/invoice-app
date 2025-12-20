@@ -5,7 +5,35 @@ import GradientButton from '@/Components/GradientButton.vue';
 import DarkInput from '@/Components/DarkInput.vue';
 import { ref } from 'vue';
 
+const props = defineProps<{
+    templates: Array<{ id: number; name: string; version: string }>;
+    hasSignedAgreement: boolean;
+    supplier_id: number | null;
+    buyers: Array<{ id: number; name: string }>;
+}>();
+
 const activeTab = ref<'supplier' | 'upload' | 'funding'>('supplier');
+
+const agreementForm = useForm({
+    template_id: null as number | null,
+});
+
+function signContract() {
+    // Find Master Agreement or just the first available template
+    const masterTemplate = props.templates.find(t => t.name.includes('Master')) || props.templates[0];
+    if (!masterTemplate) {
+        alert('No agreement templates available. Please contact support.');
+        return;
+    }
+
+    agreementForm.template_id = masterTemplate.id;
+    agreementForm.post(route('agreements.sign'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Success will be reflected in hasSignedAgreement prop via Inertia reload
+        },
+    });
+}
 
 const supplierForm = useForm({
     supplier_name: '',
@@ -15,7 +43,7 @@ const supplierForm = useForm({
 });
 
 const invoiceForm = useForm({
-    supplier_id: '',
+    supplier_id: props.supplier_id?.toString() || '',
     buyer_id: '',
     invoice_number: '',
     amount: '',
@@ -132,13 +160,18 @@ function submitInvoice() {
                                     <label class="block text-sm font-medium text-dark-text-secondary mb-2">Supplier
                                         ID</label>
                                     <DarkInput v-model="invoiceForm.supplier_id" type="number"
-                                        placeholder="Enter supplier ID" />
+                                        placeholder="Enter supplier ID" readonly class="opacity-70 cursor-not-allowed" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Buyer
-                                        ID</label>
-                                    <DarkInput v-model="invoiceForm.buyer_id" type="number"
-                                        placeholder="Enter buyer ID" />
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Buyer</label>
+                                    <select v-model="invoiceForm.buyer_id" 
+                                        class="input-dark w-full bg-dark-secondary border-dark-border text-white rounded-lg p-2.5 outline-none focus:border-purple-accent"
+                                        required>
+                                        <option value="">Select Buyer</option>
+                                        <option v-for="buyer in props.buyers" :key="buyer.id" :value="buyer.id">
+                                            {{ buyer.name }}
+                                        </option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-dark-text-secondary mb-2">Issue
@@ -194,10 +227,20 @@ function submitInvoice() {
                 <div v-if="activeTab === 'upload'" class="mt-6 pt-6 border-t border-dark-border">
                     <h3 class="text-lg font-semibold text-dark-text-primary mb-2">E-sign Contract</h3>
                     <div class="card bg-dark-secondary/50">
-                        <p class="text-sm text-dark-text-secondary mb-4">
-                            Once your invoice is uploaded, you can sign the funding agreement digitally.
-                        </p>
-                        <GradientButton size="md">Sign Contract</GradientButton>
+                        <div v-if="hasSignedAgreement" class="flex items-center gap-3 text-green-500">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="font-medium">Agreement Signed Successfully</span>
+                        </div>
+                        <template v-else>
+                            <p class="text-sm text-dark-text-secondary mb-4">
+                                Once your invoice is uploaded, you can sign the funding agreement digitally.
+                            </p>
+                            <GradientButton @click="signContract" :disabled="agreementForm.processing" size="md">
+                                {{ agreementForm.processing ? 'Signing...' : 'Sign Contract' }}
+                            </GradientButton>
+                        </template>
                     </div>
                 </div>
 
