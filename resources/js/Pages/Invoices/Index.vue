@@ -4,10 +4,10 @@ import { Head, Link } from '@inertiajs/vue3';
 import Badge from '@/Components/Badge.vue';
 import DarkInput from '@/Components/DarkInput.vue';
 import GradientButton from '@/Components/GradientButton.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
-defineProps<{
-    invoices?: Array<{
+const props = defineProps<{
+    invoices: Array<{
         id: number;
         invoice_number: string;
         customer_name?: string;
@@ -22,13 +22,14 @@ defineProps<{
 }>();
 
 const searchQuery = ref('');
-const dateRange = ref('');
 
-const invoices = [
-    { id: 1, invoice_number: 'INV-001', customer_name: 'John Doe', amount: 5000, paid: 5000, status: 'paid', payment_mode: 'Bank', due_date: '2024-12-01', created_at: '2024-11-01' },
-    { id: 2, invoice_number: 'INV-002', customer_name: 'Jane Smith', amount: 3200, paid: 1600, status: 'partially_paid', payment_mode: 'Card', due_date: '2024-12-15', created_at: '2024-11-05' },
-    { id: 3, invoice_number: 'INV-003', customer_name: 'Bob Johnson', amount: 7800, paid: 0, status: 'overdue', payment_mode: 'Bank', due_date: '2024-11-20', created_at: '2024-10-20' },
-];
+const filteredInvoices = computed(() => {
+    if (!searchQuery.value) return props.invoices;
+    const q = searchQuery.value.toLowerCase();
+    return props.invoices.filter(i => 
+        i.invoice_number.toLowerCase().includes(q)
+    );
+});
 
 function getStatusBadge(status: string) {
     const statusMap: Record<string, 'success' | 'warning' | 'danger'> = {
@@ -61,9 +62,6 @@ function formatCurrency(amount: number) {
                     <h1 class="text-2xl font-bold text-dark-text-primary">Invoices</h1>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="relative w-[199px]">
-                        <DarkInput v-model="dateRange" placeholder="Date Range" icon="calendar" class="!pr-10" />
-                    </div>
                     <Link :href="route('invoices.submit')">
                         <GradientButton size="md">New Invoice</GradientButton>
                     </Link>
@@ -86,41 +84,24 @@ function formatCurrency(amount: number) {
                     <table class="table-dark bg-none">
                         <thead>
                             <tr>
-                                <th class="w-12">
-                                    <input type="checkbox"
-                                        class="rounded border-dark-border bg-dark-secondary text-purple-accent focus:ring-purple-accent" />
-                                </th>
+                                <!-- Checkbox column removed -->
                                 <th class="w-24">ID</th>
-                                <th>Customer</th>
                                 <th>Created On</th>
                                 <th>Amount</th>
                                 <th>Paid</th>
                                 <th>Status</th>
                                 <th>Payment Mode</th>
                                 <th>Due Date</th>
-                                <th class="w-24">Actions</th>
+                                <th class="w-32 text-right px-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="invoice in invoices" :key="invoice.id">
-                                <td>
-                                    <input type="checkbox"
-                                        class="rounded border-dark-border bg-dark-secondary text-purple-accent focus:ring-purple-accent" />
+                            <tr v-for="invoice in filteredInvoices" :key="invoice.id">
+                                <!-- Checkbox column removed -->
+                                <td class="font-medium text-purple-accent">{{ invoice.invoice_number }}</td>
+                                <td class="text-dark-text-secondary">
+                                    {{ new Date(invoice.created_at).toLocaleDateString() }}
                                 </td>
-                                <td class="font-medium">{{ invoice.invoice_number }}</td>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="h-6 w-6 rounded-full bg-purple-accent flex items-center justify-center">
-                                            <span class="text-xs text-white font-medium">
-                                                {{ invoice.customer_name?.charAt(0) || 'U' }}
-                                            </span>
-                                        </div>
-                                        <span>{{ invoice.customer_name || 'Unknown' }}</span>
-                                    </div>
-                                </td>
-                                <td class="text-dark-text-secondary">{{ new
-                                    Date(invoice.created_at).toLocaleDateString() }}</td>
                                 <td>{{ formatCurrency(invoice.amount) }}</td>
                                 <td>{{ formatCurrency(invoice.paid) }}</td>
                                 <td>
@@ -129,31 +110,25 @@ function formatCurrency(amount: number) {
                                     </Badge>
                                 </td>
                                 <td class="text-dark-text-secondary">{{ invoice.payment_mode || 'N/A' }}</td>
-                                <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString()
-                                    }}</td>
-                                <td>
-                                    <div class="flex items-center gap-2">
-                                        <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
-                                                class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5"
-                                                    d="M8 1.333v13.334M1.333 8h13.334" />
+                                <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString() }}</td>
+                                <td class="px-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <Link :href="route('invoices.show', invoice.id)" 
+                                              class="p-1.5 hover:bg-dark-tertiary rounded transition-colors text-dark-text-secondary hover:text-purple-accent"
+                                              title="View">
+                                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                        </button>
-                                        <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
-                                                class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5"
-                                                    d="M11.333 2.667L5 9M11.333 2.667h-4v4h4v-4z" />
+                                        </Link>
+                                        <Link v-if="invoice.status === 'draft' || invoice.status === 'under_review'"
+                                              :href="route('invoices.edit', invoice.id)" 
+                                              class="p-1.5 hover:bg-dark-tertiary rounded transition-colors text-dark-text-secondary hover:text-purple-accent"
+                                              title="Edit">
+                                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                        </button>
-                                        <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
-                                                class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5"
-                                                    d="M2 4h12M6 8h4M4 12h8" />
-                                            </svg>
-                                        </button>
+                                        </Link>
                                     </div>
                                 </td>
                             </tr>
@@ -162,27 +137,26 @@ function formatCurrency(amount: number) {
                 </div>
 
                 <!-- Pagination -->
-                <div class="border-t border-dark-border px-4 py-3 flex items-center justify-between">
+                <div v-if="filteredInvoices.length > 0" class="border-t border-dark-border px-4 py-3 flex items-center justify-between bg-dark-secondary/10">
                     <div class="text-sm text-dark-text-secondary">
-                        Showing 1 to 10 of 50 results
+                        Showing {{ filteredInvoices.length }} of {{ props.invoices.length }} results
                     </div>
                     <div class="flex items-center gap-2">
                         <button
-                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
+                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors border border-dark-border">
                             Previous
                         </button>
-                        <button class="px-3 py-1.5 rounded-lg bg-purple-accent text-white text-sm">
+                        <button class="px-3 py-1.5 rounded-lg bg-purple-accent text-white text-sm font-medium">
                             1
                         </button>
                         <button
-                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
-                            2
-                        </button>
-                        <button
-                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors">
+                            class="px-3 py-1.5 rounded-lg bg-dark-secondary hover:bg-dark-tertiary text-dark-text-primary text-sm transition-colors border border-dark-border">
                             Next
                         </button>
                     </div>
+                </div>
+                <div v-else class="px-4 py-12 text-center text-dark-text-muted">
+                    No invoices found.
                 </div>
             </div>
         </div>
