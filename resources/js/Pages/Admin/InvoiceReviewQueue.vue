@@ -587,7 +587,7 @@ function formatDate(dateString: string | undefined) {
                         </div>
                         <div v-if="contractForm.template_id" class="space-y-2">
                              <div v-for="(val, key) in contractForm.variables" :key="key">
-                                <label class="block text-[10px] text-dark-text-secondary uppercase font-bold mb-1">{{ key.replace('_', ' ') }}</label>
+                                <label class="block text-[10px] text-dark-text-secondary uppercase font-bold mb-1">{{ String(key).replace('_', ' ') }}</label>
                                 <input v-model="contractForm.variables[key]" class="input-dark text-xs p-2 h-8" />
                             </div>
                         </div>

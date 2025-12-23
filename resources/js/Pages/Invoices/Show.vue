@@ -128,7 +128,7 @@ function formatCurrency(amount: any, currency = 'AED') {
                     <h3 class="text-sm font-semibold text-dark-text-primary mb-4">OCR Analysis Results</h3>
                     <div class="bg-dark-secondary/20 p-4 rounded-xl space-y-2">
                         <div v-for="(val, key) in invoiceData.ocr_data" :key="key" class="flex justify-between text-sm">
-                            <span class="text-dark-text-secondary capitalize">{{ key.replace('_', ' ') }}:</span>
+                            <span class="text-dark-text-secondary capitalize">{{ String(key).replace('_', ' ') }}:</span>
                             <span class="text-dark-text-primary font-medium">{{ val }}</span>
                         </div>
                     </div>

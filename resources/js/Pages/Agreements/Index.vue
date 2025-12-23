@@ -13,6 +13,7 @@ const props = defineProps<{
         status: string, 
         signed_at: string | null,
         signed_pdf: string | null,
+        document_type?: string,
         template?: { id: number, name: string }
     }> 
 }>();

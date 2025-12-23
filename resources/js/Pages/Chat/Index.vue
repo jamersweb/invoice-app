@@ -110,7 +110,7 @@
             </div>
 
             <div class="flex items-end gap-3 bg-slate-800/50 rounded-2xl border border-slate-700 p-2 focus-within:border-purple-500/50 transition-all">
-              <button type="button" @click="$refs.fileInput.click()" class="p-2 text-slate-400 hover:text-purple-400 rounded-xl hover:bg-purple-500/10 transition-colors">
+              <button type="button" @click="fileInput?.click()" class="p-2 text-slate-400 hover:text-purple-400 rounded-xl hover:bg-purple-500/10 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
@@ -176,6 +176,7 @@ const sending = ref(false);
 const starting = ref(false);
 const selectedFiles = ref<File[]>([]);
 const messagesBox = ref<HTMLElement | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
 // Watch for prop changes (e.g. after redirect from start)
 watch(() => props.selectedId, (newId) => {

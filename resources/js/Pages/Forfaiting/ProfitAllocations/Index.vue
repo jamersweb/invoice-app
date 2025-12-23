@@ -177,6 +177,7 @@ interface Transaction {
   id: number;
   transaction_number: string;
   customer: string;
+  net_amount: number;
 }
 
 interface ProfitAllocation {

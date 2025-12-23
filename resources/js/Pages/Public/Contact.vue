@@ -46,23 +46,23 @@ function submit() { form.post('/contact'); }
                   class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-300"
                   for="name">Your Name *</label><input
                   class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                  id="name" placeholder="John Smith" required="" value=""></div>
+                  id="name" placeholder="John Smith" required value=""></div>
               <div class="space-y-2" bis_skin_checked="1"><label
                   class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-300"
                   for="email">Email Address *</label><input type="email"
                   class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                  id="email" placeholder="john@company.com" required="" value=""></div>
+                  id="email" placeholder="john@company.com" required value=""></div>
             </div>
             <div class="space-y-2" bis_skin_checked="1"><label
                 class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-300"
                 for="subject">Subject *</label><input
                 class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                id="subject" placeholder="How can we help you?" required="" value=""></div>
+                id="subject" placeholder="How can we help you?" required value=""></div>
             <div class="space-y-2" bis_skin_checked="1"><label
                 class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-300"
                 for="message">Message *</label><textarea
                 class="flex min-h-[60px] w-full rounded-md border px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                id="message" placeholder="Please provide details about your inquiry..." required="" rows="6"></textarea>
+                id="message" placeholder="Please provide details about your inquiry..." required rows="6"></textarea>
             </div>
             <div class="flex justify-end pt-4" bis_skin_checked="1"><button
                 class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 shadow h-9 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"

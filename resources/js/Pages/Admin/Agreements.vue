@@ -18,7 +18,7 @@ import {
     ClockIcon,
     TagIcon,
     LinkIcon
-} from '@heroicons/vue/24/outline';
+} from '@heroicons/vue/24/outline/index.js';
 
 const props = defineProps<{
     templates: any[];
