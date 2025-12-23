@@ -98,6 +98,28 @@ const paymentStats = computed(() => ({
                 </div>
             </div>
 
+            <!-- Pending Actions Alert -->
+            <div v-if="store.pendingContracts > 0" 
+                class="relative overflow-hidden rounded-2xl bg-indigo-500/10 border border-indigo-500/20 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top duration-500"
+            >
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-2xl">
+                        ✍️
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-indigo-100 italic">Action Required: Pending Contracts</h3>
+                        <p class="text-sm text-indigo-300/80">You have {{ store.pendingContracts }} agreement(s) waiting for your digital signature.</p>
+                    </div>
+                </div>
+                <Link :href="route('agreements.index')" 
+                    class="px-6 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20 whitespace-nowrap"
+                >
+                    Review & Sign Now
+                </Link>
+                <!-- Decorative background light -->
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full"></div>
+            </div>
+
             <!-- KPIs -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <KpiCard v-for="(k, i) in kpis" :key="i" :title="k.title" :value="k.value" :icon="k.icon"

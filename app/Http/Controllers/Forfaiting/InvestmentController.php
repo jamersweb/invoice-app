@@ -23,24 +23,36 @@ class InvestmentController extends Controller
             $query->where('name', $request->investor);
         }
 
-        $investments = $query->orderBy('date', 'desc')->paginate(20);
+        $investments = $query->with('transaction')->orderBy('date', 'desc')->paginate(20);
+
+        $investors = \App\Models\User::role(['Investor', 'Supplier'])->get(['id', 'name']);
+        $transactions = \App\Models\Transaction::all(['id', 'transaction_number']);
 
         return Inertia::render('Forfaiting/Investments/Index', [
             'investments' => $investments,
+            'investors' => $investors,
+            'transactions' => $transactions,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'investor_id' => 'nullable|exists:users,id',
+            'transaction_id' => 'nullable|exists:transactions,id',
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0.01',
             'currency' => 'required|string|max:3',
             'date' => 'required|date',
+            'status' => 'required|in:Pending,Confirmed,Active,Completed',
             'notes' => 'nullable|string',
         ]);
 
         $investment = Investment::create($validated);
+
+        if ($investment->status === 'Confirmed') {
+            (new \App\Services\AppNotificationService())->notifyInvestmentConfirmed($investment);
+        }
 
         AuditEvent::create([
             'actor_type' => \App\Models\User::class,
@@ -59,7 +71,7 @@ class InvestmentController extends Controller
     public function destroy(Investment $investment)
     {
         $oldData = $investment->toArray();
-        
+
         AuditEvent::create([
             'actor_type' => \App\Models\User::class,
             'actor_id' => auth()->id(),
@@ -79,17 +91,17 @@ class InvestmentController extends Controller
     public function export(Request $request)
     {
         $investments = Investment::all();
-        
+
         $filename = 'investments_' . now()->format('Y-m-d') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() use ($investments) {
+        $callback = function () use ($investments) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['ID', 'Name', 'Amount', 'Currency', 'Date', 'Notes', 'Created At']);
-            
+
             foreach ($investments as $investment) {
                 fputcsv($file, [
                     $investment->id,

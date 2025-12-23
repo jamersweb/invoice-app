@@ -215,12 +215,23 @@
         </div>
       </div>
     </div>
+
+    <DarkConfirmModal 
+        :show="showDeleteModal"
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone."
+        confirm-text="Delete"
+        type="danger"
+        @close="showDeleteModal = false"
+        @confirm="confirmDeletion"
+    />
   </AuthenticatedLayout>
 </template>
 
 <script setup lang="ts">
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import DarkConfirmModal from '@/Components/DarkConfirmModal.vue';
 import { ref, computed } from 'vue';
 
 interface Expense {
@@ -251,6 +262,8 @@ const props = defineProps<Props>();
 
 const isFormOpen = ref(false);
 const editingExpense = ref<Expense | null>(null);
+const showDeleteModal = ref(false);
+const expenseToDelete = ref<number | null>(null);
 
 const form = useForm({
   category: '',
@@ -340,11 +353,20 @@ const updateStatus = (id: number, status: string) => {
 };
 
 const deleteExpense = (id: number) => {
-  if (confirm('Are you sure you want to delete this expense?')) {
-    router.delete(route('forfaiting.expenses.destroy', id), {
-      preserveScroll: true,
-    });
-  }
+  expenseToDelete.value = id;
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = () => {
+    if (expenseToDelete.value) {
+        router.delete(route('forfaiting.expenses.destroy', expenseToDelete.value), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                expenseToDelete.value = null;
+            }
+        });
+    }
 };
 
 const formatCurrency = (value: number) => {

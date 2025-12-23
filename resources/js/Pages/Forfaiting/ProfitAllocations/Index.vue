@@ -19,9 +19,18 @@
                 <p class="text-slate-400 mt-1">Calculate and track investor profit distributions</p>
               </div>
             </div>
-            <div class="flex gap-3">
-              <button @click="recalculateAllocations" :disabled="isRecalculating"
-                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col">
+                <label class="text-[10px] text-slate-500 uppercase font-bold mb-1">Target Deal</label>
+                <select v-model="selectedTx" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white text-sm min-w-[200px]">
+                  <option :value="null">Select a Deal...</option>
+                  <option v-for="tx in transactions" :key="tx.id" :value="tx.id">
+                    {{ tx.transaction_number }} - {{ tx.customer }}
+                  </option>
+                </select>
+              </div>
+              <button @click="recalculateAllocations" :disabled="isRecalculating || !selectedTx"
+                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 self-end">
                 <svg v-if="isRecalculating" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,8 +175,8 @@ import { ref, computed } from 'vue';
 
 interface Transaction {
   id: number;
-  transaction_number: number;
-  net_amount: number;
+  transaction_number: string;
+  customer: string;
 }
 
 interface ProfitAllocation {
@@ -192,6 +201,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const isRecalculating = ref(false);
+const selectedTx = ref<number | null>(null);
 
 const filters = ref({
   investor: 'all',
@@ -250,14 +260,17 @@ const investorSummary = computed(() => {
 });
 
 const recalculateAllocations = () => {
+  if (!selectedTx.value) return;
+  
   isRecalculating.value = true;
   router.post(
     route('forfaiting.profit-allocations.recalculate'),
-    {},
+    { transaction_id: selectedTx.value },
     {
       preserveScroll: true,
       onFinish: () => {
         isRecalculating.value = false;
+        selectedTx.value = null; // Reset after calculation
       },
     }
   );

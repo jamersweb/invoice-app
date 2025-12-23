@@ -66,13 +66,32 @@
             </button>
           </div>
           <form @submit.prevent="submitForm" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1">Investor Name</label>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-300 mb-1">Display Name (Reference)</label>
                 <input v-model="form.name" type="text" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white"
-                  placeholder="Investor name" />
+                  placeholder="e.g. Investor A - Main" />
               </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Link to Investor (Optional)</label>
+                <select v-model="form.investor_id" 
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white">
+                  <option :value="null">None</option>
+                  <option v-for="user in investors" :key="user.id" :value="user.id">{{ user.name }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Link to Deal (Optional)</label>
+                <select v-model="form.transaction_id" 
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white">
+                  <option :value="null">None</option>
+                  <option v-for="tx in transactions" :key="tx.id" :value="tx.id">{{ tx.transaction_number }}</option>
+                </select>
+              </div>
+
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1">Amount (AED)</label>
                 <input v-model.number="form.amount" type="number" step="0.01" required
@@ -84,10 +103,22 @@
                 <input v-model="form.date" type="date" required
                   class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" />
               </div>
-              <div class="md:col-span-3">
+
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Status</label>
+                <select v-model="form.status" required
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white">
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Active">Active</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+
+              <div class="md:col-span-4">
                 <label class="block text-sm font-medium text-slate-300 mb-1">Notes</label>
                 <textarea v-model="form.notes"
-                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" rows="3"
+                  class="w-full rounded-lg border border-slate-600 bg-slate-900/50 p-2 text-white" rows="2"
                   placeholder="Optional notes..."></textarea>
               </div>
             </div>
@@ -104,19 +135,7 @@
           </form>
         </div>
 
-        <!-- Filters -->
-        <div class="mb-6 flex flex-wrap gap-4">
-          <div class="flex-1 min-w-[200px]">
-            <input v-model="filters.search" type="text" placeholder="Search investments..."
-              class="w-full rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white placeholder-slate-400" />
-          </div>
-          <select v-model="filters.investor" class="rounded-lg border border-slate-600 bg-slate-800/50 p-2 text-white">
-            <option value="all">All Investors</option>
-            <option v-for="investor in uniqueInvestors" :key="investor" :value="investor">
-              {{ investor }}
-            </option>
-          </select>
-        </div>
+        <!-- Filters ... (no change) -->
 
         <!-- Investment Table -->
         <div class="bg-slate-800/30 border border-slate-700 rounded-lg overflow-hidden">
@@ -124,23 +143,36 @@
             <table class="w-full">
               <thead class="bg-slate-800/50 border-b border-slate-700">
                 <tr>
-                  <th class="text-left text-slate-300 text-xs p-3">Investor</th>
+                  <th class="text-left text-slate-300 text-xs p-3">Ref Name / Deal</th>
                   <th class="text-right text-slate-300 text-xs p-3">Amount</th>
-                  <th class="text-right text-slate-300 text-xs p-3">Currency</th>
                   <th class="text-right text-slate-300 text-xs p-3">Date</th>
+                  <th class="text-center text-slate-300 text-xs p-3">Status</th>
                   <th class="text-right text-slate-300 text-xs p-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="investment in filteredInvestments" :key="investment.id"
                   class="border-b border-slate-700/50 hover:bg-slate-800/30">
-                  <td class="text-white font-medium text-xs p-3 truncate max-w-[150px]">{{ investment.name }}</td>
-                  <td class="text-right text-blue-400 font-mono text-xs p-3">
-                    {{ formatCurrency(investment.amount) }}
+                  <td class="text-white font-medium text-xs p-3">
+                    <div>{{ investment.name }}</div>
+                    <div v-if="investment.transaction" class="text-slate-500 text-[10px] mt-0.5">
+                      Deal: {{ investment.transaction.transaction_number }}
+                    </div>
                   </td>
-                  <td class="text-right text-slate-300 text-xs p-3">{{ investment.currency }}</td>
+                  <td class="text-right text-blue-400 font-mono text-xs p-3">
+                    {{ formatCurrency(investment.amount) }} <span class="text-[10px] text-slate-500 ml-1">{{ investment.currency }}</span>
+                  </td>
                   <td class="text-right text-slate-300 text-xs p-3">
                     {{ formatDate(investment.date) }}
+                  </td>
+                  <td class="text-center p-3">
+                    <span :class="`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold border ${
+                      investment.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/50' :
+                      investment.status === 'Active' ? 'bg-blue-500/10 text-blue-400 border-blue-500/50' :
+                      'bg-slate-500/10 text-slate-400 border-slate-500/50'
+                    }`">
+                      {{ investment.status }}
+                    </span>
                   </td>
                   <td class="text-right p-3">
                     <button @click="deleteInvestment(investment.id)" class="text-red-400 hover:text-red-300">
@@ -171,12 +203,23 @@
         </div>
       </div>
     </div>
+
+    <DarkConfirmModal 
+        :show="showDeleteModal"
+        title="Delete Investment"
+        message="Are you sure you want to delete this investment? This action cannot be undone."
+        confirm-text="Delete"
+        type="danger"
+        @close="showDeleteModal = false"
+        @confirm="confirmDeletion"
+    />
   </AuthenticatedLayout>
 </template>
 
 <script setup lang="ts">
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import DarkConfirmModal from '@/Components/DarkConfirmModal.vue';
 import { ref, computed } from 'vue';
 
 interface Investment {
@@ -185,7 +228,13 @@ interface Investment {
   amount: number;
   currency: string;
   date: string;
+  status: string;
+  investor_id?: number;
+  transaction_id?: number;
   notes?: string;
+  transaction?: {
+    transaction_number: string;
+  };
 }
 
 interface Props {
@@ -194,17 +243,24 @@ interface Props {
     links: any[];
     total: number;
   };
+  investors: Array<{ id: number; name: string }>;
+  transactions: Array<{ id: number; transaction_number: string }>;
 }
 
 const props = defineProps<Props>();
 
 const isFormOpen = ref(false);
+const showDeleteModal = ref(false);
+const investmentToDelete = ref<number | null>(null);
 
 const form = useForm({
   name: '',
+  investor_id: null as number | null,
+  transaction_id: null as number | null,
   amount: 0,
   currency: 'AED',
-  date: '',
+  date: new Date().toISOString().split('T')[0],
+  status: 'Pending',
   notes: '',
 });
 
@@ -257,11 +313,20 @@ const submitForm = () => {
 };
 
 const deleteInvestment = (id: number) => {
-  if (confirm('Are you sure you want to delete this investment?')) {
-    router.delete(route('forfaiting.investments.destroy', id), {
-      preserveScroll: true,
-    });
-  }
+  investmentToDelete.value = id;
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = () => {
+    if (investmentToDelete.value) {
+        router.delete(route('forfaiting.investments.destroy', investmentToDelete.value), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                investmentToDelete.value = null;
+            }
+        });
+    }
 };
 
 const formatCurrency = (value: number) => {

@@ -12,7 +12,7 @@ const props = defineProps<{
     buyers: Array<{ id: number; name: string }>;
 }>();
 
-const activeTab = ref<'upload'>('upload');
+const activeTab = ref<'upload' | 'bank'>('upload');
 
 // signContract function removed as per request
 
@@ -32,14 +32,21 @@ const invoiceForm = useForm({
     due_date: '',
     issue_date: '',
     description: '',
-    file: null as File | null,
+    files: [] as File[],
+    bank_account_name: '',
+    bank_name: '',
+    bank_branch: '',
+    bank_iban: '',
+    bank_swift: '',
 });
 
 // fundingForm removed as per request
 
 function onFile(e: Event) {
     const t = e.target as HTMLInputElement;
-    invoiceForm.file = t.files?.[0] ?? null;
+    if (t.files) {
+        invoiceForm.files = Array.from(t.files);
+    }
 }
 
 function submitInvoice() {
@@ -74,6 +81,14 @@ function submitInvoice() {
                             : 'text-dark-text-secondary hover:text-dark-text-primary'
                     ]">
                         Upload Invoice
+                    </button>
+                    <button @click="activeTab = 'bank'" :class="[
+                        'px-4 py-2 text-sm font-medium transition-colors',
+                        activeTab === 'bank'
+                            ? 'text-purple-accent border-b-2 border-purple-accent'
+                            : 'text-dark-text-secondary hover:text-dark-text-primary'
+                    ]">
+                        Bank Details
                     </button>
                     <!-- Manual Funding tab removed as per request -->
                 </div>
@@ -130,25 +145,65 @@ function submitInvoice() {
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Upload Invoice
-                                    File</label>
-                                <input @change="onFile" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                                    class="input-dark !py-2 !px-3 text-smfile:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-accent/20 file:text-purple-accent hover:file:bg-purple-accent/30" />
+                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Upload Invoice Files</label>
+                                <input @change="onFile" type="file" multiple accept=".pdf,.jpg,.jpeg,.png"
+                                    class="input-dark !py-2 !px-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-accent/20 file:text-purple-accent hover:file:bg-purple-accent/30" />
+                                
+                                <div v-if="invoiceForm.files.length > 0" class="mt-3 space-y-2">
+                                    <p class="text-xs font-semibold text-purple-accent">Selected Files:</p>
+                                    <div v-for="(f, i) in invoiceForm.files" :key="i" class="flex items-center justify-between p-2 bg-dark-secondary/50 rounded-lg border border-dark-border">
+                                        <span class="text-xs text-dark-text-primary">{{ f.name }}</span>
+                                        <span class="text-[10px] text-dark-text-muted">{{ (f.size / 1024).toFixed(1) }} KB</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="mt-6 flex justify-end gap-4">
-                            <button type="button" class="btn-secondary">Cancel</button>
+                            <button type="button" class="btn-secondary" @click="activeTab = 'bank'">Next: Bank Details</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bank Details Tab -->
+                <div v-if="activeTab === 'bank'" class="space-y-6">
+                    <h3 class="text-lg font-semibold text-dark-text-primary mb-4">Bank Details</h3>
+
+                    <form @submit.prevent="submitInvoice">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-dark-text-secondary mb-2">Account Name</label>
+                                <DarkInput v-model="invoiceForm.bank_account_name" placeholder="Enter account name" />
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Bank</label>
+                                    <DarkInput v-model="invoiceForm.bank_name" placeholder="Enter bank name" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">Branch</label>
+                                    <DarkInput v-model="invoiceForm.bank_branch" placeholder="Enter branch name" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">IBAN</label>
+                                    <DarkInput v-model="invoiceForm.bank_iban" placeholder="Enter IBAN" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-dark-text-secondary mb-2">SWIFT</label>
+                                    <DarkInput v-model="invoiceForm.bank_swift" placeholder="Enter SWIFT code" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end gap-4">
+                            <button type="button" class="btn-secondary" @click="activeTab = 'upload'">Back</button>
                             <GradientButton type="submit" :disabled="invoiceForm.processing">
                                 Save Invoice
                             </GradientButton>
                         </div>
                     </form>
                 </div>
-
-                <!-- E-sign section removed as per request -->
-
-                <!-- Add Manual Funding section removed as per request -->
             </div>
         </div>
     </AuthenticatedLayout>

@@ -231,12 +231,23 @@
         </div>
       </div>
     </div>
+
+    <DarkConfirmModal 
+        :show="showDeleteModal"
+        title="Delete Transaction"
+        message="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirm-text="Delete"
+        type="danger"
+        @close="showDeleteModal = false"
+        @confirm="confirmDeletion"
+    />
   </AuthenticatedLayout>
 </template>
 
 <script setup lang="ts">
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import DarkConfirmModal from '@/Components/DarkConfirmModal.vue';
 import { ref, computed } from 'vue';
 
 interface Transaction {
@@ -265,6 +276,8 @@ const props = defineProps<Props>();
 
 const isFormOpen = ref(false);
 const editingTransaction = ref<Transaction | null>(null);
+const showDeleteModal = ref(false);
+const transactionToDelete = ref<number | null>(null);
 
 const form = useForm({
   transaction_number: '',
@@ -357,11 +370,20 @@ const submitForm = () => {
 };
 
 const deleteTransaction = (id: number) => {
-  if (confirm('Are you sure you want to delete this transaction?')) {
-    router.delete(route('forfaiting.transactions.destroy', id), {
-      preserveScroll: true,
-    });
-  }
+  transactionToDelete.value = id;
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = () => {
+    if (transactionToDelete.value) {
+        router.delete(route('forfaiting.transactions.destroy', transactionToDelete.value), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                transactionToDelete.value = null;
+            }
+        });
+    }
 };
 
 const formatCurrency = (value: number) => {

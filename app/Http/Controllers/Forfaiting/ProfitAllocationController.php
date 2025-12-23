@@ -66,40 +66,19 @@ class ProfitAllocationController extends Controller
         return redirect()->back()->with('success', 'Profit allocation created successfully');
     }
 
-    public function recalculate(Request $request)
+    public function recalculate(Request $request, \App\Services\ProfitAllocationService $service)
     {
         $transactionId = $request->input('transaction_id');
-        
+
         if ($transactionId) {
-            $transaction = Transaction::findOrFail($transactionId);
-            $totalProfit = ($transaction->net_amount * $transaction->profit_margin / 100) - ($transaction->disbursement_charges ?? 0);
-            
-            // Get all investments to calculate percentages
-            $investments = Investment::all();
-            $totalPrincipal = $investments->sum('amount');
-            
-            // Delete existing allocations for this transaction
-            ProfitAllocation::where('transaction_id', $transactionId)->delete();
-            
-            // Create new allocations based on investment proportions
-            foreach ($investments as $investment) {
-                if ($totalPrincipal > 0) {
-                    $percentage = ($investment->amount / $totalPrincipal) * 100;
-                    $individualProfit = ($totalProfit * $percentage) / 100;
-                    
-                    ProfitAllocation::create([
-                        'transaction_id' => $transactionId,
-                        'investor_name' => $investment->name,
-                        'individual_profit' => $individualProfit,
-                        'profit_percentage' => $percentage,
-                        'deal_status' => $transaction->status === 'Ended' ? 'Ended' : 'Ongoing',
-                        'allocation_date' => now(),
-                    ]);
-                }
+            $success = $service->calculateAndAllocate($transactionId);
+
+            if (!$success) {
+                return redirect()->back()->with('error', 'Failed to calculate profit allocation. Check investments.');
             }
         }
 
-        return redirect()->back()->with('success', 'Profit allocations recalculated successfully');
+        return redirect()->back()->with('success', 'Profit allocations recalculated successfully based on: Incoming - Outgoing - Expenses');
     }
 }
 

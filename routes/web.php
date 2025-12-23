@@ -14,6 +14,15 @@ use App\Models\User;
 use App\Models\Agreement;
 use App\Models\AgreementTemplate;
 
+use App\Http\Controllers\ChatController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/start', [ChatController::class, 'start'])->name('chat.start');
+    Route::get('/chat/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chat/{conversation}/messages', [ChatController::class, 'store'])->name('chat.store');
+});
+
 Route::get('/', function () {
     $locale = app()->getLocale();
     $blocks = \App\Models\CmsBlock::query()
@@ -317,6 +326,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
                 'outstanding' => $outstanding,
                 'overdue' => $overdue,
             ],
+            'pending_contracts' => \App\Models\Agreement::where('signer_id', auth()->id())->where('status', 'Sent')->count(),
             'series' => $series,
         ]);
     })->name('api.dashboard.metrics');
@@ -1063,6 +1073,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/invoices/{id}', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{id}/edit', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'edit'])->name('invoices.edit');
     Route::put('/invoices/{id}', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'update'])->name('invoices.update');
+    Route::delete('/invoices/{id}/attachments/{attachmentId}', [\App\Modules\Invoices\Controllers\InvoicesController::class, 'deleteAttachment'])->name('invoices.attachments.destroy');
     Route::get('/customers', function () {
         return Inertia::render('Customers/Index');
     })->name('customers.index');
@@ -1233,6 +1244,13 @@ Route::middleware('guest')->group(function () {
 // KYC/KYB Onboarding Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/onboarding/kyc', function () {
+        $user = auth()->user();
+        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+
+        if ($supplier && in_array($supplier->kyb_status, ['approved', 'under_review'])) {
+            return redirect()->route('supplier.kyc.status');
+        }
+
         return Inertia::render('Onboarding/KycKybForm');
     })->name('onboarding.kyc');
 
@@ -1287,17 +1305,20 @@ Route::middleware(['auth'])->group(function () {
 
         // Handle document uploads
         if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
-                $path = $file->store('documents', 'public');
+            foreach ($request->file('documents') as $typeId => $files) {
+                $fileArray = is_array($files) ? $files : [$files];
+                foreach ($fileArray as $file) {
+                    $path = $file->store('documents', 'public');
 
-                \App\Models\Document::create([
-                    'document_type_id' => 1, // Default document type
-                    'owner_type' => 'App\Models\Supplier',
-                    'owner_id' => $supplier->id,
-                    'supplier_id' => $supplier->id,
-                    'status' => 'pending_review',
-                    'file_path' => $path,
-                ]);
+                    \App\Models\Document::create([
+                        'document_type_id' => $typeId,
+                        'owner_type' => 'App\Models\Supplier',
+                        'owner_id' => $supplier->id,
+                        'supplier_id' => $supplier->id,
+                        'status' => 'pending_review',
+                        'file_path' => $path,
+                    ]);
+                }
             }
         }
 
@@ -1325,7 +1346,7 @@ Route::middleware(['auth'])->group(function () {
         $user = auth()->user();
         $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
 
-        return response()->json(['supplier' => $supplier]);
+        return response()->json(['supplier' => $supplier?->setAppends(['completion_percentage'])]);
     })->name('api.supplier.profile');
 
     Route::get('/api/v1/supplier/documents', function () {
@@ -1342,6 +1363,24 @@ Route::middleware(['auth'])->group(function () {
 
         return response()->json(['documents' => $documents]);
     })->name('api.supplier.documents');
+
+    Route::get('/api/v1/supplier/documents/{id}/download', function ($id) {
+        $user = auth()->user();
+        $document = \App\Models\Document::findOrFail($id);
+
+        // Basic authorization check
+        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        if (!$supplier || $document->supplier_id !== $supplier->id) {
+            abort(403);
+        }
+
+        $path = storage_path('app/public/' . $document->file_path);
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path);
+    })->name('api.supplier.documents.download');
 
     Route::get('/api/v1/supplier/export', function (Request $request) {
         $user = auth()->user();
@@ -1682,22 +1721,22 @@ Route::middleware(['auth'])->group(function () {
         })->name('admin.api.doc_requests.resolve');
 
         // Admin Banking
-        Route::get('/admin/bank', [\App\Http\Controllers\Admin\BankController::class, 'index'])->name('admin.bank');
-        Route::put('/admin/api/bank/{id}', [\App\Http\Controllers\Admin\BankController::class, 'update'])->name('admin.api.bank.update');
+        Route::get('/bank', [\App\Http\Controllers\Admin\BankController::class, 'index'])->name('admin.bank');
+        Route::put('/api/bank/{id}', [\App\Http\Controllers\Admin\BankController::class, 'update'])->name('admin.api.bank.update');
 
         // Admin Funding Logs
-        Route::get('/admin/funding-logs', [\App\Http\Controllers\Admin\FundingLogsController::class, 'index'])->name('admin.funding-logs');
-        Route::post('/admin/api/funding-logs', [\App\Http\Controllers\Admin\FundingLogsController::class, 'store'])->name('admin.api.funding-logs');
-        Route::get('/admin/api/funding-logs/export', [\App\Http\Controllers\Admin\FundingLogsController::class, 'export'])->name('admin.api.funding-logs.export');
+        Route::get('/funding-logs', [\App\Http\Controllers\Admin\FundingLogsController::class, 'index'])->name('admin.funding-logs');
+        Route::post('/api/funding-logs', [\App\Http\Controllers\Admin\FundingLogsController::class, 'store'])->name('admin.api.funding-logs');
+        Route::get('/api/funding-logs/export', [\App\Http\Controllers\Admin\FundingLogsController::class, 'export'])->name('admin.api.funding-logs.export');
 
         // Admin Audit Log
-        Route::get('/admin/audit-log', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.audit-log');
-        Route::get('/admin/api/audit-log/{id}', [\App\Http\Controllers\Admin\AuditLogController::class, 'show'])->name('admin.api.audit-log.show');
-        Route::get('/admin/api/audit-log/export', [\App\Http\Controllers\Admin\AuditLogController::class, 'export'])->name('admin.api.audit-log.export');
+        Route::get('/audit-log', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.audit-log');
+        Route::get('/api/audit-log/{id}', [\App\Http\Controllers\Admin\AuditLogController::class, 'show'])->name('admin.api.audit-log.show');
+        Route::get('/api/audit-log/export', [\App\Http\Controllers\Admin\AuditLogController::class, 'export'])->name('admin.api.audit-log.export');
 
         // Buyers CRUD
-        Route::get('/admin/buyers', [\App\Http\Controllers\Admin\BuyerController::class, 'index'])->name('admin.buyers');
-        Route::get('/admin/api/buyers', function (Request $request) {
+        Route::get('/buyers', [\App\Http\Controllers\Admin\BuyerController::class, 'index'])->name('admin.buyers');
+        Route::get('/api/buyers', function (Request $request) {
             $query = \App\Models\Buyer::query();
             if ($search = $request->query('search')) {
                 $query->where('name', 'like', "%{$search}%");
@@ -1707,53 +1746,54 @@ Route::middleware(['auth'])->group(function () {
             }
             return response()->json($query->orderBy('name')->paginate(20));
         })->name('admin.api.buyers.index');
-        Route::post('/admin/api/buyers', [\App\Http\Controllers\Admin\BuyerController::class, 'store'])->name('admin.api.buyers.store');
-        Route::put('/admin/api/buyers/{buyer}', [\App\Http\Controllers\Admin\BuyerController::class, 'update'])->name('admin.api.buyers.update');
-        Route::delete('/admin/api/buyers/{buyer}', [\App\Http\Controllers\Admin\BuyerController::class, 'destroy'])->name('admin.api.buyers.delete');
+        Route::post('/api/buyers', [\App\Http\Controllers\Admin\BuyerController::class, 'store'])->name('admin.api.buyers.store');
+        Route::put('/api/buyers/{buyer}', [\App\Http\Controllers\Admin\BuyerController::class, 'update'])->name('admin.api.buyers.update');
+        Route::delete('/api/buyers/{buyer}', [\App\Http\Controllers\Admin\BuyerController::class, 'destroy'])->name('admin.api.buyers.delete');
 
         // Risk Grades CRUD
-        Route::get('/admin/risk-grades', [\App\Http\Controllers\Admin\RiskGradeController::class, 'index'])->name('admin.risk-grades');
-        Route::get('/admin/api/risk-grades', function () {
+        Route::get('/risk-grades', [\App\Http\Controllers\Admin\RiskGradeController::class, 'index'])->name('admin.risk-grades');
+        Route::get('/api/risk-grades', function () {
             return response()->json(\App\Models\RiskGrade::orderBy('sort_order')->orderBy('code')->paginate(50));
         })->name('admin.api.risk-grades.index');
-        Route::post('/admin/api/risk-grades', [\App\Http\Controllers\Admin\RiskGradeController::class, 'store'])->name('admin.api.risk-grades.store');
-        Route::put('/admin/api/risk-grades/{riskGrade}', [\App\Http\Controllers\Admin\RiskGradeController::class, 'update'])->name('admin.api.risk-grades.update');
-        Route::delete('/admin/api/risk-grades/{riskGrade}', [\App\Http\Controllers\Admin\RiskGradeController::class, 'destroy'])->name('admin.api.risk-grades.delete');
+        Route::post('/api/risk-grades', [\App\Http\Controllers\Admin\RiskGradeController::class, 'store'])->name('admin.api.risk-grades.store');
+        Route::put('/api/risk-grades/{riskGrade}', [\App\Http\Controllers\Admin\RiskGradeController::class, 'update'])->name('admin.api.risk-grades.update');
+        Route::delete('/api/risk-grades/{riskGrade}', [\App\Http\Controllers\Admin\RiskGradeController::class, 'destroy'])->name('admin.api.risk-grades.delete');
 
         // Invoice Review Queue
-        Route::get('/admin/invoice-review', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'index'])->name('admin.invoice-review');
-        Route::get('/admin/api/invoice-review/queue', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'queue'])->name('admin.api.invoice-review.queue');
-        Route::post('/admin/api/invoice-review/{invoice}/claim', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'claim'])->name('admin.api.invoice-review.claim');
-        Route::post('/admin/api/invoice-review/{invoice}/approve', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'approve'])->name('admin.api.invoice-review.approve');
-        Route::post('/admin/api/invoice-review/{invoice}/reject', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'reject'])->name('admin.api.invoice-review.reject');
-        Route::post('/admin/api/invoice-review/{invoice}/dispute-note', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'addDisputeNote'])->name('admin.api.invoice-review.dispute-note');
-        Route::post('/admin/api/invoice-review/{invoice}/write-off', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'writeOff'])->name('admin.api.invoice-review.write-off');
+        Route::get('/invoice-review', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'index'])->name('admin.invoice-review');
+        Route::get('/api/invoice-review/queue', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'queue'])->name('admin.api.invoice-review.queue');
+        Route::post('/api/invoice-review/{invoice}/claim', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'claim'])->name('admin.api.invoice-review.claim');
+        Route::post('/api/invoice-review/{invoice}/approve', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'approve'])->name('admin.api.invoice-review.approve');
+        Route::post('/api/invoice-review/{invoice}/reject', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'reject'])->name('admin.api.invoice-review.reject');
+        Route::post('/api/invoice-review/{invoice}/dispute-note', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'addDisputeNote'])->name('admin.api.invoice-review.dispute-note');
+        Route::post('/api/invoice-review/{invoice}/write-off', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'writeOff'])->name('admin.api.invoice-review.write-off');
+        Route::delete('/api/invoice-review/{invoice}', [\App\Http\Controllers\Admin\InvoiceReviewController::class, 'destroy'])->name('admin.api.invoice-review.delete');
 
         // User/Role Management
-        Route::get('/admin/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('admin.users');
-        Route::get('/admin/api/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'users'])->name('admin.api.users.index');
-        Route::get('/admin/api/users/roles', [\App\Http\Controllers\Admin\UserManagementController::class, 'roles'])->name('admin.api.users.roles');
-        Route::get('/admin/api/users/permissions', [\App\Http\Controllers\Admin\UserManagementController::class, 'permissions'])->name('admin.api.users.permissions');
-        Route::post('/admin/api/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('admin.api.users.store');
-        Route::put('/admin/api/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('admin.api.users.update');
-        Route::delete('/admin/api/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('admin.api.users.delete');
+        Route::get('/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('admin.users');
+        Route::get('/api/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'users'])->name('admin.api.users.index');
+        Route::get('/api/users/roles', [\App\Http\Controllers\Admin\UserManagementController::class, 'roles'])->name('admin.api.users.roles');
+        Route::get('/api/users/permissions', [\App\Http\Controllers\Admin\UserManagementController::class, 'permissions'])->name('admin.api.users.permissions');
+        Route::post('/api/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('admin.api.users.store');
+        Route::put('/api/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('admin.api.users.update');
+        Route::delete('/api/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('admin.api.users.delete');
 
         // Exports
-        Route::get('/admin/api/exports/invoices', function (Request $request) {
+        Route::get('/api/exports/invoices', function (Request $request) {
             $service = new \App\Services\ExportService();
             $format = $request->query('format', 'excel');
             $filters = $request->only(['status', 'supplier_id', 'buyer_id', 'from_date', 'to_date']);
             $filepath = $service->exportInvoices($filters, $format);
             return response()->download(storage_path('app/public/' . $filepath));
         })->name('admin.api.exports.invoices');
-        Route::get('/admin/api/exports/fundings', function (Request $request) {
+        Route::get('/api/exports/fundings', function (Request $request) {
             $service = new \App\Services\ExportService();
             $format = $request->query('format', 'excel');
             $filters = $request->only(['status', 'from_date', 'to_date']);
             $filepath = $service->exportFundings($filters, $format);
             return response()->download(storage_path('app/public/' . $filepath));
         })->name('admin.api.exports.fundings');
-        Route::get('/admin/api/exports/repayments', function (Request $request) {
+        Route::get('/api/exports/repayments', function (Request $request) {
             $service = new \App\Services\ExportService();
             $format = $request->query('format', 'excel');
             $filters = $request->only(['buyer_id', 'from_date', 'to_date']);
@@ -1762,13 +1802,26 @@ Route::middleware(['auth'])->group(function () {
         })->name('admin.api.exports.repayments');
 
         // Supplier Statements
-        Route::get('/admin/api/statements/{supplier}', function (\App\Models\Supplier $supplier, Request $request) {
+        Route::get('/api/statements/{supplier}', function (\App\Models\Supplier $supplier, Request $request) {
             $service = new \App\Services\StatementGeneratorService();
             $from = $request->date('from');
             $to = $request->date('to');
             $filepath = $service->generateStatement($supplier, $from, $to);
             return response()->download(storage_path('app/public/' . $filepath));
         })->name('admin.api.statements.generate');
+
+        // Agreements/Contracts
+        Route::get('/agreements', [\App\Http\Controllers\Admin\AgreementController::class, 'index'])->name('admin.agreements');
+        Route::prefix('api/agreements')->group(function () {
+            Route::get('/list', [\App\Http\Controllers\Admin\AgreementController::class, 'list'])->name('admin.api.agreements.list');
+            Route::get('/templates', [\App\Http\Controllers\Admin\AgreementController::class, 'templates'])->name('admin.api.agreements.templates');
+            Route::get('/supplier-invoices/{supplier}', [\App\Http\Controllers\Admin\AgreementController::class, 'getSupplierInvoices'])->name('admin.api.agreements.supplier_invoices');
+            Route::post('/generate', [\App\Http\Controllers\Admin\AgreementController::class, 'generateFromInvoice'])->name('admin.api.agreements.generate');
+            Route::post('/upload', [\App\Http\Controllers\Admin\AgreementController::class, 'upload'])->name('admin.api.agreements.upload');
+            Route::post('/{agreement}/send', [\App\Http\Controllers\Admin\AgreementController::class, 'send'])->name('admin.api.agreements.send');
+            Route::get('/status/{invoice}', [\App\Http\Controllers\Admin\AgreementController::class, 'status'])->name('admin.api.agreements.status');
+            Route::delete('/{agreement}', [\App\Http\Controllers\Admin\AgreementController::class, 'destroy'])->name('admin.api.agreements.delete');
+        });
     });
 });
 

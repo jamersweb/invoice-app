@@ -16,13 +16,23 @@ class GenerateAgreementPdf implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public Agreement $agreement) {}
+    public function __construct(public Agreement $agreement)
+    {
+    }
 
     public function handle(): void
     {
         $template = AgreementTemplate::findOrFail($this->agreement->agreement_template_id);
-        $pdf = PDF::loadHTML($template->html);
-        $path = 'agreements/'.$this->agreement->id.'-draft.pdf';
+        $html = $template->html;
+
+        // Replace variables if present
+        if ($this->agreement->terms_snapshot_json) {
+            $service = new \App\Services\ContractService();
+            $html = $service->processTemplate($html, $this->agreement->terms_snapshot_json);
+        }
+
+        $pdf = PDF::loadHTML($html);
+        $path = 'agreements/' . $this->agreement->id . '-draft.pdf';
         Storage::disk('public')->put($path, $pdf->output());
         $this->agreement->update(['signed_pdf' => $path]);
     }

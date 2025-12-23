@@ -52,6 +52,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'Supplier' => [
                 'submit_invoices', 'view_offers', 'accept_offers', 'view_statements'
             ],
+            'Investor' => [
+                'view_offers', 'view_statements'
+            ],
         ];
 
         foreach ($roles as $roleName => $rolePermissions) {

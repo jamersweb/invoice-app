@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 interface Props {
-  file: File;
+  file: any;
   maxWidth?: number;
   maxHeight?: number;
 }
@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'close': [];
-  'download': [file: File];
+  'download': [file: any];
 }>();
 
 const previewRef = ref<HTMLDivElement>();
@@ -32,6 +32,7 @@ const isPdf = computed(() => fileType.value === 'pdf');
 const isDocument = computed(() => ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(fileType.value || ''));
 
 const formatFileSize = (bytes: number): string => {
+  if (!bytes) return 'N/A';
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -40,25 +41,35 @@ const formatFileSize = (bytes: number): string => {
 };
 
 const createPreviewUrl = () => {
-  if (isImage.value) {
-    previewUrl.value = URL.createObjectURL(props.file);
-    isLoading.value = false;
-  } else if (isPdf.value) {
-    previewUrl.value = URL.createObjectURL(props.file);
+  if (props.file instanceof File) {
+    if (isImage.value || isPdf.value) {
+      previewUrl.value = URL.createObjectURL(props.file);
+      isLoading.value = false;
+    } else {
+      error.value = 'Preview not available for this file type';
+      isLoading.value = false;
+    }
+  } else if (props.file.url) {
+    // For server files, we already have the URL
+    previewUrl.value = props.file.url;
     isLoading.value = false;
   } else {
-    error.value = 'Preview not available for this file type';
+    error.value = 'File reference not found';
     isLoading.value = false;
   }
 };
 
 const handleDownload = () => {
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(props.file);
-  link.download = props.file.name;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  if (props.file instanceof File) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(props.file);
+    link.download = props.file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else if (props.file.id) {
+    window.open(`/api/v1/supplier/documents/${props.file.id}/download`, '_blank');
+  }
   emit('download', props.file);
 };
 

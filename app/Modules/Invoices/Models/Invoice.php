@@ -36,6 +36,11 @@ class Invoice extends Model
         return $this->hasMany(\App\Modules\Funding\Models\Funding::class);
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(\App\Models\InvoiceAttachment::class, 'invoice_id');
+    }
+
     protected $fillable = [
         'user_id',
         'supplier_id',
@@ -44,6 +49,8 @@ class Invoice extends Model
         'amount',
         'currency',
         'due_date',
+        'issue_date',
+        'description',
         'repayment_parts',
         'repayment_interval_days',
         'extra_percentage',
@@ -65,11 +72,17 @@ class Invoice extends Model
         'written_off_by',
         'write_off_reason',
         'priority',
+        'bank_account_name',
+        'bank_name',
+        'bank_branch',
+        'bank_iban',
+        'bank_swift',
     ];
 
     protected $casts = [
         'ocr_data' => 'array',
         'due_date' => 'date',
+        'issue_date' => 'date',
         'funded_date' => 'date',
         'amount' => 'decimal:2',
         'funded_amount' => 'decimal:2',

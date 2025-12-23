@@ -16,8 +16,13 @@ class InvoiceSubmissionService
     {
         return DB::transaction(function () use ($data) {
             $path = null;
-            if (isset($data['file'])) {
-                $path = Storage::disk(config('filesystems.default'))->putFile('invoices', $data['file']);
+            $files = $data['files'] ?? [];
+            if (!is_array($files) && isset($data['file'])) {
+                $files = [$data['file']];
+            }
+
+            if (!empty($files)) {
+                $path = Storage::disk('public')->putFile('invoices', $files[0]);
             }
 
             $toleranceLow = (float) $data['amount'] * 0.95;
@@ -34,10 +39,20 @@ class InvoiceSubmissionService
             $payload = $data;
             $payload['file_path'] = $path;
             $payload['is_duplicate_flag'] = $isDuplicate;
-            $payload['status'] = 'draft';
+            $payload['status'] = 'under_review';
 
             /** @var Invoice $invoice */
             $invoice = Invoice::create($payload);
+
+            foreach ($files as $file) {
+                // Skip the first one if we already saved it manually for the legacy column, 
+                // but actually it's better to save ALL in attachments.
+                $filePath = Storage::disk('public')->putFile('invoices', $file);
+                $invoice->attachments()->create([
+                    'file_path' => $filePath,
+                    'file_name' => $file->getClientOriginalName(),
+                ]);
+            }
 
             AuditEvent::create([
                 'actor_type' => 'user',

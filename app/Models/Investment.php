@@ -11,10 +11,13 @@ class Investment extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'investor_id',
+        'transaction_id',
         'name',
         'amount',
         'currency',
         'date',
+        'status',
         'notes',
     ];
 
@@ -22,5 +25,15 @@ class Investment extends Model
         'amount' => 'decimal:2',
         'date' => 'date',
     ];
+
+    public function investor()
+    {
+        return $this->belongsTo(User::class, 'investor_id');
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
+    }
 }
 

@@ -30,6 +30,31 @@ const isSupplier = computed(() => {
 });
 
 
+interface Investment {
+  id: number;
+  name: string;
+  amount: number;
+  currency: string;
+  date: string;
+  status: string;
+  investor_id?: number;
+  transaction_id?: number;
+  notes?: string;
+  transaction?: {
+    transaction_number: string;
+  };
+}
+
+interface Props {
+  investments: {
+    data: Investment[];
+    links: any[];
+    total: number;
+  };
+  investors: Array<{id: number, name: string}>;
+  transactions: Array<{id: number, transaction_number: string}>;
+}
+
 interface NavItem {
     name: string;
     href: string;
@@ -44,6 +69,9 @@ const navigation: NavItem[] = [
     // Main navigation - Dashboard link will be set dynamically based on role
     { name: 'Dashboard', href: '', icon: '📊', section: 'main' },
     { name: 'Invoices', href: 'invoices.index', icon: '🧾', section: 'main' },
+    { name: 'KYC', href: 'onboarding.kyc', icon: '🪪', section: 'main' },
+    { name: 'Chat', href: 'chat.index', icon: '💬', section: 'main' },
+    { name: 'Agreements', href: 'agreements.index', icon: '📜', section: 'main' },
 
 
     // Admin routes - organized as shown in images
@@ -58,10 +86,10 @@ const navigation: NavItem[] = [
     { name: 'Leads', href: 'admin.leads', icon: '🧲', section: 'admin', dot: true },
     { name: 'Doc Requests', href: 'admin.doc_requests', icon: '📥', section: 'admin', dot: true },
     { name: 'Agreement Templates', href: 'admin.agreements.templates', icon: '📄', section: 'admin' },
+    { name: 'Admin Agreements', href: 'admin.agreements', icon: '📜', section: 'admin' },
     { name: 'Banking', href: 'bank.index', icon: '🏦', section: 'admin' },
     { name: 'Funding Logs', href: 'admin.funding-logs', icon: '💵', section: 'admin' },
     { name: 'Audit Log', href: 'admin.audit-log', icon: '📋', section: 'admin' },
-    { name: 'Agreements', href: 'agreements.index', icon: '📜', section: 'admin' },
 
     // Forfaiting routes - grouped separately
     { name: 'Dashboard', href: 'forfaiting.dashboard', icon: '📈', section: 'forfaiting' },
@@ -277,9 +305,6 @@ function currentRoute(routeName: string) {
                 <div class="flex flex-1 gap-x-2 sm:gap-x-4 self-stretch lg:gap-x-6">
                     <!-- Breadcrumb -->
                     <div class="flex flex-1 items-center">
-                        <nav class="flex items-center space-x-2 text-sm">
-                            <span class="text-dark-text-muted">Dashboard</span>
-                        </nav>
                     </div>
 
                     <!-- Actions Container -->

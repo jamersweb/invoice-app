@@ -45,7 +45,7 @@ const form = useForm({
   contact_phone: '',
 
   // Step 4: Documents
-  documents: [] as File[],
+  documents: [] as (File | any)[],
 
   // Additional KYC data
   kyc_data: {} as Record<string, any>
@@ -135,26 +135,40 @@ const goToStep = (step: number) => {
 
 // Document upload
 const documentTypes = ref([
-  { id: 1, name: 'Business License', required: true, description: 'Official business license document' },
-  { id: 2, name: 'Tax Registration Certificate', required: true, description: 'Tax registration certificate' },
-  { id: 3, name: 'Articles of Incorporation', required: false, description: 'Articles of incorporation or similar' },
-  { id: 4, name: 'Bank Statement', required: false, description: 'Recent bank statement (last 3 months)' },
-  { id: 5, name: 'Financial Statements', required: false, description: 'Annual financial statements' }
+  { id: 1, name: 'Trade License / Business License', required: true, description: 'Official trade or business license document' },
+  { id: 2, name: 'Memorandum of Association', required: true, description: 'MOA or equivalent (e.g., Articles of Association)' },
+  { id: 3, name: 'Owner ID (Passport/EID)', required: true, description: 'Identity document of the owner or authorized signatory' },
+  { id: 4, name: 'Bank Letter / Statement', required: true, description: 'Official bank letter or recent bank statement' },
+  { id: 5, name: 'Tax Registration Certificate', required: false, description: 'VAT/Tax registration certificate if applicable' }
 ]);
 
-const uploadedDocuments = ref<Record<number, File[]>>({});
+const uploadedDocuments = ref<Record<number, (File | any)[]>>({
+  1: [], 2: [], 3: [], 4: [], 5: []
+});
 const documentNotes = ref<Record<number, string>>({});
 
-const handleDocumentUpload = (documentTypeId: number, files: File[]) => {
-  uploadedDocuments.value[documentTypeId] = files;
-  form.documents = Object.values(uploadedDocuments.value).flat();
+const isLocalFile = (file: any): file is File => {
+  return typeof File !== 'undefined' && file instanceof File;
 };
 
-const removeDocument = (documentTypeId: number, index: number) => {
+const handleDocumentUpload = (documentTypeId: number, files: (File | any)[]) => {
+  uploadedDocuments.value[documentTypeId] = files;
+  // We only send NEW files in the 'documents' array for actual upload
+  // Existing files are already on the server
+  form.documents = Object.values(uploadedDocuments.value).flat().filter(f => isLocalFile(f));
+};
+
+const removeDocument = (documentTypeId: number, index: number, isExisting: boolean) => {
   const arr = uploadedDocuments.value[documentTypeId] || [];
+  const removedFile = arr[index];
   arr.splice(index, 1);
   uploadedDocuments.value[documentTypeId] = arr;
-  form.documents = Object.values(uploadedDocuments.value).flat();
+  form.documents = Object.values(uploadedDocuments.value).flat().filter(f => isLocalFile(f));
+
+  if (isExisting) {
+    // Optionally alert the server or mark for deletion
+    console.log('Document marked for removal:', removedFile.id);
+  }
 };
 
 // Progress calculation
@@ -175,6 +189,16 @@ const industries = [
 // Submit form
 const submitForm = () => {
   if (validateStep(4)) {
+    // Collect only NEW documents
+    const newDocuments: Record<number, File[]> = {};
+    Object.entries(uploadedDocuments.value).forEach(([typeId, files]) => {
+      const newFiles = files.filter(f => isLocalFile(f));
+      if (newFiles.length > 0) {
+        newDocuments[Number(typeId)] = newFiles;
+      }
+    });
+
+    form.documents = newDocuments as any;
     form.kyc_data = { ...(form.kyc_data || {}), document_notes: documentNotes.value } as any;
     form.post('/api/v1/supplier/kyc/submit', {
       onSuccess: () => {
@@ -199,19 +223,45 @@ onMounted(() => {
     })
     .catch(() => { });
 
-  // Load KYB checklist
+  // Load existing documents
+  fetch('/api/v1/supplier/documents')
+    .then(res => res.json())
+    .then(data => {
+      if (data.documents && Array.isArray(data.documents)) {
+        data.documents.forEach((doc: any) => {
+          // Transform for UI: add name if missing
+          const transformedDoc = {
+            ...doc,
+            name: doc.name || `Document_${doc.id}`,
+            url: `/storage/${doc.file_path}` // Standard path
+          };
+          
+          const currentDocs = uploadedDocuments.value[doc.document_type_id] || [];
+          uploadedDocuments.value[doc.document_type_id] = [...currentDocs, transformedDoc];
+        });
+      }
+    })
+    .catch(() => { });
+
+  // Load KYB checklist rules if available
   fetch('/api/v1/me/kyb/checklist')
     .then(res => res.json())
     .then(payload => {
       const rules = payload?.data || [];
-      const ruleById = new Map();
-      rules.forEach((r: any) => ruleById.set(r.document_type_id, { is_required: !!r.is_required, expires_in_days: r.expires_in_days ?? null }));
-      documentTypes.value = documentTypes.value.map(dt => {
-        const rule = ruleById.get(dt.id);
-        if (!rule) return dt;
-        const exp = rule.expires_in_days ? ` — expires every ${rule.expires_in_days} days` : '';
-        return { ...dt, required: rule.is_required, description: (dt.description || '') + exp };
-      });
+      if (rules.length > 0) {
+        const ruleById = new Map();
+        rules.forEach((r: any) => ruleById.set(r.document_type_id, r));
+        
+        documentTypes.value.forEach(dt => {
+          const rule = ruleById.get(dt.id);
+          if (rule) {
+            dt.required = !!rule.is_required;
+            if (rule.document_type) dt.name = rule.document_type;
+            const exp = rule.expires_in_days ? ` — expires every ${rule.expires_in_days} days` : '';
+            dt.description = (dt.description || '') + exp;
+          }
+        });
+      }
     })
     .catch(() => { });
 });
@@ -390,7 +440,7 @@ onMounted(() => {
               :uploaded-files="uploadedDocuments[docType.id] || []" :max-files="3"
               :accepted-types="['.pdf', '.jpg', '.jpeg', '.png']"
               @files-uploaded="(files) => handleDocumentUpload(docType.id, files)"
-              @file-removed="(index) => removeDocument(docType.id, index)"
+              @file-removed="(index, isExisting) => removeDocument(docType.id, index, isExisting)"
               @version-note="(note) => (documentNotes[docType.id] = note)" />
           </div>
 

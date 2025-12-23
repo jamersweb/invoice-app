@@ -13,9 +13,8 @@ const props = defineProps<{
         customer_name?: string;
         customer_avatar?: string;
         amount: number;
-        paid: number;
+        currency: string;
         status: string;
-        payment_mode?: string;
         due_date: string;
         created_at: string;
     }>;
@@ -41,10 +40,10 @@ function getStatusBadge(status: string) {
     return statusMap[status] || 'info';
 }
 
-function formatCurrency(amount: number) {
+function formatCurrency(amount: number, currencyCode: string = 'AED') {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'USD',
+        currency: currencyCode || 'AED',
         minimumFractionDigits: 0,
     }).format(amount);
 }
@@ -84,51 +83,26 @@ function formatCurrency(amount: number) {
                     <table class="table-dark bg-none">
                         <thead>
                             <tr>
-                                <!-- Checkbox column removed -->
                                 <th class="w-24">ID</th>
                                 <th>Created On</th>
                                 <th>Amount</th>
-                                <th>Paid</th>
                                 <th>Status</th>
-                                <th>Payment Mode</th>
                                 <th>Due Date</th>
                                 <th class="w-32 text-right px-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="invoice in filteredInvoices" :key="invoice.id">
-                                <!-- Checkbox column removed -->
                                 <td class="font-medium text-purple-accent">{{ invoice.invoice_number }}</td>
                                 <td class="text-dark-text-secondary">
                                     {{ new Date(invoice.created_at).toLocaleDateString() }}
                                 </td>
-<<<<<<< HEAD
-=======
-                                <td class="font-medium">{{ invoice.invoice_number }}</td>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="h-6 w-6 rounded-full bg-purple-accent flex items-center justify-center">
-                                            <span class="text-xs text-white font-medium">
-                                                {{ invoice.customer_name?.charAt(0) || 'U' }}
-                                            </span>
-                                        </div>
-                                        <span class="truncate max-w-[150px] sm:max-w-[200px]">{{ invoice.customer_name
-                                            || 'Unknown' }}</span>
-                                    </div>
-                                </td>
-                                <td class="text-dark-text-secondary">{{ new
-                                    Date(invoice.created_at).toLocaleDateString() }}</td>
->>>>>>> f7fcee6785bbb3d0cb36068d84f4317b2a212f60
-                                <td>{{ formatCurrency(invoice.amount) }}</td>
-                                <td>{{ formatCurrency(invoice.paid) }}</td>
+                                <td>{{ formatCurrency(invoice.amount, invoice.currency) }}</td>
                                 <td>
                                     <Badge :variant="getStatusBadge(invoice.status)">
                                         {{ invoice.status.replace('_', ' ').toUpperCase() }}
                                     </Badge>
                                 </td>
-                                <td class="text-dark-text-secondary">{{ invoice.payment_mode || 'N/A' }}</td>
-<<<<<<< HEAD
                                 <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString() }}</td>
                                 <td class="px-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
@@ -138,17 +112,6 @@ function formatCurrency(amount: number) {
                                             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-=======
-                                <td class="text-dark-text-secondary">{{ new Date(invoice.due_date).toLocaleDateString()
-                                }}</td>
-                                <td>
-                                    <div class="flex items-center gap-2">
-                                        <button class="p-1.5 hover:bg-dark-tertiary rounded transition-colors">
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"
-                                                class="text-dark-text-secondary">
-                                                <path stroke="currentColor" stroke-width="1.5"
-                                                    d="M8 1.333v13.334M1.333 8h13.334" />
->>>>>>> f7fcee6785bbb3d0cb36068d84f4317b2a212f60
                                             </svg>
                                         </Link>
                                         <Link v-if="invoice.status === 'draft' || invoice.status === 'under_review'"

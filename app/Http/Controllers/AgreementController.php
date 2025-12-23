@@ -15,13 +15,29 @@ use Illuminate\Support\Facades\Storage;
 
 class AgreementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): Response
     {
+        $user = auth()->user();
         $templates = AgreementTemplate::all(['id','name','version']);
-        $agreements = Agreement::latest()->get(['id','agreement_template_id','version','status','signed_at']);
+        
+        $agreementsQuery = Agreement::with('template:id,name')->latest();
+        
+        if (!$user->hasAnyRole(['Admin', 'Analyst'])) {
+            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            
+            $agreementsQuery->where(function($q) use ($user, $supplier) {
+                $q->where('signer_id', $user->id);
+                if ($supplier) {
+                    $q->orWhere('supplier_id', $supplier->id);
+                }
+            });
+            
+            // Also include agreements where status is not draft
+            $agreementsQuery->where('status', '!=', 'draft');
+        }
+
+        $agreements = $agreementsQuery->get(['id','agreement_template_id','version','status','signed_at', 'signed_pdf', 'document_type']);
+        
         return Inertia::render('Agreements/Index', compact('templates','agreements'));
     }
 
@@ -76,10 +92,10 @@ class AgreementController extends Controller
     public function sign(Request $request): RedirectResponse
     {
         $request->validate([
-            'template_id' => ['required','exists:agreement_templates,id']
+            'template_id' => ['nullable', 'exists:agreement_templates,id'],
+            'agreement_id' => ['nullable', 'exists:agreements,id']
         ]);
 
-        // Check if supplier is KYB approved before allowing agreement signing
         $user = auth()->user();
         $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
 
@@ -94,22 +110,33 @@ class AgreementController extends Controller
             }
         }
 
-        $template = AgreementTemplate::findOrFail($request->input('template_id'));
-        $agreement = Agreement::create([
-            'agreement_template_id' => $template->id,
-            'version' => $template->version,
-            'status' => 'signed',
-            'signer_id' => auth()->id() ?? 0,
-            'signed_at' => now(),
-            'terms_snapshot_json' => ['name' => $template->name, 'version' => $template->version],
-        ]);
+        $service = app(\App\Services\ContractService::class);
 
-        $pdf = PDF::loadHTML($template->html);
-        $path = 'agreements/'.$agreement->id.'-signed.pdf';
-        // Ensure target directory exists
-        Storage::disk('public')->makeDirectory('agreements');
-        $pdf->save(storage_path('app/public/'.$path));
-        $agreement->update(['signed_pdf' => $path]);
+        if ($request->filled('agreement_id')) {
+            $agreement = Agreement::findOrFail($request->input('agreement_id'));
+            if ($agreement->signer_id !== $user->id && !$user->hasRole('Admin')) {
+                abort(403);
+            }
+            $service->sign($agreement);
+        } else if ($request->filled('template_id')) {
+            $template = AgreementTemplate::findOrFail($request->input('template_id'));
+            $agreement = Agreement::create([
+                'agreement_template_id' => $template->id,
+                'version' => $template->version,
+                'status' => 'Signed',
+                'signer_id' => auth()->id() ?? 0,
+                'signed_at' => now(),
+                'terms_snapshot_json' => ['name' => $template->name, 'version' => $template->version],
+            ]);
+
+            $pdf = PDF::loadHTML($template->html);
+            $path = 'agreements/'.$agreement->id.'-signed.pdf';
+            Storage::disk('public')->makeDirectory('agreements');
+            $pdf->save(storage_path('app/public/'.$path));
+            $agreement->update(['signed_pdf' => $path]);
+        } else {
+            return back()->withErrors(['error' => 'Either template_id or agreement_id is required.']);
+        }
 
         // Audit signer identity
         \App\Models\AuditEvent::create([
@@ -122,11 +149,10 @@ class AgreementController extends Controller
                 'ip' => $request->ip(),
                 'ua' => $request->userAgent(),
                 'signed_at' => now()->toISOString(),
-                'template' => ['id' => $template->id, 'version' => $template->version],
             ],
         ]);
 
-        return back()->with('success','Agreement signed');
+        return back()->with('success', 'Agreement signed');
     }
 
     public function send(Request $request): RedirectResponse

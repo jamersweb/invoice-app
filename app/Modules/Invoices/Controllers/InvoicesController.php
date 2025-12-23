@@ -44,7 +44,6 @@ class InvoicesController extends Controller
         $invoice = $service->submit(array_merge(
             $request->validated(),
             [
-                'file' => $request->file('file'),
                 'supplier_id' => $supplier->id, // Force current user's supplier ID
                 'user_id' => $user->id // Link to specific user
             ]
@@ -127,11 +126,7 @@ class InvoicesController extends Controller
 
     public function show($id)
     {
-        $invoice = \App\Modules\Invoices\Models\Invoice::with(['buyer'])->findOrFail($id);
-
-        if ($invoice->user_id !== auth()->id()) {
-            abort(403, "User ID " . auth()->id() . " does not match Invoice User ID " . $invoice->user_id);
-        }
+        $invoice = \App\Modules\Invoices\Models\Invoice::with(['buyer', 'attachments'])->findOrFail($id);
 
         $this->authorize('view', $invoice);
 
@@ -142,7 +137,7 @@ class InvoicesController extends Controller
 
     public function edit($id)
     {
-        $invoice = \App\Modules\Invoices\Models\Invoice::findOrFail($id);
+        $invoice = \App\Modules\Invoices\Models\Invoice::with(['attachments'])->findOrFail($id);
         $this->authorize('update', $invoice);
 
         if ($invoice->status !== 'draft' && $invoice->status !== 'under_review') {
@@ -172,17 +167,50 @@ class InvoicesController extends Controller
             'due_date' => ['required', 'date'],
             'issue_date' => ['nullable', 'date'],
             'description' => ['nullable', 'string'],
+            'bank_account_name' => ['nullable', 'string', 'max:191'],
+            'bank_name' => ['nullable', 'string', 'max:191'],
+            'bank_branch' => ['nullable', 'string', 'max:191'],
+            'bank_iban' => ['nullable', 'string', 'max:191'],
+            'bank_swift' => ['nullable', 'string', 'max:191'],
         ]);
 
-        if ($request->hasFile('file')) {
-            $path = \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->putFile('invoices', $request->file('file'));
-            $validated['file_path'] = $path;
+        if ($request->hasFile('files')) {
+            $files = $request->file('files');
+            if (is_array($files) && count($files) > 0) {
+                // Update legacy path with the first file
+                $path = \Illuminate\Support\Facades\Storage::disk('public')->putFile('invoices', $files[0]);
+                $validated['file_path'] = $path;
+
+                // Add to attachments
+                foreach ($files as $file) {
+                    $filePath = \Illuminate\Support\Facades\Storage::disk('public')->putFile('invoices', $file);
+                    $invoice->attachments()->create([
+                        'file_path' => $filePath,
+                        'file_name' => $file->getClientOriginalName(),
+                    ]);
+                }
+            }
         }
 
         $invoice->update($validated);
 
         return redirect()->route('invoices.index')
             ->with('success', 'Invoice updated successfully.');
+    }
+    
+    public function deleteAttachment($id, $attachmentId)
+    {
+        $invoice = \App\Modules\Invoices\Models\Invoice::findOrFail($id);
+        $this->authorize('update', $invoice);
+
+        $attachment = $invoice->attachments()->findOrFail($attachmentId);
+
+        // Delete file from storage
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->file_path);
+
+        $attachment->delete();
+
+        return back()->with('success', 'Attachment removed successfully.');
     }
 }
 

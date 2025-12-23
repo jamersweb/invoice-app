@@ -55,9 +55,27 @@ class InvoiceReviewController extends Controller
         }
 
         $query->orderBy('created_at');
-        $invoices = $query->with(['supplier', 'buyer'])->paginate(20);
+        $invoices = $query->with(['supplier:id,company_name,legal_name,contact_email', 'buyer:id,name', 'attachments'])->paginate(20);
 
         return response()->json($invoices);
+    }
+
+    public function destroy(Invoice $invoice)
+    {
+        abort_unless(auth()->user()?->hasRole('Admin'), 403);
+        
+        $invoice->delete();
+        
+        AuditEvent::create([
+            'actor_type' => \App\Models\User::class,
+            'actor_id' => auth()->id(),
+            'entity_type' => Invoice::class,
+            'entity_id' => $invoice->id,
+            'action' => 'invoice_deleted',
+            'diff_json' => ['invoice_number' => $invoice->invoice_number],
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     public function claim(Invoice $invoice)

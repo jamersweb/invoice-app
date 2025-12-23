@@ -52,6 +52,7 @@ class HandleInertiaRequests extends Middleware
                 'supplier' => $user && $user->hasRole('Supplier')
                     ? \App\Models\Supplier::where('contact_email', $user->email)->first()
                     : null,
+                'ip' => $request->ip(),
             ],
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),

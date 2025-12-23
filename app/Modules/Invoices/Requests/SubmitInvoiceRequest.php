@@ -20,7 +20,16 @@ class SubmitInvoiceRequest extends FormRequest
             'amount' => ['required', 'numeric', 'min:0.01'],
             'currency' => ['required', 'string', 'size:3'],
             'due_date' => ['required', 'date', 'after:today'],
-            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'issue_date' => ['nullable', 'date'],
+            'description' => ['nullable', 'string'],
+            'file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'files' => ['nullable', 'array'],
+            'files.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'bank_account_name' => ['nullable', 'string', 'max:191'],
+            'bank_name' => ['nullable', 'string', 'max:191'],
+            'bank_branch' => ['nullable', 'string', 'max:191'],
+            'bank_iban' => ['nullable', 'string', 'max:191'],
+            'bank_swift' => ['nullable', 'string', 'max:191'],
         ];
     }
 }

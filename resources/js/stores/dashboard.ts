@@ -34,6 +34,7 @@ export const useDashboardStore = defineStore('dashboard', {
     series: null as SeriesItem[] | null,
     paymentStats: null as PaymentStats | null,
     overview: null as OverviewItem[] | null,
+    pendingContracts: 0 as number,
     error: null as string | null,
   }),
   actions: {
@@ -50,6 +51,7 @@ export const useDashboardStore = defineStore('dashboard', {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         this.kpis = data.kpis;
+        this.pendingContracts = data.pending_contracts || 0;
         this.series = data.series || [];
       } catch (e: any) {
         this.error = e?.message || 'Failed to load';
