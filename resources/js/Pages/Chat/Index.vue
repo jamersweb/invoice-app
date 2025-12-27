@@ -35,7 +35,7 @@
                 <span class="text-[10px] opacity-60">{{ formatTime(chat.last_message_at) }}</span>
               </div>
               <p class="text-xs truncate opacity-70">
-                {{ chat.messages?.[0]?.message || 'No messages yet' }}
+                {{ chat.latest_message?.message || 'No messages yet' }}
               </p>
             </div>
           </button>
@@ -162,7 +162,7 @@ import axios from 'axios';
 
 const page = usePage();
 const currentUser = computed(() => (page.props.auth as any).user);
-const isAdmin = computed(() => (currentUser.value.roles || []).some((r: any) => r.name === 'Admin'));
+const isAdmin = computed(() => (currentUser.value?.roles || []).some((r: any) => r.name === 'Admin'));
 
 const props = defineProps<{
   conversations: any[];

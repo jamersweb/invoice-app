@@ -17,9 +17,7 @@ class ChatController extends Controller
               $query = ChatConversation::with([
                      'customer',
                      'admin',
-                     'messages' => function ($q) {
-                            $q->latest()->limit(1);
-                     }
+                     'latestMessage'
               ]);
 
               if ($user->hasRole('Admin')) {
