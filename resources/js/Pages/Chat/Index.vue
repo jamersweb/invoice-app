@@ -27,11 +27,11 @@
               : 'border-transparent text-slate-400 hover:bg-slate-800/50'"
           >
             <div class="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center ring-2 ring-slate-700">
-              {{ (isAdmin ? chat.customer.name : chat.admin.name).charAt(0) }}
+              {{ (isAdmin ? (chat.customer?.name || 'Unknown') : (chat.admin?.name || 'Support')).charAt(0) }}
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex justify-between items-center mb-0.5">
-                <span class="font-semibold truncate">{{ isAdmin ? chat.customer.name : chat.admin.name }}</span>
+                <span class="font-semibold truncate">{{ isAdmin ? (chat.customer?.name || 'Unknown User') : (chat.admin?.name || 'Support Agent') }}</span>
                 <span class="text-[10px] opacity-60">{{ formatTime(chat.last_message_at) }}</span>
               </div>
               <p class="text-xs truncate opacity-70">
@@ -87,7 +87,7 @@
               </div>
             </div>
             <span class="text-[10px] text-slate-500 mt-1 px-1">
-              {{ msg.sender_id === currentUser.id ? 'You' : msg.sender.name }} • {{ formatTime(msg.created_at) }}
+              {{ msg.sender_id === currentUser.id ? 'You' : (msg.sender?.name || 'Unknown') }} • {{ formatTime(msg.created_at) }}
             </span>
           </div>
         </div>
@@ -190,7 +190,7 @@ const conversationTitle = computed(() => {
   if (!selectedId.value) return '';
   const chat = props.conversations.find(c => c.id === selectedId.value);
   if (!chat) return '';
-  return isAdmin.value ? chat.customer.name : chat.admin.name;
+  return isAdmin.value ? (chat.customer?.name || 'Unknown User') : (chat.admin?.name || 'Support Agent');
 });
 
 const selectConversation = async (chat: any) => {
