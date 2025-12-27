@@ -160,14 +160,7 @@ const paymentStats = computed(() => ({
                 </div>
             </div>
 
-            <!-- Overview List -->
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <OverviewList :title="t?.overview_title || 'Quick Overview'" :items="[
-                    { title: t?.overview_new_invoices || 'New invoices today', value: 12, icon: '🧾', status: 'success' },
-                    { title: t?.overview_kyb_pending || 'KYB pending', value: 7, icon: '🪪', status: 'warning' },
-                    { title: t?.overview_funding_approvals || 'Funding approvals', value: 4, icon: '✅', status: 'info' },
-                ]" />
-            </div>
+
         </div>
     </AuthenticatedLayout>
 </template>
