@@ -466,7 +466,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function () {
         if (!$provider)
             $provider = new \App\Services\MockKycProvider();
         $result = $provider->verify($data);
-        $supplier = \App\Models\Supplier::firstOrCreate(['contact_email' => auth()->user()->email], ['kyb_status' => 'pending']);
+        $supplier = \App\Models\Supplier::firstOrCreate(['user_id' => auth()->id()], ['contact_email' => auth()->user()->email, 'kyb_status' => 'pending']);
         $kycData = $supplier->kyc_data ?? [];
         $kycData['eid'] = $result;
         $supplier->kyc_data = $kycData;
@@ -951,11 +951,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('verification.notice');
         }
 
-        // Ensure KYC/KYB is completed - REMOVED per user request
-        // $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
-        // if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
-        //    return redirect()->route('onboarding.kyc');
-        // }
+            // Supplier Dashboard - update lookup by user_id
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
+        // Fallback for legacy records (migration step)
+        if (!$supplier) {
+            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            if ($supplier && !$supplier->user_id) {
+                $supplier->user_id = $user->id;
+                $supplier->save();
+            }
+        }
 
         return Inertia::render('Supplier/Dashboard', [
             't' => [
@@ -1003,7 +1008,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Step 2: KYC/KYB completion
             // Step 2: KYC/KYB completion - REMOVED per user request
-            // $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            // $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
+            // if (!$supplier) $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
             // if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
             //    return redirect()->route('onboarding.kyc');
             // }
@@ -1246,9 +1252,19 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/onboarding/kyc', function () {
         $user = auth()->user();
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
+        if (!$supplier) {
+            // Legacy fallback
+             $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+             if ($supplier && !$supplier->user_id) {
+                 $supplier->user_id = $user->id;
+                 $supplier->save();
+             }
+        }
 
-        if ($supplier && !in_array($supplier->kyb_status, ['pending', 'draft', 'rejected', 'approved', 'under_review', 'completed'])) {
+        // If supplier exists and status is anything other than 'pending' (new) or 'draft',
+        // show the status page. This covers: under_review, approved, rejected.
+        if ($supplier && !in_array($supplier->kyb_status, ['pending', 'draft'])) {
             return redirect()->route('supplier.kyc.status');
         }
 
@@ -1258,10 +1274,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/v1/supplier/kyc/save', function (Request $request) {
         $user = auth()->user();
 
-        // Find or create supplier
+        // Find or create supplier linked to this user
         $supplier = \App\Models\Supplier::firstOrCreate(
-            ['contact_email' => $user->email],
-            ['kyb_status' => 'pending']
+            ['user_id' => $user->id],
+            [
+                'contact_email' => $user->email,
+                'kyb_status' => 'pending'
+            ]
         );
 
         // Update supplier data
@@ -1294,8 +1313,11 @@ Route::middleware(['auth'])->group(function () {
 
         // Find or create supplier (avoid 404 on first submit)
         $supplier = \App\Models\Supplier::firstOrCreate(
-            ['contact_email' => $user->email],
-            ['kyb_status' => 'pending']
+            ['user_id' => $user->id],
+            [
+                'contact_email' => $user->email,
+                'kyb_status' => 'pending'
+            ]
         );
 
         // Update supplier status
@@ -1345,14 +1367,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/api/v1/supplier/profile', function () {
         $user = auth()->user();
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
 
         return response()->json(['supplier' => $supplier?->setAppends(['completion_percentage'])]);
     })->name('api.supplier.profile');
 
     Route::get('/api/v1/supplier/documents', function () {
         $user = auth()->user();
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
 
         if (!$supplier) {
             return response()->json(['documents' => []]);
@@ -1370,7 +1392,7 @@ Route::middleware(['auth'])->group(function () {
         $document = \App\Models\Document::findOrFail($id);
 
         // Basic authorization check
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
         if (!$supplier || $document->supplier_id !== $supplier->id) {
             abort(403);
         }
@@ -1385,7 +1407,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/api/v1/supplier/export', function (Request $request) {
         $user = auth()->user();
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
 
         if (!$supplier) {
             return response()->json(['error' => 'Supplier not found'], 404);
@@ -1433,7 +1455,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('api/v1')->group(function () {
         Route::get('/me/offers/active', function () {
             $user = auth()->user();
-            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
             if (!$supplier)
                 return response()->json(['data' => []]);
             $offers = \App\Modules\Offers\Models\Offer::whereHas('invoice', function ($q) use ($supplier) {
@@ -1444,7 +1466,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/me/invoices/recent', function () {
             $user = auth()->user();
-            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
             if (!$supplier)
                 return response()->json(['data' => []]);
             $invoices = \App\Modules\Invoices\Models\Invoice::where('supplier_id', $supplier->id)
@@ -1454,7 +1476,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/me/repayments/schedule', function () {
             $user = auth()->user();
-            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
             if (!$supplier)
                 return response()->json(['data' => []]);
             $expected = \App\Modules\Repayments\Models\ExpectedRepayment::where('supplier_id', $supplier->id)
@@ -1467,7 +1489,7 @@ Route::middleware(['auth'])->group(function () {
         // KYB Checklist for current supplier type
         Route::get('/me/kyb/checklist', function () {
             $user = auth()->user();
-            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
             $type = $supplier?->business_type ?: 'Default';
             $rules = \App\Models\KybChecklist::with('documentType')
                 ->where('is_active', true)

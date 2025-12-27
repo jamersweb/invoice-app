@@ -12,8 +12,8 @@ class Supplier extends Model
         'company_name', 'legal_name', 'tax_registration_number', 'contact_email', 'contact_phone',
         'business_type', 'industry', 'incorporation_date', 'country', 'state_province', 'city',
         'address', 'postal_code', 'website', 'kyb_status', 'grade', 'kyb_notes',
-        'kyb_approved_at', 'kyb_approved_by', 'kyc_data', 'is_active'
-    ];
+        'kyb_approved_at', 'kyb_approved_by', 'kyc_data', 'is_active', 'user_id'
+            ];
 
     protected $casts = [
         'incorporation_date' => 'date',
@@ -35,6 +35,11 @@ class Supplier extends Model
     public function kybApprovedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'kyb_approved_by');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getKybStatusBadgeAttribute(): string
