@@ -11,14 +11,7 @@ const page = usePage();
 const supplier = computed(() => (page.props as any).auth?.supplier);
 
 onMounted(() => {
-    const s = supplier.value;
-    if (s && s.kyb_status !== 'approved') {
-        if (s.kyb_status === 'pending') {
-            router.visit(route('onboarding.kyc'));
-        } else {
-            router.visit(route('supplier.kyc.status'));
-        }
-    }
+    // KYC restriction removed
 });
 
 const props = defineProps<{

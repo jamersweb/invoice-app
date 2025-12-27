@@ -951,11 +951,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('verification.notice');
         }
 
-        // Ensure KYC/KYB is completed
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
-        if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
-            return redirect()->route('onboarding.kyc');
-        }
+        // Ensure KYC/KYB is completed - REMOVED per user request
+        // $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        // if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
+        //    return redirect()->route('onboarding.kyc');
+        // }
 
         return Inertia::render('Supplier/Dashboard', [
             't' => [
@@ -1002,10 +1002,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             }
 
             // Step 2: KYC/KYB completion
-            $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
-            if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
-                return redirect()->route('onboarding.kyc');
-            }
+            // Step 2: KYC/KYB completion - REMOVED per user request
+            // $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+            // if (!$supplier || !in_array($supplier->kyb_status, ['approved'])) {
+            //    return redirect()->route('onboarding.kyc');
+            // }
 
             return redirect()->route('supplier.dashboard');
         }
