@@ -1248,7 +1248,7 @@ Route::middleware(['auth'])->group(function () {
         $user = auth()->user();
         $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
 
-        if ($supplier && in_array($supplier->kyb_status, ['approved', 'under_review'])) {
+        if ($supplier && !in_array($supplier->kyb_status, ['pending', 'draft', 'rejected', 'approved', 'under_review', 'completed'])) {
             return redirect()->route('supplier.kyc.status');
         }
 
