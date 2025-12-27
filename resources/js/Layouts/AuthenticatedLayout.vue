@@ -117,7 +117,7 @@ const mainNav = computed(() => {
             }
         }
         return item;
-    });
+    }).filter(Boolean) as NavItem[];
     return nav;
 });
 const bottomNav = computed(() => navigation.filter(n => n.section === 'bottom'));
@@ -170,7 +170,7 @@ function currentRoute(routeName: string) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-dark-primary">
+    <div class="min-h-screen bg-dark-primary dark">
         <!-- Global Notifications -->
         <Notification />
         <!-- Sidebar -->

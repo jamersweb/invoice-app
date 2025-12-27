@@ -7,7 +7,7 @@ import { Head } from '@inertiajs/vue3';
 <template>
     <Head title="Registration & KYB" />
 
-    <GuestLayout>
+    <GuestLayout widthClass="max-w-[50rem]">
         <template #header>
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-dark-text-primary mb-2">Registration & KYB</h2>

@@ -6,6 +6,7 @@ import AppFooter from '@/Components/AppFooter.vue';
 type CmsMap = Record<string, { key: string, title?: string, body?: string, cta_text?: string, cta_href?: string, image_url?: string }>;
 const page = usePage();
 const cms = computed(() => (page.props as any)?.cms as CmsMap | undefined);
+const user = computed(() => page.props.auth.user);
 onMounted(() => {
   try { fetch(`/api/v1/analytics/pv?path=${encodeURIComponent(location.pathname)}`); } catch { }
 });
@@ -62,14 +63,26 @@ onMounted(() => {
                 risk.</p>
               <p class="text-base sm:text-lg text-slate-400 mb-10 max-w-2xl mx-auto">Our focus is on real transactions,
                 clear structures, and measurable results.</p>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center" bis_skin_checked="1"><a href="/login"
+              <div class="flex flex-col sm:flex-row gap-4 justify-center" bis_skin_checked="1">
+                <a v-if="!user" href="/login"
                   class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 bg-white hover:bg-slate-100 text-slate-900 shadow-2xl text-base sm:text-lg px-8 py-6 rounded-xl font-semibold transition-all hover:scale-105"><svg
                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="lucide lucide-lock w-5 h-5 mr-2">
                     <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>Login</a><a href="/contact" data-discover="true"><button
+                  </svg>Login</a>
+                <a v-else href="/dashboard"
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 bg-white hover:bg-slate-100 text-slate-900 shadow-2xl text-base sm:text-lg px-8 py-6 rounded-xl font-semibold transition-all hover:scale-105"><svg
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-layout-dashboard w-5 h-5 mr-2">
+                    <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                    <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                    <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                    <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                  </svg>My Dashboard</a>
+                <a href="/contact" data-discover="true"><button
                     class="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-10 bg-transparent border-2 border-white/30 hover:border-white/50 text-white shadow-2xl text-base sm:text-lg px-8 py-6 rounded-xl font-semibold transition-all hover:scale-105 w-full sm:w-auto"><svg
                       xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

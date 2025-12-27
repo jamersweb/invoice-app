@@ -2,9 +2,16 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import { Link } from '@inertiajs/vue3';
 
-defineProps<{
-    bg?: 'gradient' | 'dark';
-}>();
+const props = withDefaults(
+    defineProps<{
+        bg?: 'gradient' | 'dark';
+        widthClass?: string;
+    }>(),
+    {
+        bg: 'gradient',
+        widthClass: 'max-w-2xl',
+    }
+);
 </script>
 
 <template>
@@ -32,7 +39,7 @@ defineProps<{
             </div>
         </div>
         <div class="relative" bis_skin_checked="1">
-            <div class="mx-auto max-w-2xl px-6 py-10">
+            <div class="mx-auto px-6 py-10" :class="widthClass">
                 <slot name="header" />
                 <div class="mt-8 space-y-6">
                     <!-- Form Container -->

@@ -4,7 +4,17 @@ import { Head, Link } from '@inertiajs/vue3';
 import Badge from '@/Components/Badge.vue';
 import DarkInput from '@/Components/DarkInput.vue';
 import GradientButton from '@/Components/GradientButton.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { usePage, router } from '@inertiajs/vue3';
+
+const page = usePage();
+const supplier = computed(() => (page.props as any).auth?.supplier);
+
+onMounted(() => {
+    if (supplier.value && supplier.value.kyb_status !== 'approved') {
+        router.visit(route('onboarding.kyc'));
+    }
+});
 
 const props = defineProps<{
     invoices: Array<{

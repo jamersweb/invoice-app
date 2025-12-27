@@ -95,11 +95,7 @@ const submit = () => {
                 A new verification code has been sent to the email address you provided during registration.
             </div>
 
-            <!-- Local Development OTP Display -->
-            <div v-if="otp" class="mb-6 p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg text-center">
-                <p class="text-xs text-purple-300 uppercase tracking-wider font-semibold mb-1">Local Development OTP</p>
-                <p class="text-2xl font-mono font-bold text-white tracking-widest">{{ otp }}</p>
-            </div>
+
 
             <form @submit.prevent="submit" class="space-y-8">
                 <div>

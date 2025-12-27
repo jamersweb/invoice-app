@@ -29,7 +29,7 @@ const loginWithGoogle = () => {
     <div class="mx-auto  py-8 px-4 sm:px-6 lg:px-8">
       <div class="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
         <div class="mb-4 flex items-center justify-between">
-          <div class="text-base font-semibold text-gray-900 dark:text-white">Step 1: Create Your Account</div>
+          <div class="text-base font-semibold text-gray-900 dark:text-white">Create Your Account</div>
           <Link :href="route('login')"
             class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors">
             Sign In
@@ -39,28 +39,28 @@ const loginWithGoogle = () => {
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Full Name</label>
             <input v-model="form.name" type="text" required
-              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-white p-2 text-gray-900 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               placeholder="Enter your full name" />
             <div v-if="form.errors.name" class="text-red-500 text-sm mt-1">{{ form.errors.name }}</div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Email Address</label>
             <input v-model="form.email" type="email" required
-              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-white p-2 text-gray-900 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               placeholder="Enter your email" />
             <div v-if="form.errors.email" class="text-red-500 text-sm mt-1">{{ form.errors.email }}</div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Password</label>
             <input v-model="form.password" type="password" required
-              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-white p-2 text-gray-900 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               placeholder="Create a password" />
             <div v-if="form.errors.password" class="text-red-500 text-sm mt-1">{{ form.errors.password }}</div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Confirm Password</label>
             <input v-model="form.password_confirmation" type="password" required
-              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-white p-2 text-gray-900 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               placeholder="Confirm your password" />
           </div>
           <button type="submit" :disabled="form.processing"

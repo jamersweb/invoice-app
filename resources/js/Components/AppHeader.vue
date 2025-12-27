@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 
 const isMobileMenuOpen = ref(false);
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -46,10 +49,11 @@ const toggleMobileMenu = () => {
           <a href="/how-it-works" class="hover:text-white transition-colors">How it works</a>
           <a href="/faqs" class="hover:text-white transition-colors">FAQs</a>
           <a href="/contact" class="hover:text-white transition-colors">Contact</a>
-          <a href="/login" class="hover:text-white transition-colors">Sign In</a>
+          <a v-if="!user" href="/login" class="hover:text-white transition-colors">Sign In</a>
+          <a v-else href="/dashboard" class="hover:text-white transition-colors">My Dashboard</a>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="/apply"
+          <a v-if="!user" href="/apply"
             class="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Apply Now
           </a>
@@ -111,11 +115,14 @@ const toggleMobileMenu = () => {
                     class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-slate-800">FAQs</a>
                   <a href="/contact"
                     class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-slate-800">Contact</a>
-                  <a href="/login"
+                  <a v-if="!user" href="/login"
                     class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-slate-800">Sign
                     In</a>
+                  <a v-else href="/dashboard"
+                    class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-slate-800">My
+                    Dashboard</a>
                 </div>
-                <div class="py-6">
+                <div class="py-6" v-if="!user">
                   <a href="/apply"
                     class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-white hover:bg-slate-800">Apply
                     Now</a>
