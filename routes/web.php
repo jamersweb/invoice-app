@@ -1040,7 +1040,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/bank', [\App\Http\Controllers\BankAccountController::class, 'store'])->name('bank.store');
     Route::get('/invoices', function () {
         $user = auth()->user();
-        $supplier = \App\Models\Supplier::where('contact_email', $user->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
         $invoices = [];
         if ($supplier) {
             $invoices = \App\Modules\Invoices\Models\Invoice::where('user_id', $user->id)
@@ -1065,7 +1065,7 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('invoices.index');
     Route::get('/invoices/submit', function () {
-        $supplier = \App\Models\Supplier::where('contact_email', auth()->user()->email)->first();
+        $supplier = \App\Models\Supplier::where('user_id', auth()->id())->first();
         return Inertia::render('Invoices/SubmitInvoice', [
             'templates' => AgreementTemplate::all(['id', 'name', 'version']),
             'hasSignedAgreement' => Agreement::where('status', 'signed')

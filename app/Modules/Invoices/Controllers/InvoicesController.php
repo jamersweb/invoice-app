@@ -20,7 +20,7 @@ class InvoicesController extends Controller
 
         // Get supplier for the logged-in user
         $user = $request->user();
-        $supplier = Supplier::where('contact_email', $user->email)->first();
+        $supplier = Supplier::where('user_id', $user->id)->first();
 
         // Check if supplier exists
         if (!$supplier) {
@@ -62,7 +62,7 @@ class InvoicesController extends Controller
 
         // Get supplier for the logged-in user
         $user = $request->user();
-        $supplier = Supplier::where('contact_email', $user->email)->first();
+        $supplier = Supplier::where('user_id', $user->id)->first();
 
         // Check if supplier exists
         if (!$supplier) {
