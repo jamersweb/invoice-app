@@ -126,7 +126,7 @@ const paymentStats = computed(() => store.paymentStats || {
             <!-- KPIs -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <KpiCard v-for="(k, i) in kpis" :key="i" :title="k.title" :value="k.value" :icon="k.icon"
-                    :color="k.color" :trend="k.trend" :delta="k.delta" />
+                    :color="k.color" :trend="k.trend" />
             </div>
 
             <!-- Show message if no KPIs available -->
