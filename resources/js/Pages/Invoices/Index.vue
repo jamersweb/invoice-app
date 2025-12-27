@@ -11,8 +11,13 @@ const page = usePage();
 const supplier = computed(() => (page.props as any).auth?.supplier);
 
 onMounted(() => {
-    if (supplier.value && supplier.value.kyb_status !== 'approved') {
-        router.visit(route('onboarding.kyc'));
+    const s = supplier.value;
+    if (s && s.kyb_status !== 'approved') {
+        if (s.kyb_status === 'pending') {
+            router.visit(route('onboarding.kyc'));
+        } else {
+            router.visit(route('supplier.kyc.status'));
+        }
     }
 });
 
