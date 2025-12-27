@@ -11,7 +11,10 @@ import { onMounted, computed, ref, watch } from 'vue';
 const store = useDashboardStore();
 const from = ref<string>('');
 const to = ref<string>('');
-onMounted(() => store.fetchMetrics());
+onMounted(() => {
+    store.fetchMetrics();
+    store.fetchPaymentStats();
+});
 watch([from, to], () => {
     const qs = new URLSearchParams();
     if (from.value) qs.set('from', from.value);
@@ -42,20 +45,20 @@ const kpis = computed(() => {
     const overdue = k?.overdue || 0;
 
     return [
-        { title: t?.total_funded || 'Total Funded', value: fmt(totalFunded), icon: '💸', color: 'blue' as const, trend: 'up' as const, delta: '+12.5%' },
-        { title: t?.total_repaid || 'Total Repaid', value: fmt(totalRepaid), icon: '🏦', color: 'green' as const, trend: 'up' as const, delta: '+8.2%' },
-        { title: t?.outstanding || 'Outstanding', value: fmt(outstanding), icon: '📉', color: 'yellow' as const, trend: 'neutral' as const, delta: '0.0%' },
-        { title: t?.overdue || 'Overdue', value: fmt(overdue), icon: '⏰', color: 'red' as const, trend: 'down' as const, delta: '-5.1%' },
+        { title: t?.total_funded || 'Total Funded', value: fmt(totalFunded), icon: '💸', color: 'blue' as const, trend: 'neutral' as const },
+        { title: t?.total_repaid || 'Total Repaid', value: fmt(totalRepaid), icon: '🏦', color: 'green' as const, trend: 'neutral' as const },
+        { title: t?.outstanding || 'Outstanding', value: fmt(outstanding), icon: '📉', color: 'yellow' as const, trend: 'neutral' as const },
+        { title: t?.overdue || 'Overdue', value: fmt(overdue), icon: '⏰', color: 'red' as const, trend: 'neutral' as const },
     ];
 });
 
-// Mock payment statistics data
-const paymentStats = computed(() => ({
-    total: 100000,
-    paid: 65000,
-    partiallyPaid: 20000,
-    overdue: 15000,
-}));
+// Real payment statistics data from store
+const paymentStats = computed(() => store.paymentStats || {
+    total: 0,
+    paid: 0,
+    partiallyPaid: 0,
+    overdue: 0,
+});
 </script>
 
 <template>

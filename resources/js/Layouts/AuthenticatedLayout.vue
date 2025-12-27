@@ -69,9 +69,9 @@ const navigation: NavItem[] = [
     // Main navigation - Dashboard link will be set dynamically based on role
     { name: 'Dashboard', href: '', icon: '📊', section: 'main' },
     { name: 'Invoices', href: 'invoices.index', icon: '🧾', section: 'main' },
-    // { name: 'KYC', href: 'onboarding.kyc', icon: '🪪', section: 'main' },
+    { name: 'KYC', href: 'onboarding.kyc', icon: '🪪', section: 'main' },
     { name: 'Chat', href: 'chat.index', icon: '💬', section: 'main' },
-    // { name: 'Agreements', href: 'agreements.index', icon: '📜', section: 'main' },
+    { name: 'Agreements', href: 'agreements.index', icon: '📜', section: 'main' },
 
 
     // Admin routes - organized as shown in images
@@ -91,17 +91,17 @@ const navigation: NavItem[] = [
     // { name: 'Funding Logs', href: 'admin.funding-logs', icon: '💵', section: 'admin' },
     // { name: 'Audit Log', href: 'admin.audit-log', icon: '📋', section: 'admin' },
 
-    // // Forfaiting routes - grouped separately
-    // { name: 'Dashboard', href: 'forfaiting.dashboard', icon: '📈', section: 'forfaiting' },
-    // { name: 'Investments', href: 'forfaiting.investments.index', icon: '💼', section: 'forfaiting' },
-    // { name: 'Transactions', href: 'forfaiting.transactions.index', icon: '💳', section: 'forfaiting' },
-    // { name: 'Profit Allocations', href: 'forfaiting.profit-allocations.index', icon: '💰', section: 'forfaiting' },
-    // { name: 'Expenses', href: 'forfaiting.expenses.index', icon: '💸', section: 'forfaiting' },
-    // { name: 'Customers', href: 'forfaiting.customers.index', icon: '👥', section: 'forfaiting' },
-    // { name: 'Investors', href: 'forfaiting.investors.index', icon: '🤝', section: 'forfaiting' },
-    // { name: 'Analytics', href: 'forfaiting.analytics.index', icon: '📊', section: 'forfaiting' },
-    // { name: 'Contact Requests', href: 'forfaiting.contact-requests.index', icon: '📧', section: 'forfaiting' },
-    // { name: 'Notifications', href: 'forfaiting.notifications.index', icon: '🔔', section: 'forfaiting' },
+    // Forfaiting routes - grouped separately
+    { name: 'Dashboard', href: 'forfaiting.dashboard', icon: '📈', section: 'forfaiting' },
+    { name: 'Investments', href: 'forfaiting.investments.index', icon: '💼', section: 'forfaiting' },
+    { name: 'Transactions', href: 'forfaiting.transactions.index', icon: '💳', section: 'forfaiting' },
+    { name: 'Profit Allocations', href: 'forfaiting.profit-allocations.index', icon: '💰', section: 'forfaiting' },
+    { name: 'Expenses', href: 'forfaiting.expenses.index', icon: '💸', section: 'forfaiting' },
+    { name: 'Customers', href: 'forfaiting.customers.index', icon: '👥', section: 'forfaiting' },
+    { name: 'Investors', href: 'forfaiting.investors.index', icon: '🤝', section: 'forfaiting' },
+    { name: 'Analytics', href: 'forfaiting.analytics.index', icon: '📊', section: 'forfaiting' },
+    { name: 'Contact Requests', href: 'forfaiting.contact-requests.index', icon: '📧', section: 'forfaiting' },
+    { name: 'Notifications', href: 'forfaiting.notifications.index', icon: '🔔', section: 'forfaiting' },
 ];
 
 const mainNav = computed(() => {
@@ -115,6 +115,10 @@ const mainNav = computed(() => {
             } else {
                 item.href = 'supplier.dashboard'; // Default fallback
             }
+        }
+        // Hide KYC and Agreements from Admin
+        if (isAdmin.value && (item.name === 'KYC' || item.name === 'Agreements')) {
+            return null;
         }
         return item;
     }).filter(Boolean) as NavItem[];

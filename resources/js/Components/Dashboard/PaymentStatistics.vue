@@ -75,7 +75,7 @@ const overdueDashOffset = computed(() => {
         </svg>
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="text-center">
-            <div class="text-2xl font-bold text-dark-text-primary">{{ total.toLocaleString() }}</div>
+            <div class="text-2xl font-bold text-dark-text-primary">{{ total.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }}</div>
             <div class="text-xs text-dark-text-muted">Total</div>
           </div>
         </div>
@@ -102,15 +102,15 @@ const overdueDashOffset = computed(() => {
     <div class="mt-6 grid grid-cols-3 gap-4 pt-4 border-t border-dark-border">
       <div>
         <div class="text-xs text-dark-text-muted mb-1">Invoiced</div>
-        <div class="text-lg font-semibold text-dark-text-primary">{{ total.toLocaleString() }}</div>
+        <div class="text-lg font-semibold text-dark-text-primary">{{ total.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }}</div>
       </div>
       <div>
         <div class="text-xs text-dark-text-muted mb-1">Received</div>
-        <div class="text-lg font-semibold text-dark-text-primary">{{ paid.toLocaleString() }}</div>
+        <div class="text-lg font-semibold text-dark-text-primary">{{ paid.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }}</div>
       </div>
       <div>
         <div class="text-xs text-dark-text-muted mb-1">Outstanding</div>
-        <div class="text-lg font-semibold text-dark-text-primary">{{ (total - paid).toLocaleString() }}</div>
+        <div class="text-lg font-semibold text-dark-text-primary">{{ (total - paid).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }}</div>
       </div>
     </div>
   </div>

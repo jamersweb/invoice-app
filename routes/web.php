@@ -1453,6 +1453,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Supplier-facing dashboard widgets (for current user)
     Route::prefix('api/v1')->group(function () {
+        Route::get('/dashboard/metrics', [\App\Http\Controllers\Supplier\DashboardController::class, 'metrics'])->name('api.dashboard.metrics');
+        Route::get('/dashboard/payment-stats', [\App\Http\Controllers\Supplier\DashboardController::class, 'paymentStats'])->name('api.dashboard.payment_stats');
+
         Route::get('/me/offers/active', function () {
             $user = auth()->user();
             $supplier = \App\Models\Supplier::where('user_id', $user->id)->first();
